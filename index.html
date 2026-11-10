@@ -296,6 +296,58 @@
   .catbar { display: block; height: 6px; background: var(--accent); border-radius: 3px; min-width: 2px; }
   .cat-idr { font-size: 14px; color: var(--muted); white-space: nowrap; flex: none; }
 
+  /* Donut */
+  .dchips { position: relative; margin-top: 2px; }
+  .dchip {
+    flex: 0 0 auto;
+    min-width: 56px;
+    min-height: 44px;
+    padding: 0 16px;
+    border: 1px solid var(--rule);
+    border-radius: 22px;
+    font-size: 15px;
+    white-space: nowrap;
+  }
+  .dchip[aria-pressed="true"] { color: var(--paper); background: var(--accent); border-color: var(--accent); font-weight: 600; }
+  .dn-head { margin-top: 12px; font-size: 15px; font-weight: 600; }
+  .dn-fig { position: relative; width: 200px; height: 200px; margin: 16px auto 12px; }
+  .dn-fig svg { display: block; width: 200px; height: 200px; }
+  .dn-slice { stroke: var(--paper); stroke-width: 2px; stroke-linejoin: round; }
+  .dn-centre {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    line-height: 1.2;
+    pointer-events: none;
+  }
+  .dn-c-cur { font-size: 13px; color: var(--muted); }
+  .dn-c-eur { font-size: 22px; font-weight: 600; letter-spacing: -0.01em; white-space: nowrap; }
+  .dn-c-idr { margin-top: 3px; font-size: 13px; color: var(--muted); white-space: nowrap; }
+  .dn-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    width: calc(100% + 16px);
+    margin: 0 -8px;
+    min-height: 44px;
+    padding: 9px 8px;
+    border-radius: 8px;
+  }
+  .dn-tap:active { background: var(--tint); }
+  .dn-sw { flex: none; width: 12px; height: 12px; border-radius: 3px; }
+  .dn-sw-none { border: 1.5px solid var(--muted); }
+  .dn-words { flex: 1; min-width: 0; }
+  .dn-name { font-weight: 500; }
+  .dn-share { margin-left: 6px; font-size: 14px; color: var(--muted); white-space: nowrap; }
+  .dn-amts { flex: none; text-align: right; }
+  .dn-eur { display: block; font-weight: 500; white-space: nowrap; }
+  .dn-idr { display: block; font-size: 13px; color: var(--muted); white-space: nowrap; }
+  .dn-empty { padding: 16px 0 4px; font-size: 15px; color: var(--muted); }
+
   /* Icons */
   .icon { display: block; flex: none; width: 20px; height: 20px; color: var(--muted); }
   .cat-name-box { display: flex; align-items: center; gap: 8px; min-width: 0; }
@@ -800,6 +852,7 @@
 
   @media (hover: hover) {
     .chip:hover, .barcol:hover, .cat:hover { background: var(--tint); }
+    .dn-tap:hover, .dchip[aria-pressed="false"]:hover { background: var(--tint); }
     .panel-action:hover, .back:hover { opacity: 0.8; }
   }
 </style>
@@ -1146,8 +1199,10 @@ function tabIconPaths_(tab) {
   return ['M3.5 6.5h17v11h-17z', 'M14.5 12a2.5 2.5 0 1 1-5 0a2.5 2.5 0 1 1 5 0z', 'M6.5 9.5v5', 'M17.5 9.5v5'];
 }
 
+var SVG_NS = 'http://www.w3.org/2000/svg';
+
 function svgIcon_(paths) {
-  var ns = 'http://www.w3.org/2000/svg';
+  var ns = SVG_NS;
   var svg = document.createElementNS(ns, 'svg');
   svg.setAttribute('class', 'icon');
   svg.setAttribute('viewBox', '0 0 24 24');
@@ -1297,6 +1352,7 @@ function lockOut() {
   DATA = null;
   VIEW = { screen: 'home', key: null };
   FILTER = null;
+  DONUT_KEY = null;
   EDIT = null;
   TOAST = null;
   FIRST_LOAD = true;
@@ -1514,6 +1570,7 @@ function renderHome() {
   });
 
   renderBalance(section(body));
+  renderDonut_(section(body, 'Where the money goes'));
   var barsEl = renderBars(section(body, 'Month by month, in euros'));
 
   if (DATA.notCountedYet > 0) {
@@ -1538,6 +1595,246 @@ function renderHome() {
   HOME_STATUS = add(foot, 'p', 'small');
 
   barsEl.scrollLeft = barsEl.scrollWidth; // newest month in view when there are many
+}
+
+// ---- where the money goes (home donut, ruling R65) ---------------------------------
+var DONUT_KEY = null; // the chip chosen on the home screen, kept for this visit only; null is the current month
+
+// Six type colours, by a type's rank in All, then Other (R69): apricot, terracotta, dusty teal, sand, brick, sage,
+// warm grey. Each is at least 3:1 on --paper and every pair is at least 15 apart in OKLab for normal vision, since a
+// month's own size order can put any two side by side. The largest types get the most distinct ones.
+function donutColors_() {
+  return ['#da720d', '#781d00', '#136c7a', '#765d00', '#b93d42', '#22462a', '#8c857f'];
+}
+
+// Every month added up per type, in cents and Rp, largest first (same order rule as Calc.gs).
+function donutAll_(months) {
+  var by = Object.create(null);
+  var list = [];
+  var totalCents = 0;
+  var totalIdr = 0;
+  months.forEach(function (m) {
+    totalCents += Math.round(m.totalEur * 100);
+    totalIdr += m.totalIdr;
+    m.categories.forEach(function (c) {
+      if (!by[c.name]) { by[c.name] = { name: c.name, cents: 0, idr: 0 }; list.push(by[c.name]); }
+      by[c.name].cents += Math.round(c.eur * 100);
+      by[c.name].idr += c.idr;
+    });
+  });
+  var cats = list.map(function (c) {
+    return { name: c.name, eur: c.cents / 100, idr: c.idr, share: totalCents > 0 ? Math.round(c.cents / totalCents * 10000) / 10000 : 0 };
+  });
+  cats.sort(function (a, b) {
+    if (b.eur !== a.eur) return b.eur - a.eur;
+    return a.name < b.name ? -1 : (a.name > b.name ? 1 : 0);
+  });
+  return { cats: cats, totalCents: totalCents, totalIdr: totalIdr };
+}
+
+// R68: a type's colour is its rank among the top 6 of All, so it is the same in every month.
+function donutColourMap_(allCats) {
+  var colours = donutColors_();
+  var map = Object.create(null);
+  var n = 0;
+  allCats.forEach(function (c) {
+    if (n < 6 && c.eur > 0 && c.name !== 'Other') { map[c.name] = colours[n]; n++; }
+  });
+  return map;
+}
+
+function donutChipLabel_(key, todayIso) {
+  return key.slice(0, 4) === todayIso.slice(0, 4) ? monthName(key).slice(0, 3) : shortMonth(key);
+}
+
+// One month (by key) or 'all': the header, the totals and the list rows. Month numbers are the payload's own,
+// so they match the month screen; All adds every month up in cents.
+function donutModel_(months, key, todayIso) {
+  var cur = todayIso.slice(0, 7);
+  var cats = [];
+  var totalCents = 0;
+  var totalIdr = 0;
+  var head;
+  var emptyText;
+  var all = donutAll_(months);
+  var colourOf = donutColourMap_(all.cats);
+  if (key === 'all') {
+    cats = all.cats;
+    totalCents = all.totalCents;
+    totalIdr = all.totalIdr;
+    head = months.length ? 'All, since ' + shortMonth(months[months.length - 1].key) : 'All';
+    emptyText = 'Nothing spent yet.';
+  } else {
+    var m = null;
+    for (var i = 0; i < months.length; i++) if (months[i].key === key) m = months[i];
+    var part = m ? partialLabel(m, todayIso) : (key === cur ? 'so far' : '');
+    if (m) {
+      cats = m.categories;
+      totalCents = Math.round(m.totalEur * 100);
+      totalIdr = m.totalIdr;
+    }
+    head = monthName(key) + ' ' + key.slice(0, 4) + (part ? ', ' + part : '');
+    emptyText = key === cur ? 'Nothing spent yet this month.' : 'Nothing spent this month.';
+  }
+  var colours = donutColors_();
+  var own = [];
+  var rest = [];
+  var tail = [];
+  // In this view's size order: a top 6 type of All keeps its slice and colour, every other type goes into Other.
+  cats.forEach(function (c) {
+    if (c.name === 'Other') rest.push(c); // a real Other always joins the one Other row, whatever its sign
+    else if (!(c.eur > 0)) tail.push(c);
+    else if (colourOf[c.name]) own.push(c);
+    else rest.push(c);
+  });
+  var rows = own.map(function (c) {
+    return { name: c.name, eur: c.eur, idr: c.idr, share: c.share, color: colourOf[c.name] };
+  });
+  if (rest.length) {
+    var oc = 0;
+    var oi = 0;
+    rest.forEach(function (c) { oc += Math.round(c.eur * 100); oi += c.idr; });
+    rows.push({ name: 'Other', eur: oc / 100, idr: oi, share: totalCents > 0 ? Math.round(oc / totalCents * 10000) / 10000 : 0, color: oc > 0 ? colours[6] : null });
+  }
+  // A type that came out at zero or below (refunds) has no slice; it is still listed, without a colour.
+  tail.forEach(function (c) { rows.push({ name: c.name, eur: c.eur, idr: c.idr, share: c.share, color: null }); });
+  return {
+    key: key, head: head, emptyText: emptyText, totalEur: totalCents / 100, totalIdr: totalIdr, rows: rows,
+    empty: !rows.some(function (r) { return r.color; })
+  };
+}
+
+// Start and end of each slice in degrees, clockwise from the top. The last one ends at exactly 360.
+function donutSlices_(values) {
+  var total = 0;
+  values.forEach(function (v) { total += v; });
+  var at = 0;
+  return values.map(function (v, i) {
+    var start = at;
+    at = i === values.length - 1 ? 360 : at + v / total * 360;
+    return { start: start, end: at };
+  });
+}
+
+function donutPoint_(deg, rad, c) {
+  var a = deg * Math.PI / 180;
+  return String(Math.round((c + rad * Math.sin(a)) * 100) / 100) + ' ' + String(Math.round((c - rad * Math.cos(a)) * 100) / 100);
+}
+
+// An annular sector from start to end degrees, outer radius R, inner radius r, centred on (c, c). Each arc is
+// drawn in two halves split at the midpoint, so no arc ever starts where it ends (SVG drops such an arc, and a
+// slice of nearly 360 degrees would fill the hole).
+function donutPath_(start, end, R, r, c) {
+  var mid = (start + end) / 2;
+  var outer = ' A ' + R + ' ' + R + ' 0 0 1 ';
+  var inner = ' A ' + r + ' ' + r + ' 0 0 0 ';
+  return 'M ' + donutPoint_(start, R, c) + outer + donutPoint_(mid, R, c) + outer + donutPoint_(end, R, c) +
+    ' L ' + donutPoint_(end, r, c) + inner + donutPoint_(mid, r, c) + inner + donutPoint_(start, r, c) + ' Z';
+}
+
+// Brings the chosen chip into the visible part of its sideways-scrolling row (no animation).
+function donutReveal_(row, el) {
+  var left = el.offsetLeft;
+  var w = el.offsetWidth;
+  var view = row.clientWidth;
+  if (typeof left !== 'number' || typeof w !== 'number' || !view) return;
+  var pad = 20;
+  if (left - pad < row.scrollLeft) row.scrollLeft = Math.max(0, left - pad);
+  else if (left + w + pad > row.scrollLeft + view) row.scrollLeft = left + w + pad - view;
+}
+
+function renderDonut_(s) {
+  var today = DATA.today;
+  var cur = today.slice(0, 7);
+  var keys = DATA.months.map(function (m) { return m.key; });
+  if (keys.indexOf(cur) < 0) { keys.push(cur); keys.sort().reverse(); }
+  var chosen = DONUT_KEY === 'all' || keys.indexOf(DONUT_KEY) >= 0 ? DONUT_KEY : cur;
+  var row = add(s, 'div', 'scroller chips dchips');
+  row.setAttribute('role', 'group');
+  row.setAttribute('aria-label', 'Choose a month, or all months');
+  var chips = [];
+  keys.concat(['all']).forEach(function (k) {
+    var c = btn(row, 'dchip', k === 'all' ? 'All' : donutChipLabel_(k, today), function () {
+      DONUT_KEY = k;
+      chosen = k;
+      paint();
+    });
+    c.setAttribute('aria-label', k === 'all' ? 'All months' : monthName(k) + ' ' + k.slice(0, 4));
+    chips.push({ key: k, el: c });
+  });
+  var body = add(s, 'div', 'dn-body');
+  function paint() {
+    chips.forEach(function (x) {
+      x.el.setAttribute('aria-pressed', x.key === chosen ? 'true' : 'false');
+      if (x.key === chosen) donutReveal_(row, x.el);
+    });
+    body.textContent = '';
+    drawDonut_(body, donutModel_(DATA.months, chosen, today));
+  }
+  paint();
+}
+
+function drawDonut_(body, model) {
+  add(body, 'p', 'dn-head', model.head);
+  if (model.empty) {
+    add(body, 'p', 'dn-empty', model.emptyText);
+    return;
+  }
+  var open = model.key === 'all' ? null : function () { goMonth(model.key); };
+  var parts = model.rows.filter(function (r) { return r.color; });
+  var fig = add(body, 'div', 'dn-fig');
+  var svg = document.createElementNS(SVG_NS, 'svg');
+  svg.setAttribute('viewBox', '0 0 200 200');
+  svg.setAttribute('width', '200');
+  svg.setAttribute('height', '200');
+  svg.setAttribute('role', 'img');
+  svg.setAttribute('focusable', 'false');
+  svg.setAttribute('aria-label', 'Where the money goes, ' + model.head + ': ' + parts.slice(0, 3).map(function (r) {
+    return r.name + ' ' + shareText(r.share);
+  }).join(', ') + '.');
+  fig.appendChild(svg);
+  var mark;
+  var spans = donutSlices_(parts.map(function (r) { return r.eur; }));
+  var whole = -1; // a part of 359.5 degrees or more is drawn as the full ring; the rest would vanish under the gaps
+  spans.forEach(function (a, i) { if (a.end - a.start >= 359.5) whole = i; });
+  if (whole >= 0) {
+    mark = document.createElementNS(SVG_NS, 'circle');
+    mark.setAttribute('class', 'dn-ring');
+    mark.setAttribute('cx', '100');
+    mark.setAttribute('cy', '100');
+    mark.setAttribute('r', '83');
+    mark.setAttribute('fill', 'none');
+    mark.setAttribute('stroke', parts[whole].color);
+    mark.setAttribute('stroke-width', '26');
+    if (open) mark.addEventListener('click', open);
+    svg.appendChild(mark);
+  } else {
+    spans.forEach(function (a, i) {
+      mark = document.createElementNS(SVG_NS, 'path');
+      mark.setAttribute('class', 'dn-slice');
+      mark.setAttribute('d', donutPath_(a.start, a.end, 96, 70, 100));
+      mark.setAttribute('fill', parts[i].color);
+      if (open) mark.addEventListener('click', open);
+      svg.appendChild(mark);
+    });
+  }
+  var mid = add(fig, 'div', 'dn-centre');
+  add(mid, 'span', 'dn-c-cur', 'EUR');
+  add(mid, 'span', 'dn-c-eur', (model.totalEur < 0 ? '-' : '') + fixed2(model.totalEur));
+  add(mid, 'span', 'dn-c-idr', fmtIdr(model.totalIdr));
+  var list = add(body, 'div', 'dn-list');
+  model.rows.forEach(function (r) {
+    var line = open ? btn(list, 'dn-row dn-tap', null, open) : add(list, 'div', 'dn-row');
+    var sw = add(line, 'span', r.color ? 'dn-sw' : 'dn-sw dn-sw-none');
+    sw.setAttribute('aria-hidden', 'true');
+    if (r.color) sw.style.background = r.color;
+    var words = add(line, 'span', 'dn-words');
+    add(words, 'span', 'dn-name', r.name);
+    add(words, 'span', 'dn-share', shareText(r.share));
+    var amts = add(line, 'span', 'dn-amts');
+    add(amts, 'span', 'dn-eur', fmtEur(r.eur));
+    add(amts, 'span', 'dn-idr', fmtIdr(r.idr));
+  });
 }
 
 function renderBalance(s) {
@@ -2355,6 +2652,11 @@ var QUEUE_UNSAVED = false; // the last kl.queue write failed: the queue lives on
 var INFLIGHT = '';       // uid of the op on its way. Ops go strictly one at a time; this outlives a lock-out.
 var RETRY_TIMER = null;
 var RETRY_N = 0;         // failed sends in a row, for the backoff
+// R70: SERVER replies in a row for the queue head (HEAD_FAIL_UID). After HEAD_FAIL_MAX the op is dropped, so one op
+// the server can never take does not hold the queue forever. TIMEOUT, UNREACHED and offline never count.
+var HEAD_FAIL_UID = '';
+var HEAD_FAIL_N = 0;
+var HEAD_FAIL_MAX = 8;
 // R46: SETTLE_N counts settled ops. A read remembers SETTLE_N when it is sent (READ_N); ops settled while it is
 // on its way are kept in SETTLED and applied again onto it when it lands, so an older read never undoes them.
 var SETTLE_N = 0;
@@ -2604,6 +2906,16 @@ function listsQueue_(input) {
     if (!op.fields) op.fields = {};
     if (!op.fields.who && whoAmI_()) op.fields.who = whoAmI_();
   }
+  // R66b: an add (both lists) says which phone it came from, only as exactly Kev or Lili; nothing else
+  // ever carries from (the server refuses it on any other op, and any other value).
+  if (op.fields) delete op.fields.from;
+  if (op.op === 'add') {
+    var me = whoAmI_();
+    if (me === 'Kev' || me === 'Lili') {
+      if (!op.fields) op.fields = {};
+      op.fields.from = me;
+    }
+  }
   if (op.op === 'edit' || op.op === 'tick' || op.op === 'delete') {
     var cur = listsItem_(op.list, op.id);
     op.fp = (typeof input.fp === 'string' && input.fp) ? input.fp : (cur ? cur.fp : '');
@@ -2694,6 +3006,7 @@ function listsFlush_() {
   WAITING_READ = false;
   var op = QUEUE[0];
   var sent = JSON.parse(JSON.stringify(op));
+  if (HEAD_FAIL_UID !== op.uid) { HEAD_FAIL_UID = op.uid; HEAD_FAIL_N = 0; } // a new head starts from zero
   INFLIGHT = op.uid;
   var session = SESSION;
   listsCall_('listOp', listsBody_(sent)).then(function (res) {
@@ -2707,6 +3020,8 @@ function listsFlush_() {
     var code = err ? err.code : '';
     if (code === 'NO_SESSION') { lockOut(); return; }
     if (code === 'BAD_REQUEST') { listsRefused_(sent, false); return; }
+    // R70: a server that fails this op 8 times in a row will not take it; it goes, so the ops behind it can.
+    if (code === 'SERVER' && HEAD_FAIL_UID === sent.uid && ++HEAD_FAIL_N >= HEAD_FAIL_MAX) { listsRefused_(sent, false); return; }
     listsRetryLater_(); // TIMEOUT, UNREACHED, SERVER, NOT_CONFIGURED: every op is safe to send again
   });
 }
@@ -2733,6 +3048,15 @@ function listsReply_(op, res) {
     listsRecord_(op, res);
     listsWaitFor_(op);
     listsDone_(op, true);
+    return;
+  }
+  // R70 deploy-order safety net: a server from before R66b refuses an add that says which phone it came from. The
+  // add goes once more without from (same id, so it can never duplicate); only that answer is final.
+  if (res.invalid && op.op === 'add' && op.fields && Object.prototype.hasOwnProperty.call(op.fields, 'from')) {
+    listsQueueChange_(function (arr) {
+      arr.forEach(function (q) { if (q.uid === op.uid && q.fields) delete q.fields.from; });
+    });
+    listsFlush_();
     return;
   }
   if (res.invalid || res.capped) { listsRefused_(op, !!res.capped); return; }
@@ -2809,6 +3133,8 @@ function listsRemove_(base, list, id) {
 function listsDone_(op, refresh) {
   listsQueueRemove_(op.uid);
   RETRY_N = 0;
+  HEAD_FAIL_UID = '';
+  HEAD_FAIL_N = 0;
   listsSaveCache_();
   listsRebuild_();
   if (refresh) listsLoad_(true);
@@ -2971,6 +3297,24 @@ function todoValidDay_(v) {
   return typeof v === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(v) && isoAddDays_(v, 0) === v;
 }
 
+// The Bali day ('yyyy-MM-dd') at ms on the phone's clock: Asia/Makassar is UTC+8 all year (no DST). '' for a bad clock.
+function baliDay_(ms) {
+  var d = new Date(Number(ms) + 8 * 3600000);
+  if (isNaN(d.getTime())) return '';
+  var m = d.getUTCMonth() + 1;
+  var day = d.getUTCDate();
+  return d.getUTCFullYear() + '-' + (m < 10 ? '0' : '') + m + '-' + (day < 10 ? '0' : '') + day;
+}
+
+// R70: the page's today, the later of the lists' server day (maybe from the cache) and the Bali day of the phone's
+// clock. A cache from yesterday moves on at Bali midnight; a phone clock behind the server never moves it back.
+function listsToday_(lists) {
+  var server = lists && todoValidDay_(lists.today) ? lists.today : '';
+  var phone = baliDay_(Date.now());
+  if (!todoValidDay_(phone)) return server;
+  return phone > server ? phone : server;
+}
+
 // 'Fri 14'; the month is added when the day is not in today's month: 'Tue 1 Dec'.
 function todoDayLabel_(iso, today) {
   var days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
@@ -2994,11 +3338,20 @@ function todoWho_(who) {
   return (who === 'Kev' || who === 'Lili' || who === 'Couple') ? who : '';
 }
 
-// '5 min' for a quick item, 'First step: ...' for a bigger one, else nothing.
+// The first step still worth offering, or ''. R70: an item whose text already is its first step (it was made
+// smaller to it) is already small: no chip, never named by the note, no "Make it smaller".
+function todoStep_(it) {
+  var step = String((it && it.firstStep) || '');
+  if (!step || foldKey_(it.text) === foldKey_(step)) return '';
+  return step;
+}
+
+// '5 min' for a quick item, 'First step: ...' for a bigger one that is not already small, else nothing.
 function todoEffortText_(it) {
   var mins = Number(it.minutes);
   if (it.kind === 'quick') return (isFinite(mins) && mins > 0) ? mins + ' min' : '';
-  if (it.kind === 'bigger' && it.firstStep) return 'First step: ' + it.firstStep;
+  var step = todoStep_(it);
+  if (it.kind === 'bigger' && step) return 'First step: ' + step;
   return '';
 }
 
@@ -3064,20 +3417,24 @@ function todoSections_(items, today) {
   return out;
 }
 
-// The one item the note names: of those that waited 7 days or more, the oldest quick one, else the oldest.
+// The one item the note names: of those that waited 7 days or more, the oldest quick one, else the oldest. An item
+// already made small (todoStep_) is never named (R70).
 function todoNotePick_(items) {
-  var waited = (items || []).filter(function (it) { return (Number(it.ageDays) || 0) >= 7; }).sort(todoCmpAge_);
+  var waited = (items || []).filter(function (it) {
+    return (Number(it.ageDays) || 0) >= 7 && !(it.firstStep && !todoStep_(it));
+  }).sort(todoCmpAge_);
   for (var i = 0; i < waited.length; i++) if (waited[i].kind === 'quick') return waited[i];
   return waited[0] || null;
 }
 
 // The note as [lead, rest]: '<text> has waited a while.' (a trailing punctuation mark of the text dropped) and the
-// first step and minutes when known, else ''.
+// first step and minutes when known, else ''. Minutes only for a quick item: a bigger item's minutes are the
+// whole task, not its first step (R70).
 function todoNoteParts_(it) {
   var lead = String(it.text).replace(/[\s.!?,;:\u2026]+$/, '') + ' has waited a while.';
   var mins = Number(it.minutes);
-  var hasMins = isFinite(mins) && mins > 0;
-  var step = String(it.firstStep || '').replace(/[.\s]+$/, '');
+  var hasMins = it.kind === 'quick' && isFinite(mins) && mins > 0;
+  var step = todoStep_(it).replace(/[.\s]+$/, '');
   var rest = '';
   if (step) rest = 'First step: ' + step + (hasMins ? ', about ' + mins + ' min.' : '.');
   else if (hasMins) rest = 'About ' + mins + ' min.';
@@ -3196,7 +3553,8 @@ function todoPause_(until) {
 function todoPausedUntil_(lists, me) {
   var p = lists && lists.prefs && lists.prefs[me];
   var u = p ? p.pausedUntil : '';
-  return (todoIsDay_(u) && todoIsDay_(lists.today) && u >= lists.today) ? u : '';
+  var today = listsToday_(lists);
+  return (todoIsDay_(u) && todoIsDay_(today) && u >= today) ? u : '';
 }
 
 // What the screen shows: the open items with the struck ones back in their places, Mine applied, in sections.
@@ -3220,7 +3578,7 @@ function todoView_(lists, me, mineOnly) {
     all = todoMine_(all, me);
     done = todoMine_(done, me);
   }
-  var today = todoIsDay_(lists.today) ? lists.today : '';
+  var today = listsToday_(lists);
   var sections = todoSections_(all, today);
   var dueToday = sections.today.filter(function (it) { return !TODO_STRUCK[it.id]; }).length;
   return { today: today, sections: sections, done: done, count: all.length, dueToday: dueToday };
@@ -3361,7 +3719,7 @@ function todoRow_(parent, it, today, where) {
       btn(menu, 'btn-plain', 'No date', function () { todoMove_(it, ''); });
     }
   }
-  // R53: a parked item comes back with today's date (the server's day), which puts it under Today.
+  // R53: a parked item comes back with today's date (the page's day, R70), which puts it under Today.
   if (where === 'parked' && !done && todoValidDay_(today)) {
     btn(row, 'textbtn todo-revive', 'Bring back', function () {
       TODO_FOCUS = 'tick:' + it.id;
@@ -3391,8 +3749,9 @@ function todoNote_(parent, it, today) {
   add(n, 'p', 'todo-note-lead', parts[0]);
   if (parts[1]) add(n, 'p', '', parts[1]);
   var actions = add(n, 'div', 'todo-note-actions');
-  // R55: only with a first step to make it smaller to.
-  if (it.firstStep) btn(actions, 'btn-plain', 'Make it smaller', function () { todoOpen_(it, { text: it.firstStep }); });
+  // R55: only with a first step to make it smaller to; R70: never for an item already made small.
+  var step = todoStep_(it);
+  if (step) btn(actions, 'btn-plain', 'Make it smaller', function () { todoOpen_(it, { text: step }); });
   btn(actions, 'btn-plain', 'Not now', function () { todoSnooze_(today); });
 }
 
@@ -3407,8 +3766,8 @@ function todoSettings_(body, lists, me) {
     TODO_MINE = false;
     render(true);
   });
-  if (!lists || !todoIsDay_(lists.today)) return;
-  var today = lists.today;
+  var today = lists ? listsToday_(lists) : '';
+  if (!todoIsDay_(today)) return;
   var until = todoPausedUntil_(lists, me);
   var line = add(body, 'p', 'lists-settings small');
   line.appendChild(document.createTextNode(until ? 'Reminders: paused until ' + todoDayLabel_(until, today) : 'Reminders: on'));
@@ -3526,7 +3885,8 @@ function sheetOneLine_(v) {
 }
 
 // The fields of an edit: only those the list allows and the draft changed, or null for no change. Text is
-// trimmed; an emptied text keeps the old one (the server needs 1 to 500 characters).
+// trimmed; an emptied text keeps the old one (the server needs 1 to 500 characters). Text is compared before the
+// 500 cut (R71), so an untouched long item is never sent and never shortened; edited text goes cut to 500 (R70).
 function sheetDiff_(list, orig, draft) {
   var out = {};
   var any = false;
@@ -3542,8 +3902,9 @@ function sheetDiff_(list, orig, draft) {
       was = sheetWho_(was);
       now = sheetWho_(now);
     }
-    if (now !== was) {
-      out[k] = now;
+    var send = k === 'text' ? now.slice(0, 500).trim() : now;
+    if (now !== was && send !== was) { // a cut that lands on the stored text is no change either
+      out[k] = send;
       any = true;
     }
   });
@@ -3552,7 +3913,7 @@ function sheetDiff_(list, orig, draft) {
 
 // The fields of an add, or null when there is no text (the new item is dropped). A time goes only with a day.
 function sheetAddFields_(list, d) {
-  var text = sheetOneLine_(d.text);
+  var text = sheetOneLine_(d.text).slice(0, 500).trim(); // R70: 500 at most, as the Groceries add field
   if (!text) return null;
   if (list === 'grocery') {
     var shop = sheetOneLine_(d.shop);
@@ -3572,7 +3933,7 @@ function openItemSheet_(it, list, prefill) {
   if (SHEET) closeItemSheet_('replace');
   var cur = it && it.id ? (listsItem_(list, it.id) || it) : null;
   var orig = cur ? JSON.parse(JSON.stringify(cur)) : null;
-  var today = LISTS && todoValidDay_(LISTS.today) ? LISTS.today : '';
+  var today = LISTS ? listsToday_(LISTS) : '';
   var s = {
     list: list, id: orig ? orig.id : '', orig: orig, draft: sheetDraft_(list, orig, prefill, whoAmI_()),
     today: today, chips: sheetWhenChips_(today), more: false, pick: false,
