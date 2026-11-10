@@ -10,36 +10,52 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Expenses">
-<meta name="theme-color" content="#2a3488" media="(prefers-color-scheme: light)">
-<meta name="theme-color" content="#1d2259" media="(prefers-color-scheme: dark)">
+<meta name="theme-color" content="#fbd3b0" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#4a2e1c" media="(prefers-color-scheme: dark)">
 <title>Expenses</title>
 <style>
   :root {
     color-scheme: light dark;
-    --paper: #f5f6f9;
-    --ink: #171b34;
-    --muted: #565b76;
-    --rule: #d8dae6;
-    --accent: #2a3488;
-    --tint: #e3e5f4;
-    --cover: #2a3488;
-    --on-cover: #f5f6ff;
-    --on-cover-muted: #c3c8ee;
-    --on-cover-line: rgba(245, 246, 255, 0.42);
-    --on-cover-fill: rgba(245, 246, 255, 0.12);
+    --paper: #fbf7f3;
+    --ink: #2b1d14;
+    --muted: #6b5a4e;
+    --rule: #eadfd5;
+    --accent: #a64a18;
+    --tint: #fde6d2;
+    --cover: #fbd3b0;
+    --on-cover: #3a2213;
+    --on-cover-muted: #6e4a33;
+    --on-cover-line: rgba(58, 34, 19, 0.55);
+    --on-cover-fill: rgba(58, 34, 19, 0.08);
     --gutter: 20px;
+    --bar-h: 57px;
+    /* To do who chips: one look per person, none of them the muted age chip */
+    --kev-bg: #d7ebf1;
+    --kev-ink: #114a5f;
+    --lili-bg: #f0e1f4;
+    --lili-ink: #622873;
+    --couple-bg: #dff0d8;
+    --couple-ink: #2c5420;
   }
   @media (prefers-color-scheme: dark) {
     :root {
-      --paper: #10121f;
-      --ink: #e9eaf4;
-      --muted: #a3a7c0;
-      --rule: #2b2e47;
-      --accent: #a9b2f8;
-      --tint: #252950;
-      --cover: #1d2259;
-      --on-cover: #f0f1ff;
-      --on-cover-muted: #bdc2ea;
+      --paper: #17110d;
+      --ink: #f4ebe4;
+      --muted: #bfae9f;
+      --rule: #3a2e25;
+      --accent: #f2a874;
+      --tint: #3a2618;
+      --cover: #4a2e1c;
+      --on-cover: #fde9d8;
+      --on-cover-muted: #e3c2a8;
+      --on-cover-line: rgba(253, 233, 216, 0.42);
+      --on-cover-fill: rgba(253, 233, 216, 0.12);
+      --kev-bg: #173b48;
+      --kev-ink: #b4e0ee;
+      --lili-bg: #3d2147;
+      --lili-ink: #e9c4f3;
+      --couple-bg: #213d1b;
+      --couple-ink: #c2e6b5;
     }
   }
 
@@ -71,7 +87,7 @@
   [tabindex="-1"]:focus { outline: none; }
   .wrap { max-width: 560px; margin: 0 auto; padding: 0 var(--gutter); }
 
-  /* The cover: the PIN screen, the loading state and the top of every screen share one indigo panel. */
+  /* The cover: the PIN screen, the loading state and the top of every screen share one apricot panel. */
   .cover {
     min-height: 100vh;
     background: var(--cover);
@@ -362,7 +378,7 @@
   .toast {
     position: fixed;
     left: 50%;
-    bottom: 16px;
+    bottom: calc(var(--bar-h) + 12px + env(safe-area-inset-bottom));
     z-index: 5;
     transform: translateX(-50%);
     display: flex;
@@ -441,6 +457,369 @@
   .rolling-row { display: flex; justify-content: space-between; gap: 12px; padding: 9px 0; border-bottom: 1px solid var(--rule); font-size: 15px; }
   .rolling-row span:last-child { text-align: right; }
 
+  /* The bottom bar: Money, To do, Groceries. Fixed, above the phone's home bar. Toasts and the dock sit above it. */
+  #app { padding-bottom: calc(var(--bar-h) + env(safe-area-inset-bottom)); }
+  .tabbar {
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 6;
+    display: flex;
+    justify-content: center;
+    padding: 0 env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+    background: var(--paper);
+    border-top: 1px solid var(--rule);
+  }
+  .tab {
+    flex: 1 1 0;
+    max-width: 180px;
+    min-height: 56px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 3px;
+    font-size: 13px;
+    color: var(--muted);
+    text-align: center;
+  }
+  .tab .icon { width: 22px; height: 22px; color: currentColor; }
+  .tab[aria-current="page"] { color: var(--accent); font-weight: 600; }
+
+  /* Lists shell: the phone's identity, the settings line and the dock above the bar */
+  .who-card { margin-top: 24px; padding: 16px; border: 1px solid var(--rule); border-radius: 10px; }
+  .who-card h2 { margin-bottom: 10px; }
+  .who-choices { display: flex; gap: 8px; margin-bottom: 10px; }
+  .lists-main { padding-top: 24px; }
+  .lists-settings { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-top: 28px; }
+  .dock {
+    position: fixed;
+    left: 50%;
+    bottom: calc(var(--bar-h) + 12px + env(safe-area-inset-bottom));
+    z-index: 5;
+    transform: translateX(-50%);
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    width: calc(100% - 32px);
+    max-width: 520px;
+    pointer-events: none;
+  }
+  .dock > * { pointer-events: auto; }
+  .dock-note {
+    align-self: flex-start;
+    padding: 6px 12px;
+    border-radius: 8px;
+    font-size: 14px;
+    color: var(--ink);
+    background: var(--tint);
+  }
+  .dock-toast {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    min-height: 52px;
+    padding: 4px 16px;
+    border-radius: 10px;
+    color: var(--on-cover);
+    background: var(--cover);
+    border: 1px solid var(--on-cover-line);
+  }
+
+  /* To do: sections, rows with a wide tick zone, chips, the calm note, the settings lines */
+  .todo-top { display: flex; justify-content: flex-end; margin-bottom: 4px; }
+  .mine {
+    min-height: 44px;
+    padding: 0 16px;
+    border: 1px solid var(--rule);
+    border-radius: 22px;
+    font-size: 15px;
+  }
+  .mine[aria-pressed="true"] { color: var(--paper); background: var(--accent); border-color: var(--accent); font-weight: 600; }
+  .todo-sec { padding-top: 20px; }
+  .todo-sec > h2 { margin-bottom: 4px; }
+  .todo-fold-h { margin: 0; }
+  .todo-fold {
+    display: flex;
+    width: 100%;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    min-height: 48px;
+    font-size: 17px;
+    font-weight: 600;
+  }
+  .todo-fold::after {
+    content: "";
+    flex: none;
+    width: 8px;
+    height: 8px;
+    margin-right: 6px;
+    border-right: 2px solid var(--muted);
+    border-bottom: 2px solid var(--muted);
+    transform: rotate(45deg);
+  }
+  .todo-fold[aria-expanded="true"]::after { transform: rotate(-135deg); }
+  .todo-day { font-size: 14px; font-weight: 600; color: var(--muted); padding: 12px 0 2px; }
+  .todo-row { display: flex; align-items: flex-start; min-height: 56px; border-bottom: 1px solid var(--rule); }
+  .tick-zone {
+    flex: none;
+    width: 56px;
+    min-height: 56px;
+    margin-left: -12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .tick-zone .icon { width: 26px; height: 26px; color: var(--muted); }
+  .tick-zone[aria-pressed="true"] .icon { color: var(--accent); }
+  .tick-zone:active { background: var(--tint); }
+  .todo-open { display: block; flex: 1; min-width: 0; padding: 15px 0 13px; text-align: left; }
+  .todo-text {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    font-size: 16px;
+    line-height: 1.4;
+  }
+  .is-done .todo-text { text-decoration: line-through; text-decoration-thickness: 1px; color: var(--muted); }
+  .todo-chips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 6px; }
+  .tchip { display: inline-block; max-width: 100%; padding: 1px 8px; border-radius: 4px; font-size: 13px; line-height: 1.4; }
+  .tchip-kev { color: var(--kev-ink); background: var(--kev-bg); font-weight: 600; }
+  .tchip-lili { color: var(--lili-ink); background: var(--lili-bg); font-weight: 600; }
+  .tchip-couple { color: var(--couple-ink); background: var(--couple-bg); font-weight: 600; }
+  .tchip-effort { color: var(--ink); background: var(--tint); }
+  .tchip-date { color: var(--ink); background: transparent; border: 1px solid var(--rule); padding: 0 7px; }
+  .tchip-age { color: var(--muted); background: transparent; padding: 1px 0; }
+  .tchip-from { color: var(--muted); background: transparent; padding: 1px 0; }
+  .todo-revive { flex: none; align-self: center; min-height: 44px; padding-left: 10px; font-size: 14px; }
+  .todo-note-lead {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+  .todo-note { margin: 6px 0 4px; padding: 14px 16px; border-radius: 10px; background: var(--tint); font-size: 15px; }
+  .todo-note-actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+  .todo-note-actions .btn-plain { flex: 0 0 auto; background: var(--paper); }
+  .todo-empty { padding: 28px 0 8px; font-size: 15px; color: var(--muted); }
+  .lists-settings + .lists-settings { margin-top: 4px; }
+  .sep { color: var(--muted); }
+  .pause-menu { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-top: 8px; }
+  .pause-menu .btn-plain { flex: 0 0 auto; }
+  .pause-menu input {
+    min-height: 44px;
+    padding: 8px 10px;
+    font: inherit;
+    font-size: 16px;
+    color: var(--ink);
+    background: var(--paper);
+    border: 1px solid var(--muted);
+    border-radius: 8px;
+  }
+  .pause-error { width: 100%; font-size: 14px; color: var(--accent); font-weight: 500; }
+
+  /* Task 7: "+", Not today, the Undo line, and the item sheet (a dialog from the bottom; closing it saves) */
+  .todo-add {
+    align-self: flex-end;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 56px;
+    height: 56px;
+    border-radius: 28px;
+    color: var(--paper);
+    background: var(--accent);
+    box-shadow: 0 2px 8px rgba(43, 29, 20, 0.28);
+  }
+  .todo-add .icon { width: 28px; height: 28px; stroke-width: 2; }
+  .todo-nottoday { flex: none; align-self: center; min-height: 44px; padding-left: 10px; font-size: 14px; }
+  .todo-nottoday-menu { display: flex; flex-wrap: wrap; gap: 8px; padding: 4px 0 12px 44px; border-bottom: 1px solid var(--rule); }
+  .todo-nottoday-menu .btn-plain { flex: 0 0 auto; }
+  .dock-toast button {
+    min-height: 44px;
+    min-width: 44px;
+    padding: 0 6px;
+    font-weight: 600;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+  .dock-toast :focus-visible { outline-color: var(--on-cover); }
+  .sheet {
+    position: fixed;
+    inset: 0;
+    z-index: 8;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+  }
+  .sheet-backdrop { position: absolute; inset: 0; background: rgba(43, 29, 20, 0.5); }
+  .sheet-panel {
+    position: relative;
+    width: 100%;
+    max-width: 560px;
+    max-height: 90vh;
+    max-height: 90dvh;
+    margin: 0 auto;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    padding: 6px var(--gutter) calc(16px + env(safe-area-inset-bottom));
+    border-radius: 16px 16px 0 0;
+    color: var(--ink);
+    background: var(--paper);
+    box-shadow: 0 -4px 24px rgba(43, 29, 20, 0.25);
+  }
+  .sheet-panel:focus { outline: none; }
+  .sheet-handle { width: 40px; height: 5px; margin: 4px auto 14px; border-radius: 3px; background: var(--rule); }
+  .sheet-text {
+    display: block;
+    width: 100%;
+    min-height: 48px;
+    max-height: 40vh;
+    padding: 10px 12px;
+    font: inherit;
+    font-size: 17px;
+    line-height: 1.4;
+    color: var(--ink);
+    background: var(--paper);
+    border: 1px solid var(--muted);
+    border-radius: 10px;
+    resize: none;
+    overflow-y: auto;
+    field-sizing: content;
+  }
+  .sheet-label { margin: 18px 0 8px; font-size: 14px; font-weight: 600; color: var(--muted); }
+  .sheet-chips { display: flex; flex-wrap: wrap; gap: 8px; }
+  .schip {
+    min-height: 44px;
+    min-width: 44px;
+    padding: 0 14px;
+    border: 1px solid var(--rule);
+    border-radius: 22px;
+    font-size: 15px;
+    text-align: center;
+  }
+  .schip[aria-pressed="true"] { color: var(--paper); background: var(--accent); border-color: var(--accent); font-weight: 600; }
+  .sheet-day, .sheet-time input {
+    min-height: 44px;
+    margin-top: 10px;
+    padding: 8px 10px;
+    font: inherit;
+    font-size: 16px;
+    color: var(--ink);
+    background: var(--paper);
+    border: 1px solid var(--muted);
+    border-radius: 8px;
+  }
+  .sheet-time input:disabled { opacity: 0.55; }
+  .sheet-time .small { margin-top: 6px; }
+  .sheet-more { margin-top: 8px; }
+  .sheet-foot { display: flex; align-items: center; gap: 12px; margin-top: 22px; }
+  .sheet-delete { min-height: 44px; font-size: 14px; color: var(--muted); }
+  .sheet-save { flex: 0 0 auto; min-width: 120px; margin-left: auto; }
+  .sheet-shop-input {
+    display: block;
+    width: 100%;
+    min-height: 44px;
+    margin-bottom: 10px;
+    padding: 8px 12px;
+    font: inherit;
+    font-size: 16px;
+    color: var(--ink);
+    background: var(--paper);
+    border: 1px solid var(--muted);
+    border-radius: 8px;
+  }
+
+  /* Task 8: Groceries. A pinned add field, Bought recently chips, the shop filter, plain rows; the problems line */
+  .lists-problem { margin-top: 16px; padding: 10px 14px; border-radius: 10px; font-size: 14px; color: var(--ink); background: var(--tint); }
+  .gro-add { position: sticky; top: 0; z-index: 2; padding: 12px 0 6px; background: var(--paper); border-bottom: 1px solid var(--rule); }
+  .gro-add input {
+    display: block;
+    width: 100%;
+    min-height: 48px;
+    padding: 10px 14px;
+    font: inherit;
+    font-size: 17px;
+    color: var(--ink);
+    background: var(--paper);
+    border: 1px solid var(--muted);
+    border-radius: 10px;
+  }
+  .gro-add input::placeholder { color: var(--muted); opacity: 1; }
+  .gro-note { min-height: 24px; padding-top: 4px; font-size: 14px; line-height: 20px; color: var(--muted); }
+  .gro-main { padding-top: 14px; }
+  .gro-recent { padding-bottom: 6px; }
+  .gro-label { margin-bottom: 8px; font-size: 14px; font-weight: 600; color: var(--muted); }
+  .gro-chips {
+    display: flex;
+    gap: 8px;
+    overflow-x: auto;
+    margin: 0 calc(var(--gutter) * -1);
+    padding: 0 var(--gutter) 4px;
+    scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
+  }
+  .gchip {
+    flex: none;
+    max-width: 70vw;
+    min-height: 44px;
+    padding: 0 14px;
+    border: 1px solid var(--rule);
+    border-radius: 22px;
+    font-size: 15px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .gro-tools { display: flex; justify-content: flex-end; padding-top: 8px; }
+  .gro-shop { min-height: 44px; padding: 0 16px; border: 1px solid var(--rule); border-radius: 22px; font-size: 15px; }
+  .gro-shop[aria-expanded="true"] { border-color: var(--accent); }
+  .gro-menu { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 8px; padding: 10px 0 6px; }
+  .gro-menu .schip { min-height: 44px; }
+  .gro-head { margin: 0; padding: 18px 0 2px; font-size: 14px; font-weight: 600; color: var(--muted); }
+  .gro-more {
+    display: flex;
+    width: 100%;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    min-height: 48px;
+    font-size: 15px;
+    color: var(--muted);
+  }
+  .gro-more::after {
+    content: "";
+    flex: none;
+    width: 8px;
+    height: 8px;
+    margin-right: 6px;
+    border-right: 2px solid var(--muted);
+    border-bottom: 2px solid var(--muted);
+    transform: rotate(45deg);
+  }
+  .gro-more[aria-expanded="true"]::after { transform: rotate(-135deg); }
+  .gro-row { display: flex; align-items: flex-start; min-height: 56px; border-bottom: 1px solid var(--rule); }
+  .gro-open { display: block; flex: 1; min-width: 0; padding: 15px 0 13px; text-align: left; }
+  .gro-text {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    font-size: 17px;
+    line-height: 1.4;
+  }
+  .is-done .gro-text { text-decoration: line-through; text-decoration-thickness: 1px; color: var(--muted); }
+  .gro-empty { padding: 20px 0 8px; font-size: 15px; color: var(--muted); }
+  .gro-done { padding-top: 16px; }
+
   @media (hover: hover) {
     .chip:hover, .barcol:hover, .cat:hover { background: var(--tint); }
     .panel-action:hover, .back:hover { opacity: 0.8; }
@@ -466,6 +845,10 @@
   <div id="month" hidden></div>
   <div id="trends" hidden></div>
   <div id="balance" hidden></div>
+  <div id="todo" hidden></div>
+  <div id="groceries" hidden></div>
+  <nav id="tabbar" class="tabbar" aria-label="Sections"></nav>
+  <div id="sheet" class="sheet" hidden></div>
 </div>
 <script>
 // Never run inside someone else's frame: show nothing and stop.
@@ -709,6 +1092,8 @@ function viewHash(view) {
   if (view.screen === 'month') return '#month=' + view.key;
   if (view.screen === 'trends') return '#tendencies';
   if (view.screen === 'balance') return '#balance';
+  if (view.screen === 'todo') return '#todo';
+  if (view.screen === 'groceries') return '#groceries';
   return '';
 }
 
@@ -717,13 +1102,39 @@ function viewFromHash(hash) {
   if (m) return { screen: 'month', key: m[1] };
   if (hash === '#tendencies') return { screen: 'trends', key: null };
   if (hash === '#balance') return { screen: 'balance', key: null };
+  if (hash === '#todo') return { screen: 'todo', key: null };
+  if (hash === '#groceries') return { screen: 'groceries', key: null };
   return { screen: 'home', key: null };
+}
+
+// The bottom bar tab a screen belongs to: every money screen is under Money.
+function tabOf_(screen) {
+  if (screen === 'todo' || screen === 'groceries') return screen;
+  return 'money';
+}
+
+function isListScreen_(screen) {
+  return screen === 'todo' || screen === 'groceries';
 }
 
 // ---- token: kept in memory, and in browser storage when the browser allows it ----
 function store(t) { try { localStorage.setItem(KEY, t); } catch (e) {} }
 function stored() { try { return localStorage.getItem(KEY); } catch (e) { return null; } }
 function unstore() { try { localStorage.removeItem(KEY); } catch (e) {} }
+
+// ---- lists storage: four kl.* keys, each read and write inside try, so the page works without storage ----
+var LS_TAB = 'kl.tab';     // the last bottom bar tab: money, todo or groceries
+var LS_ME = 'kl.me';       // who this phone is: Kev or Lili
+var LS_LISTS = 'kl.lists'; // the last lists reply, as {at, result}
+var LS_QUEUE = 'kl.queue'; // the list ops not yet answered, oldest first
+function lsGet_(k) { try { return localStorage.getItem(k); } catch (e) { return null; } }
+function lsSet_(k, v) { try { localStorage.setItem(k, v); return true; } catch (e) { return false; } }
+function lsDel_(k) { try { localStorage.removeItem(k); } catch (e) {} }
+function lsJson_(k) {
+  var t = lsGet_(k);
+  if (!t) return null;
+  try { return JSON.parse(t); } catch (e) { return null; }
+}
 
 // ---- DOM helpers: every value goes in as text --------------------------------
 function $(id) { return document.getElementById(id); }
@@ -747,6 +1158,17 @@ function btn(parent, cls, text, onClick) {
 }
 
 function icon(name) {
+  return svgIcon_(iconPaths(name));
+}
+
+// Bottom bar icons. Paths are constant strings in this file, never data. Groceries reuses the cart.
+function tabIconPaths_(tab) {
+  if (tab === 'todo') return ['M4.5 4.5h15v15h-15z', 'M8.5 12.5l2.5 2.5l4.5-5.5'];
+  if (tab === 'groceries') return iconPaths('Groceries');
+  return ['M3.5 6.5h17v11h-17z', 'M14.5 12a2.5 2.5 0 1 1-5 0a2.5 2.5 0 1 1 5 0z', 'M6.5 9.5v5', 'M17.5 9.5v5'];
+}
+
+function svgIcon_(paths) {
   var ns = 'http://www.w3.org/2000/svg';
   var svg = document.createElementNS(ns, 'svg');
   svg.setAttribute('class', 'icon');
@@ -760,7 +1182,7 @@ function icon(name) {
   svg.setAttribute('stroke-linejoin', 'round');
   svg.setAttribute('aria-hidden', 'true');
   svg.setAttribute('focusable', 'false');
-  iconPaths(name).forEach(function (d) {
+  paths.forEach(function (d) {
     var path = document.createElementNS(ns, 'path');
     path.setAttribute('d', d);
     svg.appendChild(path);
@@ -845,6 +1267,7 @@ function clock(ms) {
 }
 
 function showCover(mode, text) {
+  APP_ON = false;
   $('app').hidden = true;
   $('cover').hidden = false;
   $('gate').hidden = mode !== 'gate';
@@ -866,7 +1289,7 @@ function submit() {
     if (r && r.ok) {
       TOKEN = r.token;
       store(r.token);
-      loadData(false);
+      openSession_();
     }
     else if (r && r.locked) { msg('Locked until ' + clock(r.untilMs) + '.'); }
     else if (r && r.notReady) { msg('Not set up yet.'); }
@@ -883,18 +1306,26 @@ function clearScreens() {
   $('month').textContent = '';
   $('trends').textContent = '';
   $('balance').textContent = '';
+  $('todo').textContent = '';
+  groClear_();
+  $('tabbar').textContent = '';
 }
 
 function lockOut() {
   SESSION++;
   LOADING = false;
   TOKEN = null;
+  closeItemSheet_('lock'); // Task 7: an open sheet's change goes into the queue, sent after the unlock
   DATA = null;
   VIEW = { screen: 'home', key: null };
   FILTER = null;
   EDIT = null;
   TOAST = null;
   FIRST_LOAD = true;
+  listsLockOut_();
+  todoLeave_();
+  groLeave_();
+  GRO_DRAFT = '';
   unstore();
   try { location.hash = ''; } catch (e) {}
   clearScreens();
@@ -904,6 +1335,11 @@ function lockOut() {
 function loadFailed(quiet, err) {
   var code = err ? err.code : '';
   if (code === 'NO_SESSION') { lockOut(); return; }
+  if (quiet && !DATA && APP_ON) {
+    MONEY_FAILED = true;
+    render(true);
+    return;
+  }
   if (quiet && DATA) {
     if (TOAST && TOAST.refreshing) {
       TOAST = { text: (TOAST.after ? TOAST.after + ' ' : '') + 'Could not refresh. These are the last numbers loaded.', key: TOAST.key };
@@ -942,8 +1378,7 @@ function loadData(quiet) {
       FIRST_LOAD = false;
       VIEW = viewFromHash(location.hash);
     }
-    $('cover').hidden = true;
-    $('app').hidden = false;
+    showApp_();
     if (VIEW.screen === 'month' && !monthByKey(VIEW.key)) VIEW = { screen: 'home', key: null };
     if (TOAST && TOAST.refreshing) TOAST = TOAST.after ? { text: TOAST.after, key: TOAST.key } : null;
     render(true);
@@ -971,11 +1406,30 @@ function remember(view) {
 }
 
 function go(view, fromHistory) {
+  if (SHEET) closeItemSheet_('nav');
   if (VIEW.screen === 'home') HOME_Y = window.scrollY || 0;
+  if (VIEW.screen === 'todo' && view.screen !== 'todo') todoLeave_();
+  if (VIEW.screen === 'groceries' && view.screen !== 'groceries') groLeave_();
   if (view.screen !== 'month' || view.key !== VIEW.key) FILTER = null;
   VIEW = view;
   EDIT = null;
   TOAST = null;
+  LISTS_TOAST = '';
+  listsUndoClear_();
+  // Money opened for the first time this session (the page started on a list tab): load its numbers first.
+  if (tabOf_(view.screen) === 'money' && !DATA) {
+    if (!fromHistory) remember(view);
+    if (!APP_ON) { loadData(false); return; }
+    // M1: the app and its bar stay; the money screen says it is loading, or why it could not.
+    MONEY_FAILED = false;
+    render(false);
+    loadData(true);
+    return;
+  }
+  if (isListScreen_(view.screen)) {
+    if (!LISTS_BASE) listsFromCache_();
+    showApp_();
+  }
   if (view.editRow) {
     var r = rowByNumber(DATA.months, view.editRow);
     if (r) startEdit(r);
@@ -983,6 +1437,7 @@ function go(view, fromHistory) {
   if (!fromHistory) remember(view);
   render(false);
   if (view.editRow && EDIT_EL) EDIT_EL.scrollIntoView({ block: 'center' });
+  if (isListScreen_(view.screen)) listsLoad_(false);
 }
 
 function goHome() { go({ screen: 'home', key: null }); }
@@ -995,16 +1450,25 @@ function render(keepScroll) {
   $('month').hidden = VIEW.screen !== 'month';
   $('trends').hidden = VIEW.screen !== 'trends';
   $('balance').hidden = VIEW.screen !== 'balance';
+  $('todo').hidden = VIEW.screen !== 'todo';
+  $('groceries').hidden = VIEW.screen !== 'groceries';
+  LISTS_NOTE = null;
+  rememberTab_(tabOf_(VIEW.screen));
+  renderTabs_();
   var title = null;
   EDIT_EL = null;
-  if (VIEW.screen === 'month') title = renderMonth();
+  if (VIEW.screen === 'todo') title = renderTodo_();
+  else if (VIEW.screen === 'groceries') title = renderGroceries_();
+  else if (!DATA) title = renderMoneyWaiting_();
+  else if (VIEW.screen === 'month') title = renderMonth();
   else if (VIEW.screen === 'trends') title = renderTrends();
   else if (VIEW.screen === 'balance') title = renderBalanceScreen();
   else renderHome();
   if (!keepScroll) {
     window.scrollTo(0, VIEW.screen === 'home' ? HOME_Y : 0);
-    if (title) title.focus({ preventScroll: true });
+    if (title && !SHEET) title.focus({ preventScroll: true });
   }
+  if (SHEET) sheetClaimFocus_();
 }
 
 // ---- shared pieces --------------------------------------------------------------
@@ -1714,20 +2178,2262 @@ function renderTrends() {
   return title;
 }
 
+// ---- session start: the remembered tab, or the address when there is one ----------------
+var APP_ON = false; // true while the screens are on show, false while the cover is
+var MONEY_FAILED = false; // Money's first load, started from a list tab, failed
+
+// Money before its numbers are in, when it was opened from a list tab: the bar stays usable (M1).
+function renderMoneyWaiting_() {
+  var root = $(VIEW.screen === 'trends' ? 'trends' : (VIEW.screen === 'month' ? 'month' : (VIEW.screen === 'balance' ? 'balance' : 'home')));
+  var w = panel(root);
+  add(w, 'div', 'panel-top').appendChild(el('p', 'names', 'Kev & Lili'));
+  var title = add(w, 'h1', 'title-big', 'Money');
+  title.setAttribute('tabindex', '-1');
+  var body = add(root, 'div', 'wrap');
+  var s = section(body);
+  if (MONEY_FAILED) {
+    add(s, 'p', 'small', 'Could not load your expenses.');
+    btn(s, 'textbtn', 'Try again', function () {
+      MONEY_FAILED = false;
+      render(true);
+      loadData(true);
+    });
+  } else {
+    add(s, 'p', 'small', 'Opening your expenses...');
+  }
+  return title;
+}
+
+function showApp_() {
+  APP_ON = true;
+  $('cover').hidden = true;
+  $('app').hidden = false;
+}
+
+// Runs on load with a stored token and after each unlock. The queue is sent again here too.
+function openSession_() {
+  var v = viewFromHash(location.hash);
+  if (!location.hash || location.hash === '#') {
+    var t = lsGet_(LS_TAB);
+    if (t === 'todo' || t === 'groceries') v = { screen: t, key: null };
+  }
+  if (isListScreen_(v.screen)) {
+    VIEW = v;
+    remember(v);
+    listsEnter_();
+  } else {
+    loadData(false);
+  }
+  if (QUEUE.length) setTimeout(listsNoteUpdate_, 10000);
+  listsFlush_();
+}
+
+// Writes kl.tab only when it changes, so a Money-only visit stores nothing new.
+function rememberTab_(tab) {
+  if ((lsGet_(LS_TAB) || 'money') !== tab) lsSet_(LS_TAB, tab);
+}
+
+// ---- bottom bar -------------------------------------------------------------------------
+function renderTabs_() {
+  var bar = $('tabbar');
+  var cur = tabOf_(VIEW.screen);
+  [['money', 'Money'], ['todo', 'To do'], ['groceries', 'Groceries']].forEach(function (t) {
+    var b = btn(bar, 'tab', null, function () {
+      go(t[0] === 'money' ? { screen: 'home', key: null } : { screen: t[0], key: null });
+    });
+    if (t[0] === cur) b.setAttribute('aria-current', 'page');
+    b.appendChild(svgIcon_(tabIconPaths_(t[0])));
+    add(b, 'span', '', t[1]);
+  });
+}
+
+// ---- this phone's identity: sets the default Who for new to-dos ------------------------------
+var ME = null; // memory copy of kl.me, so the choice holds for this visit even without storage
+
+function whoAmI_() {
+  if (ME === null) {
+    var v = lsGet_(LS_ME);
+    ME = (v === 'Kev' || v === 'Lili') ? v : '';
+  }
+  return ME;
+}
+
+// Kev or Lili; anything else clears it, so the card asks again.
+function setWhoAmI_(v) {
+  if (v === 'Kev' || v === 'Lili') {
+    ME = v;
+    lsSet_(LS_ME, v);
+  } else {
+    ME = '';
+    lsDel_(LS_ME);
+  }
+}
+
+// ---- lists: pure helpers (no page state) ------------------------------------------------------
+function updatedText_(at, now) {
+  var mins = Math.floor((now - at) / 60000);
+  if (!(mins >= 1)) return 'Updated just now';
+  if (mins < 60) return 'Updated ' + mins + ' min ago';
+  var hours = Math.floor(mins / 60);
+  if (hours < 24) return 'Updated ' + hours + ' h ago';
+  var days = Math.floor(hours / 24);
+  return 'Updated ' + days + (days === 1 ? ' day ago' : ' days ago');
+}
+
+// The wait before send attempt n + 1, after n failures in a row.
+function backoffMs_(n) {
+  if (n <= 1) return 2000;
+  if (n === 2) return 5000;
+  if (n === 3) return 15000;
+  return 30000;
+}
+
+// 16 random bytes as a lowercase version 4 uuid.
+function uuidFromBytes_(bytes) {
+  var b = Array.prototype.slice.call(bytes, 0, 16);
+  b[6] = (b[6] & 0x0f) | 0x40;
+  b[8] = (b[8] & 0x3f) | 0x80;
+  var hex = b.map(function (x) { return (x < 16 ? '0' : '') + x.toString(16); }).join('');
+  return hex.slice(0, 8) + '-' + hex.slice(8, 12) + '-' + hex.slice(12, 16) + '-' + hex.slice(16, 20) + '-' + hex.slice(20);
+}
+
+// The lists reply key for an op's list.
+function listsKey_(list) {
+  return list === 'grocery' ? 'groceries' : 'todo';
+}
+
+// Applies one op to a lists object, the way the server will, and returns it. Used for the screens (the
+// server's lists plus every queued op) and for keeping the server copy current from op replies. Matching is by
+// id only, so applying an op twice changes nothing more.
+function listsApplyOp_(lists, op) {
+  function at(arr, id) {
+    for (var i = 0; i < arr.length; i++) if (arr[i] && arr[i].id === id) return i;
+    return -1;
+  }
+  function copy(o) {
+    var out = {};
+    for (var k in o) if (Object.prototype.hasOwnProperty.call(o, k)) out[k] = o[k];
+    return out;
+  }
+  var f = op.fields || {};
+  if (op.op === 'pause') {
+    if (!lists.prefs || typeof lists.prefs !== 'object') lists.prefs = {};
+    if (f.person === 'Kev' || f.person === 'Lili') lists.prefs[f.person] = { pausedUntil: f.until || '' };
+    return lists;
+  }
+  var arr = lists[listsKey_(op.list)];
+  if (!Array.isArray(arr)) return lists;
+  if (!Array.isArray(lists.doneToday)) lists.doneToday = [];
+  var i = at(arr, op.id);
+  var isTodo = op.list === 'todo';
+  if (op.op === 'add') {
+    if (i < 0) {
+      arr.push({
+        id: op.id, list: op.list, text: f.text || '', who: isTodo ? (f.who || 'Either') : '', due: isTodo ? (f.due || '') : '',
+        time: isTodo ? (f.time || '') : '', shop: isTodo ? '' : (f.shop || ''), added: lists.today || '', ageDays: 0,
+        kind: '', minutes: '', firstStep: '', fp: ''
+      });
+    }
+  } else if (op.op === 'edit') {
+    if (i >= 0) {
+      for (var k in f) if (Object.prototype.hasOwnProperty.call(f, k)) arr[i][k] = f[k];
+    }
+  } else if (op.op === 'tick' || op.op === 'delete') {
+    if (i >= 0) {
+      var gone = arr.splice(i, 1)[0];
+      if (op.op === 'tick' && at(lists.doneToday, op.id) < 0) {
+        var done = copy(gone);
+        done.fp = '';
+        lists.doneToday.unshift(done);
+      }
+    }
+  } else if (op.op === 'restore') {
+    var d = at(lists.doneToday, op.id);
+    var back = d >= 0 ? lists.doneToday.splice(d, 1)[0] : (op.item || null);
+    if (back && i < 0) {
+      var item = copy(back);
+      item.list = op.list;
+      arr.push(item);
+    }
+  }
+  return lists;
+}
+
+// ---- lists: state -----------------------------------------------------------------------------
+// LISTS_BASE is the server's lists as last known (the lists reply, kept current by each op reply). LISTS is what
+// the screens show: LISTS_BASE with every queued op applied on top. Screens read LISTS only.
+var LISTS = null;
+var LISTS_BASE = null;
+var LISTS_AT = 0;        // when LISTS_BASE was read from the server (ms); the "Updated N min ago" line
+var LISTS_FETCHED = 0;   // when this page itself last loaded the lists (ms); 0 when only the cache is known
+var LISTS_LOADING = false;
+var LISTS_AGAIN = false; // a forced load asked for while one was on its way
+var LISTS_FAILED = false;
+var LISTS_TOAST = '';    // one short line in the dock; cleared on every navigation
+var LISTS_NOTE = null;   // the dock's "Not saved yet" element on screen now
+var QUEUE = [];          // ops not yet answered, oldest first; mirrored in kl.queue, shared with other tabs
+var KNOWN = {};          // uids seen in kl.queue: one gone from there was settled by another tab
+var QUEUE_UNSAVED = false; // the last kl.queue write failed: the queue lives only in this page
+var INFLIGHT = '';       // uid of the op on its way. Ops go strictly one at a time; this outlives a lock-out.
+var RETRY_TIMER = null;
+var RETRY_N = 0;         // failed sends in a row, for the backoff
+// R46: SETTLE_N counts settled ops. A read remembers SETTLE_N when it is sent (READ_N); ops settled while it is
+// on its way are kept in SETTLED and applied again onto it when it lands, so an older read never undoes them.
+var SETTLE_N = 0;
+var READ_N = 0;
+var SETTLED = [];
+// R47, R50: after an unsure success (saved, but the reply has no item to take fp and id from), or when the queue
+// head has no fp, the head waits for a read sent at or after WAIT_KEYS[list + '|' + id] (a SETTLE_N), then takes
+// its fp from it. Only the head is ever resolved: an op behind an earlier op for the same item is retargeted by
+// that op's reply instead. LANDED_N is the newest landed read's READ_N, -1 before any lands in this session.
+var WAIT_KEYS = {};
+var LANDED_N = -1;
+var WAITING_READ = false; // the head waits for a read: a failed read then retries on the backoff
+
+// Fills in what an older or partial reply leaves out. null when it is not a lists reply at all.
+function listsShape_(r) {
+  if (!r || typeof r !== 'object' || !Array.isArray(r.todo) || !Array.isArray(r.groceries)) return null;
+  ['doneToday', 'boughtRecently', 'shops', 'problems'].forEach(function (k) { if (!Array.isArray(r[k])) r[k] = []; });
+  if (!r.prefs || typeof r.prefs !== 'object') r.prefs = { Kev: { pausedUntil: '' }, Lili: { pausedUntil: '' } };
+  return r;
+}
+
+function listsRebuild_() {
+  if (!LISTS_BASE) { LISTS = null; return; }
+  var view = JSON.parse(JSON.stringify(LISTS_BASE));
+  QUEUE.forEach(function (op) { listsApplyOp_(view, op); });
+  LISTS = view;
+}
+
+function listsFind_(lists, list, id) {
+  var arr = lists ? lists[listsKey_(list)] : null;
+  if (!Array.isArray(arr)) return null;
+  for (var i = 0; i < arr.length; i++) if (arr[i].id === id) return arr[i];
+  return null;
+}
+
+function listsItem_(list, id) {
+  return listsFind_(LISTS, list, id);
+}
+
+// ---- lists: cache (kl.lists) -------------------------------------------------------------------
+function listsFromCache_() {
+  var c = lsJson_(LS_LISTS);
+  var r = (c && typeof c.at === 'number') ? listsShape_(c.result) : null;
+  if (!r) return;
+  LISTS_BASE = r;
+  LISTS_AT = c.at;
+  listsRebuild_();
+}
+
+function listsSaveCache_() {
+  if (LISTS_BASE) lsSet_(LS_LISTS, JSON.stringify({ at: LISTS_AT, result: LISTS_BASE }));
+}
+
+// ---- lists: loading ------------------------------------------------------------------------
+// Every lists call comes through here, with the session token. call_ does the rest.
+function listsCall_(action, payload) {
+  payload.token = TOKEN;
+  return call_(action, payload);
+}
+
+// The cached lists show at once when there are any; otherwise the loading cover. Then a refresh.
+function listsEnter_() {
+  if (!LISTS_BASE) listsFromCache_();
+  if (LISTS || APP_ON) {
+    showApp_();
+    render(false);
+  } else {
+    showCover('loading', 'Opening your lists. The first load can take a few seconds.');
+  }
+  listsLoad_(false);
+}
+
+// force false: load unless one is on its way or this page loaded the lists under 15 s ago.
+// force true: load now, or right after the one on its way.
+function listsLoad_(force) {
+  if (!TOKEN) return;
+  if (!LISTS_BASE) listsFromCache_();
+  if (LISTS_LOADING) {
+    if (force) LISTS_AGAIN = true;
+    return;
+  }
+  if (!force && LISTS_FETCHED && Date.now() - LISTS_FETCHED < 15000) return;
+  LISTS_LOADING = true;
+  READ_N = SETTLE_N;
+  SETTLED = [];
+  var sentN = READ_N;
+  var session = SESSION;
+  listsCall_('lists', {}).then(function (r) {
+    if (session !== SESSION) return;
+    LISTS_LOADING = false;
+    var shaped = listsShape_(r);
+    if (!shaped) { LISTS_AGAIN = false; listsLoadFailed_(null); return; }
+    // R46: what settled while this read was on its way goes on top of it again.
+    SETTLED.forEach(function (s) { listsSettleInto_(shaped, s.op, s.res); });
+    SETTLED = [];
+    LISTS_BASE = shaped;
+    LISTS_AT = Date.now();
+    LISTS_FETCHED = LISTS_AT;
+    LISTS_FAILED = false;
+    listsSaveCache_();
+    if (sentN > LANDED_N) LANDED_N = sentN;
+    listsDropIdleWaits_();
+    listsRebuild_();
+    if (LISTS_AGAIN) {
+      LISTS_AGAIN = false;
+      listsLoad_(true);
+    }
+    if (isListScreen_(VIEW.screen)) {
+      showApp_();
+      render(true);
+    }
+    listsFlush_();
+  }, function (err) {
+    if (session !== SESSION) return;
+    LISTS_LOADING = false;
+    LISTS_AGAIN = false;
+    SETTLED = [];
+    listsLoadFailed_(err);
+  });
+}
+
+// With lists on screen, a failed refresh only changes the status line. Without, the cover says why.
+function listsLoadFailed_(err) {
+  var code = err ? err.code : '';
+  if (code === 'NO_SESSION') { lockOut(); return; }
+  LISTS_FAILED = true;
+  // A head waiting for this read tries again on the backoff (listsFlush_ asks for the read).
+  if (WAITING_READ && RETRY_TIMER === null) listsRetryLater_();
+  if (!isListScreen_(VIEW.screen)) return;
+  if (LISTS || APP_ON) { listsPaint_(); return; }
+  if (code === 'NOT_CONFIGURED') showCover('error', 'Your PIN works, but the lists are not connected yet.');
+  else if (unreached(err)) showCover('error', REACH_TEXT);
+  else showCover('error', 'Could not load your lists. Check the connection and try again.');
+}
+
+// Repaints a list screen that is on show. Screen state that must survive (an open sheet, a focused field)
+// lives in the screen's own variables, because this rebuilds the screen.
+function listsPaint_() {
+  if (isListScreen_(VIEW.screen) && APP_ON) render(true);
+}
+
+// ---- lists: the queue (kl.queue, shared by every open tab) ----------------------------------------
+// Ops that kl.queue holds now, oldest first. An op with no uid (none should exist) gets a fixed one.
+function listsReadQueue_() {
+  var q = lsJson_(LS_QUEUE);
+  if (!Array.isArray(q)) return [];
+  return q.filter(function (o) { return !!o && typeof o === 'object' && typeof o.op === 'string'; }).map(function (o) {
+    if (typeof o.uid !== 'string' || !o.uid) o.uid = 'u:' + [o.op, o.list, o.id, o.at].join('|');
+    return o;
+  });
+}
+
+// R48: the queue is read, changed and written back on every change, so another tab's ops are never lost.
+// change(arr) is applied to this page's queue and to what kl.queue holds now. What is written also carries this
+// page's ops that never made it into kl.queue, in their own order.
+function listsQueueChange_(change) {
+  change(QUEUE);
+  var stored = listsReadQueue_();
+  change(stored);
+  var next = listsMerge_(stored);
+  QUEUE_UNSAVED = !lsSet_(LS_QUEUE, JSON.stringify(next));
+  if (!QUEUE_UNSAVED) listsAdopt_(next, next);
+}
+
+// What the queue should be: kl.queue's ops in its order (this page's copies take its fields; another tab may
+// have added or retargeted some), plus this page's ops that never made it into kl.queue, each placed right after
+// the op before it here, so the order this page made them in holds. An op this page knew from kl.queue and no
+// longer finds there was settled by another tab, so it is left out.
+function listsMerge_(stored) {
+  var local = {};
+  QUEUE.forEach(function (q) { local[q.uid] = q; });
+  var there = {};
+  stored.forEach(function (s) { there[s.uid] = true; });
+  var out = stored.map(function (s) {
+    var q = local[s.uid];
+    if (!q) return s;
+    for (var k in s) if (Object.prototype.hasOwnProperty.call(s, k)) q[k] = s[k];
+    return q;
+  });
+  var prev = null;
+  QUEUE.forEach(function (q) {
+    if (there[q.uid]) { prev = q.uid; return; }
+    if (KNOWN[q.uid]) return;
+    var at = 0;
+    if (prev !== null) {
+      for (var i = 0; i < out.length; i++) if (out[i].uid === prev) { at = i + 1; break; }
+    }
+    out.splice(at, 0, q);
+    prev = q.uid;
+  });
+  return out;
+}
+
+// Takes next as this page's queue. inStore is what kl.queue holds now: only those ops count as known, so an op
+// that never made it there is never mistaken for one another tab settled. The op on its way stays at the front
+// until its reply, even when another tab settled it.
+function listsAdopt_(next, inStore) {
+  var keep = [];
+  if (INFLIGHT && !next.some(function (q) { return q.uid === INFLIGHT; })) {
+    QUEUE.forEach(function (q) { if (q.uid === INFLIGHT) keep.push(q); });
+  }
+  inStore.forEach(function (q) { KNOWN[q.uid] = true; });
+  QUEUE = keep.concat(next);
+}
+
+function listsQueueInit_() {
+  QUEUE = [];
+  var stored = listsReadQueue_();
+  listsAdopt_(listsMerge_(stored), stored);
+}
+
+function listsQueueRemove_(uid) {
+  listsQueueChange_(function (arr) {
+    for (var i = arr.length - 1; i >= 0; i--) if (arr[i].uid === uid) arr.splice(i, 1);
+  });
+}
+
+// 'd:' + a lowercase uuid, made here so a replayed add is recognised and never duplicates.
+function newId_() {
+  var c = window.crypto;
+  if (c && typeof c.randomUUID === 'function') return 'd:' + String(c.randomUUID()).toLowerCase();
+  var bytes = [];
+  if (c && typeof c.getRandomValues === 'function') {
+    bytes = c.getRandomValues(new Uint8Array(16));
+  } else {
+    for (var i = 0; i < 16; i++) bytes.push(Math.floor(Math.random() * 256));
+  }
+  return 'd:' + uuidFromBytes_(bytes);
+}
+
+// op: {op, list, id, fp, fields, item}. add gets its id here and, on To do, this phone's Who unless fields
+// says one; edit, tick and delete take the fp of the item on screen unless given. item (restore only, never
+// sent) is the item to show again when it is not in doneToday, as after a delete. Shows the change at once,
+// saves the queue and sends it. Returns the queued op, with its id.
+function listsQueue_(input) {
+  var op = { op: String(input.op), at: Date.now() };
+  if (op.op !== 'pause') {
+    op.list = input.list;
+    op.id = input.id || (op.op === 'add' ? newId_() : '');
+  }
+  op.uid = 'u' + newId_().slice(1);
+  if (input.fields && typeof input.fields === 'object') {
+    op.fields = {};
+    for (var k in input.fields) if (Object.prototype.hasOwnProperty.call(input.fields, k)) op.fields[k] = input.fields[k];
+  }
+  if (op.op === 'add' && op.list === 'todo') {
+    if (!op.fields) op.fields = {};
+    if (!op.fields.who && whoAmI_()) op.fields.who = whoAmI_();
+  }
+  if (op.op === 'edit' || op.op === 'tick' || op.op === 'delete') {
+    var cur = listsItem_(op.list, op.id);
+    op.fp = (typeof input.fp === 'string' && input.fp) ? input.fp : (cur ? cur.fp : '');
+  }
+  if (op.op === 'restore' && input.item) op.item = input.item;
+  listsQueueChange_(function (arr) { arr.push(op); });
+  listsRebuild_();
+  setTimeout(listsNoteUpdate_, 10000);
+  listsPaint_();
+  listsFlush_();
+  return op;
+}
+
+// What goes over the wire: no queue bookkeeping, and only the keys each op takes.
+function listsBody_(op) {
+  var b = { op: op.op };
+  if (op.op !== 'pause') {
+    b.list = op.list;
+    b.id = op.id;
+  }
+  if (op.op === 'edit' || op.op === 'tick' || op.op === 'delete') b.fp = op.fp;
+  if (op.op === 'add' || op.op === 'edit' || op.op === 'pause') b.fields = op.fields || {};
+  return b;
+}
+
+function listsNeedsFp_(op) {
+  return op.op === 'edit' || op.op === 'tick' || op.op === 'delete';
+}
+
+function listsWaitKey_(op) {
+  return op.list + '|' + op.id;
+}
+
+// R47, R50: what the queue head needs before it can go. 'go'; 'wait' (a fresh read is asked for); or 'dropped'
+// (a tick or delete whose item the fresh read no longer lists is done; an edit of a gone item is dropped as a
+// conflict would be). Only ever called for the head with nothing in flight, so no earlier op for its item exists.
+function listsHeadReady_(op) {
+  if (op.op === 'pause') return 'go';
+  var key = listsWaitKey_(op);
+  var blank = listsNeedsFp_(op) && !op.fp;
+  if (!Object.prototype.hasOwnProperty.call(WAIT_KEYS, key)) {
+    if (!blank) return 'go';
+    WAIT_KEYS[key] = SETTLE_N;
+  }
+  if (!LISTS_BASE || LANDED_N < WAIT_KEYS[key]) {
+    WAITING_READ = true;
+    if (!(LISTS_LOADING && READ_N >= WAIT_KEYS[key])) listsLoad_(true);
+    return 'wait';
+  }
+  delete WAIT_KEYS[key];
+  if (!listsNeedsFp_(op)) return 'go';
+  var it = listsFind_(LISTS_BASE, op.list, op.id);
+  if (it) {
+    listsQueueChange_(function (arr) {
+      arr.forEach(function (q) { if (q.uid === op.uid) q.fp = it.fp; });
+    });
+    return 'go';
+  }
+  if (op.op === 'edit') LISTS_TOAST = 'This item changed. Refreshed.';
+  listsQueueRemove_(op.uid);
+  listsRebuild_();
+  listsPaint_();
+  return 'dropped';
+}
+
+// Wait marks for items with no queued op left are dropped once a read sent at or after the mark lands. An older
+// read keeps the mark: its fp predates the unsure change, so an op queued later must still wait (case G).
+function listsDropIdleWaits_() {
+  var used = {};
+  QUEUE.forEach(function (q) { if (q.op !== 'pause') used[listsWaitKey_(q)] = true; });
+  for (var k in WAIT_KEYS) {
+    if (Object.prototype.hasOwnProperty.call(WAIT_KEYS, k) && !used[k] && WAIT_KEYS[k] <= LANDED_N) delete WAIT_KEYS[k];
+  }
+}
+
+function listsByUid_(uid) {
+  for (var i = 0; i < QUEUE.length; i++) if (QUEUE[i].uid === uid) return QUEUE[i];
+  return null;
+}
+
+// Sends the oldest op, one at a time, in order. Called on load, on online, on another tab's queue change, after
+// each enqueue, after each read and after each reply.
+function listsFlush_() {
+  if (INFLIGHT || RETRY_TIMER !== null || !TOKEN || !QUEUE.length) return;
+  var ready = listsHeadReady_(QUEUE[0]);
+  if (ready === 'dropped') { listsFlush_(); return; }
+  if (ready === 'wait') return;
+  WAITING_READ = false;
+  var op = QUEUE[0];
+  var sent = JSON.parse(JSON.stringify(op));
+  INFLIGHT = op.uid;
+  var session = SESSION;
+  listsCall_('listOp', listsBody_(sent)).then(function (res) {
+    INFLIGHT = '';
+    // M3: a reply from before a lock-out only frees the line; the op stays queued and goes again.
+    if (session !== SESSION) { listsFlush_(); return; }
+    listsReply_(sent, res);
+  }, function (err) {
+    INFLIGHT = '';
+    if (session !== SESSION) { listsFlush_(); return; }
+    var code = err ? err.code : '';
+    if (code === 'NO_SESSION') { lockOut(); return; }
+    if (code === 'BAD_REQUEST') { listsRefused_(sent, false); return; }
+    listsRetryLater_(); // TIMEOUT, UNREACHED, SERVER, NOT_CONFIGURED: every op is safe to send again
+  });
+}
+
+function listsReply_(op, res) {
+  if (!res || typeof res !== 'object') { listsRetryLater_(); return; }
+  if (res.ok === true) {
+    var item = (res.item && typeof res.item === 'object') ? res.item : null;
+    if (item) listsRetarget_(op, item);
+    listsRecord_(op, res);
+    var unsure = op.op !== 'pause' && ((Object.prototype.hasOwnProperty.call(res, 'item') && res.item === null) || (op.op === 'add' && res.gone));
+    if (unsure) listsWaitFor_(op);
+    listsDone_(op, unsure || (op.op === 'pause' && !res.prefs));
+    return;
+  }
+  if (res.conflict) {
+    listsRecord_(op, res);
+    LISTS_TOAST = 'This item changed. Refreshed.';
+    listsDone_(op, false);
+    return;
+  }
+  // A retried restore after a success answers invalid: it is done, but its fp is unknown.
+  if (res.invalid && op.op === 'restore') {
+    listsRecord_(op, res);
+    listsWaitFor_(op);
+    listsDone_(op, true);
+    return;
+  }
+  if (res.invalid || res.capped) { listsRefused_(op, !!res.capped); return; }
+  listsRetryLater_();
+}
+
+function listsWaitFor_(op) {
+  WAIT_KEYS[listsWaitKey_(op)] = SETTLE_N;
+}
+
+// A settled op goes into the server copy, and is kept for a read on its way (R46).
+function listsRecord_(op, res) {
+  SETTLE_N++;
+  if (LISTS_BASE) listsSettleInto_(LISTS_BASE, op, res);
+  if (LISTS_LOADING) SETTLED.push({ op: op, res: res });
+}
+
+// What a settled op means for a lists object. Matching is by id, so applying it twice changes nothing more.
+function listsSettleInto_(base, op, res) {
+  var item = (res.item && typeof res.item === 'object') ? res.item : null;
+  if (res.conflict) {
+    if (op.op === 'pause') return;
+    if (item) listsUpsert_(base, op.list, item, op.id);
+    else listsRemove_(base, op.list, op.id);
+    return;
+  }
+  if (res.ok !== true) {
+    listsApplyOp_(base, op); // a restore answered invalid on replay
+    return;
+  }
+  if (res.gone) {
+    if (op.op !== 'pause') listsRemove_(base, op.list, op.id);
+    return;
+  }
+  if (op.op === 'pause') {
+    if (res.prefs && typeof res.prefs === 'object') base.prefs = res.prefs;
+    else listsApplyOp_(base, op);
+    return;
+  }
+  listsApplyOp_(base, op);
+  if (item) listsUpsert_(base, op.list, item, op.id);
+}
+
+// Later queued ops for the same item go with the reply's id and fp, so they never trip over the change just saved.
+function listsRetarget_(op, item) {
+  listsQueueChange_(function (arr) {
+    arr.forEach(function (q) {
+      if (q.uid === op.uid || q.op === 'pause' || q.list !== op.list || q.id !== op.id) return;
+      q.id = item.id;
+      if (listsNeedsFp_(q)) q.fp = item.fp;
+    });
+  });
+}
+
+// Puts the server's item where the old one was (found by the op's id, or the item's own), else at the end.
+function listsUpsert_(base, list, item, oldId) {
+  var arr = base[listsKey_(list)];
+  if (!Array.isArray(arr)) return;
+  var i = -1;
+  for (var j = 0; j < arr.length && i < 0; j++) if (arr[j].id === oldId) i = j;
+  for (var k = 0; k < arr.length && i < 0; k++) if (arr[k].id === item.id) i = k;
+  if (i >= 0) arr[i] = item;
+  else arr.push(item);
+}
+
+function listsRemove_(base, list, id) {
+  var arr = base[listsKey_(list)];
+  if (!Array.isArray(arr)) return;
+  for (var i = arr.length - 1; i >= 0; i--) if (arr[i].id === id) arr.splice(i, 1);
+}
+
+// The op is answered: off the queue (its own uid only), screens rebuilt, the next one sent. refresh forces a
+// lists load first.
+function listsDone_(op, refresh) {
+  listsQueueRemove_(op.uid);
+  RETRY_N = 0;
+  listsSaveCache_();
+  listsRebuild_();
+  if (refresh) listsLoad_(true);
+  listsPaint_();
+  listsFlush_();
+}
+
+function listsRefused_(op, capped) {
+  LISTS_TOAST = capped ? 'Too many new items today. This one was not saved.' : 'That change was not saved.';
+  listsDone_(op, true);
+}
+
+function listsRetryLater_() {
+  RETRY_N++;
+  RETRY_TIMER = setTimeout(function () {
+    RETRY_TIMER = null;
+    listsFlush_();
+  }, backoffMs_(RETRY_N));
+  listsNoteUpdate_();
+}
+
+// True once the oldest op has waited 10 s unsent.
+function listsPendingLong_() {
+  return QUEUE.length > 0 && Date.now() - (Number(QUEUE[0].at) || 0) >= 10000;
+}
+
+function listsNoteUpdate_() {
+  if (!LISTS_NOTE) return;
+  var late = listsPendingLong_();
+  LISTS_NOTE.textContent = late ? 'Not saved yet, retrying' : '';
+  LISTS_NOTE.hidden = !late;
+}
+
+// Another tab changed kl.queue: take its ops, drop the ones it settled, send what is ours to send.
+function listsStorageChanged_(e) {
+  if (e && e.key !== LS_QUEUE && e.key !== null) return;
+  var stored = listsReadQueue_();
+  listsAdopt_(listsMerge_(stored), stored);
+  listsRebuild_();
+  listsPaint_();
+  listsFlush_();
+}
+
+// At lock-out: nothing on screen, no read pending. The queue stays, in memory and in kl.queue. A send on its way
+// is left to finish (INFLIGHT), so the next one never overtakes it (M3).
+function listsLockOut_() {
+  if (RETRY_TIMER !== null) clearTimeout(RETRY_TIMER);
+  RETRY_TIMER = null;
+  RETRY_N = 0;
+  LISTS_LOADING = false;
+  LISTS_AGAIN = false;
+  LISTS_FAILED = false;
+  LISTS = null;
+  LISTS_BASE = null;
+  LISTS_AT = 0;
+  LISTS_FETCHED = 0;
+  LISTS_TOAST = '';
+  listsUndoClear_();
+  LISTS_NOTE = null;
+  SETTLED = [];
+  LANDED_N = -1;     // the next read must land before a waiting head is resolved against anything
+  WAITING_READ = false;
+}
+
+// ---- lists: screens (Tasks 6 to 8 fill the lists-main container) ---------------------------------
+function listsPanel_(root, title, line) {
+  var w = panel(root);
+  add(w, 'div', 'panel-top').appendChild(el('p', 'names', 'Kev & Lili'));
+  var h = add(w, 'h1', 'title-big', title);
+  h.setAttribute('tabindex', '-1');
+  if (line) add(w, 'p', 'panel-note', line);
+  if (LISTS_AT) add(w, 'p', 'panel-small', (LISTS_FAILED ? 'Could not refresh. ' : '') + updatedText_(LISTS_AT, Date.now()) + '.');
+  return h;
+}
+
+function renderWhoCard_(parent) {
+  var card = add(parent, 'div', 'who-card');
+  add(card, 'h2', '', 'This phone is');
+  var row = add(card, 'div', 'who-choices');
+  ['Kev', 'Lili'].forEach(function (name) {
+    btn(row, 'btn-plain', name, function () {
+      setWhoAmI_(name);
+      render(true);
+    });
+  });
+  add(card, 'p', 'small', 'New to-dos from this phone are for this person unless you pick someone else.');
+}
+
+// True when there are no lists to show yet; it says why in parent.
+function listsWaiting_(parent) {
+  if (LISTS) return false;
+  if (LISTS_FAILED) {
+    add(parent, 'p', 'small', 'Could not load your lists.');
+    btn(parent, 'textbtn', 'Try again', function () { listsLoad_(true); });
+  } else {
+    add(parent, 'p', 'small', 'Opening your lists...');
+  }
+  return true;
+}
+
+// R57: what the server found wrong with the list tabs (a blanked header cell), as one quiet line of text.
+function listsProblems_(parent, lists) {
+  var all = lists && Array.isArray(lists.problems) ? lists.problems : [];
+  var lines = [];
+  all.forEach(function (x) {
+    var t = typeof x === 'string' ? sheetOneLine_(x) : '';
+    if (t) lines.push(/[.]$/.test(t) ? t : t + '.');
+  });
+  return lines.length ? add(parent, 'p', 'lists-problem', lines.join(' ')) : null;
+}
+
+// The fixed strip above the bar: "Not saved yet", the lists toast and the "Deleted. Undo" line. To do adds
+// its "+" button at the end, so it stays nearest the bar.
+function listsDock_(root) {
+  var dock = add(root, 'div', 'dock');
+  LISTS_NOTE = add(dock, 'p', 'dock-note');
+  LISTS_NOTE.setAttribute('role', 'status');
+  listsNoteUpdate_();
+  if (QUEUE_UNSAVED && QUEUE.length) add(dock, 'p', 'dock-note', 'Changes are kept only while this page is open.');
+  if (LISTS_TOAST) {
+    var t = add(dock, 'div', 'dock-toast');
+    t.setAttribute('role', 'status');
+    add(t, 'span', '', LISTS_TOAST);
+  }
+  if (LISTS_UNDO) {
+    // M2: only "Deleted." is the live region, and it is said once: it goes on screen empty and is filled
+    // 100 ms later on the line then on screen; every repaint after that draws it filled.
+    var u = add(dock, 'div', 'dock-toast dock-undo');
+    var said = add(u, 'span', '', LISTS_UNDO.said ? 'Deleted.' : '');
+    said.setAttribute('role', 'status');
+    LISTS_UNDO_SAY = said;
+    if (!LISTS_UNDO.said && !LISTS_UNDO.saying) {
+      var undo = LISTS_UNDO;
+      undo.saying = true;
+      setTimeout(function () {
+        if (LISTS_UNDO !== undo) return;
+        undo.said = true;
+        if (LISTS_UNDO_SAY) LISTS_UNDO_SAY.textContent = 'Deleted.';
+      }, 100);
+    }
+    todoKey_(btn(u, '', 'Undo', listsUndo_), 'undo');
+  }
+  return dock;
+}
+
+// ---- To do screen (Task 6) -------------------------------------------------------------------
+// Days are 'yyyy-MM-dd' text in Bali time. Every section and age comes from the server's today, never the
+// phone clock. The pure helpers below take everything they use as arguments.
+
+// iso plus n days, as 'yyyy-MM-dd'.
+function isoAddDays_(iso, n) {
+  var d = new Date(Date.UTC(Number(iso.slice(0, 4)), Number(iso.slice(5, 7)) - 1, Number(iso.slice(8, 10)) + n));
+  var m = d.getUTCMonth() + 1;
+  var day = d.getUTCDate();
+  return d.getUTCFullYear() + '-' + (m < 10 ? '0' : '') + m + '-' + (day < 10 ? '0' : '') + day;
+}
+
+// True for a real calendar day as 'yyyy-MM-dd' (2026-02-30 and 2026-13-01 are not).
+function todoValidDay_(v) {
+  return typeof v === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(v) && isoAddDays_(v, 0) === v;
+}
+
+// 'Fri 14'; the month is added when the day is not in today's month: 'Tue 1 Dec'.
+function todoDayLabel_(iso, today) {
+  var days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+  var months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+  var d = new Date(Date.UTC(Number(iso.slice(0, 4)), Number(iso.slice(5, 7)) - 1, Number(iso.slice(8, 10))));
+  var out = days[d.getUTCDay()] + ' ' + d.getUTCDate();
+  if (iso.slice(0, 7) !== String(today || '').slice(0, 7)) out += ' ' + months[d.getUTCMonth()];
+  return out;
+}
+
+// The muted age chip: nothing under 7 days, then '7 days' to '13 days', then '2+ weeks' and no higher.
+function todoAgeText_(ageDays) {
+  var n = Math.floor(Number(ageDays) || 0);
+  if (n < 7) return '';
+  if (n < 14) return n + ' days';
+  return '2+ weeks';
+}
+
+// The who chip. Either (and the old stored Both) is the default and shows no chip.
+function todoWho_(who) {
+  return (who === 'Kev' || who === 'Lili' || who === 'Couple') ? who : '';
+}
+
+// '5 min' for a quick item, 'First step: ...' for a bigger one, else nothing.
+function todoEffortText_(it) {
+  var mins = Number(it.minutes);
+  if (it.kind === 'quick') return (isFinite(mins) && mins > 0) ? mins + ' min' : '';
+  if (it.kind === 'bigger' && it.firstStep) return 'First step: ' + it.firstStep;
+  return '';
+}
+
+// Soonest due first; on one day a set time comes first (earliest first), then the one that waited longest.
+function todoCmpDue_(a, b) {
+  if (a.due !== b.due) return a.due < b.due ? -1 : 1;
+  var ta = a.time || '';
+  var tb = b.time || '';
+  if (ta !== tb) {
+    if (!ta) return 1;
+    if (!tb) return -1;
+    return ta < tb ? -1 : 1;
+  }
+  return todoCmpAge_(a, b);
+}
+
+// Oldest first: the most days waited, then the earliest added, then by id. The id makes the order total, so a
+// row unticked here (restore puts it at the end of the list) comes back to the same place.
+function todoCmpAge_(a, b) {
+  var d = (Number(b.ageDays) || 0) - (Number(a.ageDays) || 0);
+  if (d) return d;
+  var x = a.added || '';
+  var y = b.added || '';
+  if (x !== y) return x < y ? -1 : 1;
+  var i = String(a.id);
+  var j = String(b.id);
+  return i === j ? 0 : (i < j ? -1 : 1);
+}
+
+// The five To do sections. today: due on or before today (the earlier days folded in); week: the next 7 days,
+// grouped by day as {due, label, items}; later: after that; anytime: no date, under 30 days; parked: no date,
+// 30 days or more. A due that is not a real 'yyyy-MM-dd' day counts as no date. items is not changed.
+function todoSections_(items, today) {
+  var end = isoAddDays_(today, 7);
+  var out = { today: [], week: [], later: [], anytime: [], parked: [] };
+  var week = [];
+  (items || []).forEach(function (it) {
+    var due = todoValidDay_(it.due) ? it.due : '';
+    if (!due) {
+      if ((Number(it.ageDays) || 0) >= 30) out.parked.push(it);
+      else out.anytime.push(it);
+    } else if (due <= today) {
+      out.today.push(it);
+    } else if (due <= end) {
+      week.push(it);
+    } else {
+      out.later.push(it);
+    }
+  });
+  out.today.sort(todoCmpDue_);
+  week.sort(todoCmpDue_);
+  out.later.sort(todoCmpDue_);
+  out.anytime.sort(todoCmpAge_);
+  out.parked.sort(todoCmpAge_);
+  week.forEach(function (it) {
+    var g = out.week[out.week.length - 1];
+    if (!g || g.due !== it.due) {
+      g = { due: it.due, label: todoDayLabel_(it.due, today), items: [] };
+      out.week.push(g);
+    }
+    g.items.push(it);
+  });
+  return out;
+}
+
+// The one item the note names: of those that waited 7 days or more, the oldest quick one, else the oldest.
+function todoNotePick_(items) {
+  var waited = (items || []).filter(function (it) { return (Number(it.ageDays) || 0) >= 7; }).sort(todoCmpAge_);
+  for (var i = 0; i < waited.length; i++) if (waited[i].kind === 'quick') return waited[i];
+  return waited[0] || null;
+}
+
+// The note as [lead, rest]: '<text> has waited a while.' (a trailing punctuation mark of the text dropped) and the
+// first step and minutes when known, else ''.
+function todoNoteParts_(it) {
+  var lead = String(it.text).replace(/[\s.!?,;:\u2026]+$/, '') + ' has waited a while.';
+  var mins = Number(it.minutes);
+  var hasMins = isFinite(mins) && mins > 0;
+  var step = String(it.firstStep || '').replace(/[.\s]+$/, '');
+  var rest = '';
+  if (step) rest = 'First step: ' + step + (hasMins ? ', about ' + mins + ' min.' : '.');
+  else if (hasMins) rest = 'About ' + mins + ' min.';
+  return [lead, rest];
+}
+
+function todoNoteText_(it) {
+  var p = todoNoteParts_(it);
+  return p[1] ? p[0] + ' ' + p[1] : p[0];
+}
+
+// Mine: the items for me, plus Either and Couple. With no phone identity, everything.
+function todoMine_(items, me) {
+  if (!me) return items.slice();
+  return items.filter(function (it) { return it.who === me || it.who === 'Couple' || todoWho_(it.who) === ''; });
+}
+
+// ---- To do: screen state. A repaint rebuilds the screen, so what must survive lives here.
+var LS_NOTE = 'kl.noteSnooze'; // the Bali day the Anytime note shows again (yyyy-MM-dd)
+var NOTE_SNOOZE = null;  // memory copy of kl.noteSnooze, so "Not now" holds for this visit even without storage
+var TODO_MINE = false;   // the Mine toggle
+var TODO_STRUCK = {};    // id -> {item, at}: ticked here, struck in place (at its old position) until the screen is left
+var TODO_OPEN = {};      // the collapsed sections opened on this visit: later, parked, done
+var TODO_PAUSE = '';     // the reminders Pause menu: '' closed, 'menu', or 'date' with the day field
+var TODO_PAUSE_DAY = ''; // the day typed in that field
+var TODO_PAUSE_ERR = '';
+var TODO_PAUSE_ERR_NEW = false; // the error was just set: its status line goes on screen empty, then is filled
+var TODO_FOCUS = '';     // the control that had focus ('tick:<id>', 'fold:later', 'mine', ...), given back after a repaint
+var TODO_FOCUS_EL = null; // that control on the screen being drawn
+var TODO_NOTTODAY = '';  // the earlier-day row whose "Not today" choices are open (its id)
+var PLUS_PATHS = ['M12 5v14', 'M5 12h14'];
+var TICK_OPEN_PATHS = ['M12 3.5a8.5 8.5 0 1 1 0 17a8.5 8.5 0 1 1 0-17z'];
+var TICK_DONE_PATHS = ['M12 3.5a8.5 8.5 0 1 1 0 17a8.5 8.5 0 1 1 0-17z', 'M8 12.3l2.8 2.8l5.2-5.8'];
+
+// Leaving To do: struck items go to Done today, the folds close, the Pause menu closes.
+function todoLeave_() {
+  TODO_STRUCK = {};
+  TODO_OPEN = {};
+  TODO_PAUSE = '';
+  TODO_PAUSE_DAY = '';
+  TODO_PAUSE_ERR = '';
+  TODO_PAUSE_ERR_NEW = false;
+  TODO_FOCUS = '';
+  TODO_NOTTODAY = '';
+}
+
+// Marks a control with a focus key. Tapping it (its handler) or focusing it (the focusin listener on #todo)
+// makes it the one a repaint gives focus back to; focusing anything without a key clears the key.
+function todoKey_(e, key) {
+  e.setAttribute('data-focus', key);
+  if (key === TODO_FOCUS) TODO_FOCUS_EL = e;
+  if (key === GRO_FOCUS) GRO_FOCUS_EL = e; // Groceries uses the same keys (the dock's Undo is keyed here)
+  return e;
+}
+
+function todoIsDay_(v) {
+  return todoValidDay_(v);
+}
+
+function todoSnoozedUntil_() {
+  if (NOTE_SNOOZE === null) {
+    var v = lsGet_(LS_NOTE);
+    NOTE_SNOOZE = todoIsDay_(v) ? v : '';
+  }
+  return NOTE_SNOOZE;
+}
+
+function todoSnooze_(today) {
+  NOTE_SNOOZE = isoAddDays_(today, 7);
+  lsSet_(LS_NOTE, NOTE_SNOOZE);
+  render(true);
+}
+
+// Opens the edit sheet (Task 7) on a row tap, or with the text set to the first step ("Make it smaller").
+function todoOpen_(it, prefill) {
+  openItemSheet_(it, 'todo', prefill);
+}
+
+// "Not today": Tomorrow or No date (which clears the time too).
+function todoMove_(it, due) {
+  TODO_NOTTODAY = '';
+  TODO_FOCUS = 'tick:' + it.id;
+  var fields = { due: due };
+  if (!due && it.time) fields.time = '';
+  listsQueue_({ op: 'edit', list: 'todo', id: it.id, fields: fields });
+}
+
+function todoCopy_(it) {
+  var c = JSON.parse(JSON.stringify(it));
+  c.fp = '';
+  return c;
+}
+
+function todoTick_(it) {
+  var at = 0;
+  var open = (LISTS && LISTS.todo) || [];
+  for (var i = 0; i < open.length; i++) if (open[i].id === it.id) at = i;
+  TODO_STRUCK[it.id] = { item: todoCopy_(it), at: at };
+  listsQueue_({ op: 'tick', list: 'todo', id: it.id });
+}
+
+// Unticks a struck item, or brings one back from Done today.
+function todoUntick_(it) {
+  delete TODO_STRUCK[it.id];
+  listsQueue_({ op: 'restore', list: 'todo', id: it.id, item: todoCopy_(it) });
+}
+
+function todoPause_(until) {
+  TODO_PAUSE = '';
+  TODO_PAUSE_DAY = '';
+  TODO_PAUSE_ERR = '';
+  listsQueue_({ op: 'pause', fields: { person: whoAmI_(), until: until } });
+}
+
+// The day this phone's reminders are paused until, or '' when they are on (a pause that ended is on again).
+function todoPausedUntil_(lists, me) {
+  var p = lists && lists.prefs && lists.prefs[me];
+  var u = p ? p.pausedUntil : '';
+  return (todoIsDay_(u) && todoIsDay_(lists.today) && u >= lists.today) ? u : '';
+}
+
+// What the screen shows: the open items with the struck ones back in their places, Mine applied, in sections.
+function todoView_(lists, me, mineOnly) {
+  var open = Array.isArray(lists.todo) ? lists.todo : [];
+  var openIds = {};
+  open.forEach(function (it) { openIds[it.id] = true; });
+  var struck = [];
+  Object.keys(TODO_STRUCK).forEach(function (id) {
+    // Open again (a conflict, or brought back elsewhere): it is not struck any more.
+    if (openIds[id]) delete TODO_STRUCK[id];
+    else struck.push(TODO_STRUCK[id]);
+  });
+  struck.sort(function (a, b) { return a.at - b.at; });
+  var all = open.slice();
+  struck.forEach(function (s) { all.splice(Math.min(s.at, all.length), 0, s.item); });
+  var done = (Array.isArray(lists.doneToday) ? lists.doneToday : []).filter(function (it) {
+    return it && it.list === 'todo' && !TODO_STRUCK[it.id];
+  });
+  if (mineOnly && me) {
+    all = todoMine_(all, me);
+    done = todoMine_(done, me);
+  }
+  var today = todoIsDay_(lists.today) ? lists.today : '';
+  var sections = todoSections_(all, today);
+  var dueToday = sections.today.filter(function (it) { return !TODO_STRUCK[it.id]; }).length;
+  return { today: today, sections: sections, done: done, count: all.length, dueToday: dueToday };
+}
+
+function renderTodo_(data, me, mineOnly) {
+  var root = $('todo');
+  var lists = data === undefined ? LISTS : data;
+  if (me === undefined) me = whoAmI_();
+  if (mineOnly === undefined) mineOnly = TODO_MINE;
+  var view = lists ? todoView_(lists, me, mineOnly) : null;
+  TODO_FOCUS_EL = null;
+  var title = listsPanel_(root, 'To do', view && view.dueToday > 0 ? 'Today: ' + view.dueToday : '');
+  var body = add(root, 'div', 'wrap');
+  listsProblems_(body, lists);
+  if (!me) renderWhoCard_(body);
+  var main = add(body, 'div', 'lists-main');
+  if (!view) {
+    listsWaiting_(main);
+  } else {
+    if (me) {
+      var top = add(main, 'div', 'todo-top');
+      var mine = todoKey_(btn(top, 'mine', 'Mine', function () {
+        TODO_FOCUS = 'mine';
+        TODO_MINE = !TODO_MINE;
+        render(true);
+      }), 'mine');
+      mine.setAttribute('aria-pressed', mineOnly ? 'true' : 'false');
+    }
+    todoMain_(main, view);
+  }
+  if (me) todoSettings_(body, lists, me);
+  add(body, 'div', 'list-end');
+  var dock = listsDock_(root);
+  if (view) {
+    var plus = todoKey_(btn(dock, 'todo-add', null, function () {
+      TODO_FOCUS = 'add';
+      openItemSheet_(null, 'todo');
+    }), 'add');
+    plus.setAttribute('aria-label', 'Add a to-do');
+    plus.appendChild(svgIcon_(PLUS_PATHS));
+  }
+  // An open sheet keeps focus: a repaint behind it never moves focus (iOS would close the keyboard).
+  if (TODO_FOCUS_EL && !SHEET) TODO_FOCUS_EL.focus({ preventScroll: true });
+  return title;
+}
+
+function todoMain_(main, view) {
+  var s = view.sections;
+  var today = view.today;
+  if (!view.count) add(main, 'p', 'todo-empty', 'Nothing here. Tap + or tell the bot.');
+  if (s.today.length) {
+    var t = todoSection_(main, 'today', 'Today');
+    s.today.forEach(function (it) { todoRow_(t, it, today, 'today'); });
+  }
+  if (s.week.length) {
+    var w = todoSection_(main, 'week', 'This week');
+    s.week.forEach(function (g) {
+      add(w, 'p', 'todo-day', g.label);
+      g.items.forEach(function (it) { todoRow_(w, it, today, 'week'); });
+    });
+  }
+  if (s.later.length) {
+    var l = add(main, 'div', 'todo-sec todo-sec-later');
+    if (todoFold_(l, 'later', 'Later · ' + s.later.length + ' · next ' + todoDayLabel_(s.later[0].due, today))) {
+      s.later.forEach(function (it) { todoRow_(l, it, today, 'later'); });
+    }
+  }
+  if (s.anytime.length) {
+    var a = todoSection_(main, 'anytime', 'Anytime');
+    var pick = todoSnoozedUntil_() && today < todoSnoozedUntil_() ? null
+      : todoNotePick_(s.anytime.filter(function (it) { return !TODO_STRUCK[it.id]; }));
+    if (pick) todoNote_(a, pick, today);
+    s.anytime.forEach(function (it) { todoRow_(a, it, today, 'anytime'); });
+  }
+  if (s.parked.length) {
+    var p = add(main, 'div', 'todo-sec todo-sec-parked');
+    if (todoFold_(p, 'parked', 'Parked · ' + s.parked.length)) {
+      s.parked.forEach(function (it) { todoRow_(p, it, today, 'parked'); });
+    }
+  }
+  if (view.done.length) {
+    var d = add(main, 'div', 'todo-sec todo-sec-done');
+    if (todoFold_(d, 'done', 'Done today')) {
+      view.done.forEach(function (it) { todoRow_(d, it, today, 'done'); });
+    }
+  }
+}
+
+function todoSection_(main, key, heading) {
+  var sec = add(main, 'div', 'todo-sec todo-sec-' + key);
+  add(sec, 'h2', '', heading);
+  return sec;
+}
+
+// A collapsed section's header. True when it is open.
+function todoFold_(sec, key, label) {
+  var h = add(sec, 'h2', 'todo-fold-h');
+  var b = todoKey_(btn(h, 'todo-fold', label, function () {
+    TODO_FOCUS = 'fold:' + key;
+    TODO_OPEN[key] = !TODO_OPEN[key];
+    render(true);
+  }), 'fold:' + key);
+  b.setAttribute('aria-expanded', TODO_OPEN[key] ? 'true' : 'false');
+  return !!TODO_OPEN[key];
+}
+
+// One row: the tick zone, the text (2 lines at most), then the chips. where says which section it is in.
+function todoRow_(parent, it, today, where) {
+  var done = where === 'done' || !!TODO_STRUCK[it.id];
+  var row = add(parent, 'div', 'todo-row' + (done ? ' is-done' : ''));
+  var tick = todoKey_(btn(row, 'tick-zone', null, function () {
+    TODO_FOCUS = 'tick:' + it.id;
+    if (done) todoUntick_(it);
+    else todoTick_(it);
+  }), 'tick:' + it.id);
+  tick.setAttribute('aria-label', 'Done: ' + it.text);
+  tick.setAttribute('aria-pressed', done ? 'true' : 'false');
+  tick.appendChild(svgIcon_(done ? TICK_DONE_PATHS : TICK_OPEN_PATHS));
+  var main = done ? add(row, 'div', 'todo-open') : todoKey_(btn(row, 'todo-open', null, function () {
+    TODO_FOCUS = 'open:' + it.id;
+    todoOpen_(it);
+  }), 'open:' + it.id);
+  add(main, 'span', 'todo-text', it.text);
+  // Rows from earlier days: "Not today" opens two choices under the row, Tomorrow and No date.
+  if (where === 'today' && !done && todoValidDay_(today) && it.due < today) {
+    var later = todoKey_(btn(row, 'textbtn todo-nottoday', 'Not today', function () {
+      TODO_FOCUS = 'nottoday:' + it.id;
+      TODO_NOTTODAY = TODO_NOTTODAY === it.id ? '' : it.id;
+      render(true);
+    }), 'nottoday:' + it.id);
+    later.setAttribute('aria-expanded', TODO_NOTTODAY === it.id ? 'true' : 'false');
+    if (TODO_NOTTODAY === it.id) {
+      var menu = add(parent, 'div', 'todo-nottoday-menu');
+      menu.setAttribute('role', 'group');
+      menu.setAttribute('aria-label', 'Not today');
+      btn(menu, 'btn-plain', 'Tomorrow', function () { todoMove_(it, isoAddDays_(today, 1)); });
+      btn(menu, 'btn-plain', 'No date', function () { todoMove_(it, ''); });
+    }
+  }
+  // R53: a parked item comes back with today's date (the server's day), which puts it under Today.
+  if (where === 'parked' && !done && todoValidDay_(today)) {
+    btn(row, 'textbtn todo-revive', 'Bring back', function () {
+      TODO_FOCUS = 'tick:' + it.id;
+      listsQueue_({ op: 'edit', list: 'todo', id: it.id, fields: { due: today } });
+    });
+  }
+  var chips = [];
+  var who = todoWho_(it.who);
+  if (who) chips.push([who, 'tchip-who tchip-' + who.toLowerCase()]);
+  var effort = todoEffortText_(it);
+  if (effort) chips.push([effort, 'tchip-effort']);
+  var age = todoAgeText_(it.ageDays);
+  if (age) chips.push([age, 'tchip-age']);
+  if (where === 'today' && today && it.due < today) chips.push(['from ' + todoDayLabel_(it.due, today), 'tchip-from']);
+  else if (where === 'later') chips.push([todoDayLabel_(it.due, today) + (it.time ? ' ' + it.time : ''), 'tchip-date']);
+  else if (it.time && (where === 'today' || where === 'week')) chips.push([it.time, 'tchip-date']);
+  if (!chips.length) return;
+  var box = add(main, 'span', 'todo-chips');
+  chips.forEach(function (c) { add(box, 'span', 'tchip ' + c[1], c[0]); });
+}
+
+// The calm note at the top of Anytime: one item, its first step, two ways out.
+function todoNote_(parent, it, today) {
+  var n = add(parent, 'div', 'todo-note');
+  n.setAttribute('role', 'note');
+  var parts = todoNoteParts_(it);
+  add(n, 'p', 'todo-note-lead', parts[0]);
+  if (parts[1]) add(n, 'p', '', parts[1]);
+  var actions = add(n, 'div', 'todo-note-actions');
+  // R55: only with a first step to make it smaller to.
+  if (it.firstStep) btn(actions, 'btn-plain', 'Make it smaller', function () { todoOpen_(it, { text: it.firstStep }); });
+  btn(actions, 'btn-plain', 'Not now', function () { todoSnooze_(today); });
+}
+
+// The two lines at the bottom: this phone, and its reminders.
+function todoSettings_(body, lists, me) {
+  var phone = add(body, 'p', 'lists-settings small');
+  phone.appendChild(document.createTextNode('This phone: ' + me));
+  add(phone, 'span', 'sep', '·').setAttribute('aria-hidden', 'true');
+  btn(phone, 'textbtn', 'Change', function () {
+    TODO_FOCUS = '';
+    setWhoAmI_('');
+    TODO_MINE = false;
+    render(true);
+  });
+  if (!lists || !todoIsDay_(lists.today)) return;
+  var today = lists.today;
+  var until = todoPausedUntil_(lists, me);
+  var line = add(body, 'p', 'lists-settings small');
+  line.appendChild(document.createTextNode(until ? 'Reminders: paused until ' + todoDayLabel_(until, today) : 'Reminders: on'));
+  add(line, 'span', 'sep', '·').setAttribute('aria-hidden', 'true');
+  if (until) {
+    todoKey_(btn(line, 'textbtn', 'Resume', function () {
+      TODO_FOCUS = 'pause';
+      todoPause_('');
+    }), 'resume');
+    return;
+  }
+  var pause = todoKey_(btn(line, 'textbtn', 'Pause', function () {
+    TODO_FOCUS = 'pause';
+    TODO_PAUSE = TODO_PAUSE ? '' : 'menu';
+    TODO_PAUSE_ERR = '';
+    render(true);
+  }), 'pause');
+  pause.setAttribute('aria-expanded', TODO_PAUSE ? 'true' : 'false');
+  if (!TODO_PAUSE) return;
+  var menu = add(body, 'div', 'pause-menu');
+  if (TODO_PAUSE === 'menu') {
+    btn(menu, 'btn-plain', '1 week', function () {
+      TODO_FOCUS = 'resume';
+      todoPause_(isoAddDays_(today, 7));
+    });
+    btn(menu, 'btn-plain', '2 weeks', function () {
+      TODO_FOCUS = 'resume';
+      todoPause_(isoAddDays_(today, 14));
+    });
+    btn(menu, 'btn-plain', 'Until a date', function () {
+      TODO_FOCUS = 'pause-day';
+      TODO_PAUSE = 'date';
+      render(true);
+    });
+    return;
+  }
+  var field = todoKey_(add(menu, 'input', ''), 'pause-day');
+  field.setAttribute('type', 'date');
+  field.setAttribute('min', isoAddDays_(today, 1));
+  field.setAttribute('max', isoAddDays_(today, 60));
+  field.setAttribute('aria-label', 'Pause reminders until');
+  field.value = TODO_PAUSE_DAY;
+  var keep = function () { TODO_PAUSE_DAY = field.value; };
+  field.addEventListener('input', keep);
+  field.addEventListener('change', keep);
+  btn(menu, 'btn-plain', 'Pause until then', function () {
+    var day = field.value;
+    if (!todoIsDay_(day) || day <= today || day > isoAddDays_(today, 60)) {
+      TODO_PAUSE_DAY = day;
+      TODO_PAUSE_ERR = 'Pick a day in the next 60 days.';
+      TODO_PAUSE_ERR_NEW = true;
+      TODO_FOCUS = 'pause-day';
+      render(true);
+      return;
+    }
+    TODO_FOCUS = 'resume';
+    todoPause_(day);
+  });
+  // The status line is always there while the field is. A fresh error goes in after it is on screen, so screen
+  // readers announce it; a repaint after that draws it filled, with no second announcement.
+  var status = add(menu, 'p', 'pause-error');
+  status.setAttribute('role', 'status');
+  if (TODO_PAUSE_ERR_NEW) {
+    TODO_PAUSE_ERR_NEW = false;
+    var msgText = TODO_PAUSE_ERR;
+    setTimeout(function () { status.textContent = msgText; }, 100);
+  } else {
+    status.textContent = TODO_PAUSE_ERR;
+  }
+}
+
+// ---- the item sheet (Task 7): edit or add one item; closing it saves ------------------------------
+// One sheet for both lists. The list decides the fields: To do has text, When, Who and More > Time; Groceries
+// has text and a Shop slot (Task 8 fills it through sheetShop_). The sheet lives in the static #sheet, outside
+// the screens, so a repaint behind it never rebuilds it or moves its focus. Closing it (tap outside, Escape,
+// back, swipe down, Save, Enter in the text) sends the change as one edit or one add through the queue; no
+// change sends nothing; a new item with no text is dropped.
+var SHEET_FIELDS = { todo: ['text', 'who', 'due', 'time'], grocery: ['text', 'shop'] }; // the user fields each list edits
+var SHEET = null;          // the open sheet: {list, id, orig, draft, today, chips, pick, more, returnKey, els, ctls, focusEl}
+var SHEET_IN_HISTORY = false; // the open sheet added a history step, so the phone's back closes it
+var SHEET_POPS = 0;        // our own history.back() calls whose popstate has not arrived yet
+var LISTS_UNDO = null;     // {list, item}: the "Deleted. Undo" line, for 6 s
+var LISTS_UNDO_TIMER = null;
+var LISTS_UNDO_SAY = null; // the "Deleted." status line on screen now
+
+// Who as the sheet shows it: the old stored Both, blank and anything unknown read as Either.
+function sheetWho_(who) {
+  return (who === 'Kev' || who === 'Lili' || who === 'Couple') ? who : 'Either';
+}
+
+// The When day chips from the server's Bali day: Today, Tomorrow, then the next 5 weekday names.
+function sheetWhenChips_(today) {
+  if (!todoValidDay_(today)) return [];
+  var out = [{ label: 'Today', due: today }, { label: 'Tomorrow', due: isoAddDays_(today, 1) }];
+  for (var n = 2; n < 7; n++) {
+    var d = isoAddDays_(today, n);
+    out.push({ label: todoDayLabel_(d, d).split(' ')[0], due: d });
+  }
+  return out;
+}
+
+// The sheet's starting values: the item's, or for a new item no text, this phone's Who (else Either), no
+// date. prefill.text ("Make it smaller") replaces the starting text and keeps the rest.
+function sheetDraft_(list, it, prefill, me) {
+  var d = it
+    ? { text: String(it.text || ''), who: sheetWho_(it.who), due: String(it.due || ''), time: String(it.time || ''), shop: String(it.shop || '') }
+    : { text: '', who: sheetWho_(me), due: '', time: '', shop: '' };
+  if (prefill && typeof prefill.text === 'string') d.text = prefill.text;
+  return d;
+}
+
+// M4: pasted line breaks (and the spaces around them) become one space; the ends are trimmed.
+function sheetOneLine_(v) {
+  return String(v === undefined || v === null ? '' : v).replace(/\s*[\r\n]+\s*/g, ' ').trim();
+}
+
+// The fields of an edit: only those the list allows and the draft changed, or null for no change. Text is
+// trimmed; an emptied text keeps the old one (the server needs 1 to 500 characters).
+function sheetDiff_(list, orig, draft) {
+  var out = {};
+  var any = false;
+  (SHEET_FIELDS[list] || []).forEach(function (k) {
+    var was = String(orig[k] === undefined || orig[k] === null ? '' : orig[k]);
+    var now = String(draft[k] === undefined || draft[k] === null ? '' : draft[k]);
+    if (k === 'text' || k === 'shop') {
+      was = sheetOneLine_(was);
+      now = sheetOneLine_(now);
+      if (k === 'text' && !now) return;
+    }
+    if (k === 'who') {
+      was = sheetWho_(was);
+      now = sheetWho_(now);
+    }
+    if (now !== was) {
+      out[k] = now;
+      any = true;
+    }
+  });
+  return any ? out : null;
+}
+
+// The fields of an add, or null when there is no text (the new item is dropped). A time goes only with a day.
+function sheetAddFields_(list, d) {
+  var text = sheetOneLine_(d.text);
+  if (!text) return null;
+  if (list === 'grocery') {
+    var shop = sheetOneLine_(d.shop);
+    return shop ? { text: text, shop: shop } : { text: text };
+  }
+  var f = { text: text, who: sheetWho_(d.who) };
+  if (todoValidDay_(d.due)) {
+    f.due = d.due;
+    if (/^\d{2}:\d{2}$/.test(d.time || '')) f.time = d.time;
+  }
+  return f;
+}
+
+// item null opens an empty sheet for a new item. prefill: {text} sets the starting text.
+function openItemSheet_(it, list, prefill) {
+  list = list === 'grocery' ? 'grocery' : 'todo';
+  if (SHEET) closeItemSheet_('replace');
+  var cur = it && it.id ? (listsItem_(list, it.id) || it) : null;
+  var orig = cur ? JSON.parse(JSON.stringify(cur)) : null;
+  var today = LISTS && todoValidDay_(LISTS.today) ? LISTS.today : '';
+  var s = {
+    list: list, id: orig ? orig.id : '', orig: orig, draft: sheetDraft_(list, orig, prefill, whoAmI_()),
+    today: today, chips: sheetWhenChips_(today), more: false, pick: false,
+    returnKey: orig ? 'open:' + orig.id : 'add', els: {}, ctls: [], focusEl: null, touch: null,
+  };
+  s.more = !!s.draft.time;
+  s.pick = !!s.draft.due && !s.chips.some(function (c) { return c.due === s.draft.due; });
+  SHEET = s;
+  sheetBuild_(s);
+  sheetInert_(true);
+  if (!SHEET_IN_HISTORY) {
+    var h = window.history;
+    if (h && typeof h.pushState === 'function') {
+      try {
+        h.pushState({ sheet: 1 }, '');
+        SHEET_IN_HISTORY = true;
+      } catch (e) {}
+    }
+  }
+  // A new item or a smaller first step: straight into the text. An edit: the dialog itself, so the phone
+  // keyboard does not cover the chips.
+  s.focusEl = (orig && !prefill) ? s.els.panel : s.els.text;
+  s.focusEl.focus({ preventScroll: true });
+}
+
+// how: 'close' (tap outside, Escape, swipe, Save, Enter), 'back' (the phone's back), 'nav' (the screen changes),
+// 'lock' (lock-out), 'replace' (another sheet opens), 'hide' (pagehide, R58). Every one saves; only close and back give focus back.
+function closeItemSheet_(how) {
+  var s = SHEET;
+  if (!s) return null;
+  sheetShut_(how);
+  var op = sheetOp_(s);
+  var quiet = how === 'nav' || how === 'lock' || how === 'replace' || how === 'hide';
+  if (!quiet && s.list === 'todo') TODO_FOCUS = s.returnKey;
+  if (!quiet && s.list === 'grocery') GRO_FOCUS = s.returnKey;
+  if (op) listsQueue_(op);
+  else if (!quiet) listsPaint_();
+  return op;
+}
+
+function sheetShut_(how) {
+  SHEET = null;
+  var root = $('sheet');
+  root.textContent = '';
+  root.hidden = true;
+  sheetInert_(false);
+  if (!SHEET_IN_HISTORY || how === 'replace') return;
+  SHEET_IN_HISTORY = false;
+  // Closed by a tap: remove the history step it added. Back already removed it; a screen change or a
+  // lock-out leaves it, as a step back that does nothing.
+  if (how !== 'close') return;
+  var h = window.history;
+  if (h && typeof h.back === 'function') {
+    SHEET_POPS++;
+    h.back();
+  }
+}
+
+// The op the closed sheet sends, or null. When the item changed elsewhere while the sheet was open, the edit
+// goes with the fp from when it opened, so the server refuses it ("This item changed. Refreshed.") instead
+// of writing over the other change.
+function sheetOp_(s) {
+  if (typeof s.finish === 'function') s.finish(); // Task 8: the shop as typed becomes a known shop's spelling
+  if (!s.orig) {
+    var fields = sheetAddFields_(s.list, s.draft);
+    return fields ? { op: 'add', list: s.list, fields: fields } : null;
+  }
+  var diff = sheetDiff_(s.list, s.orig, s.draft);
+  if (!diff) return null;
+  var op = { op: 'edit', list: s.list, id: s.id, fields: diff };
+  var cur = listsItem_(s.list, s.id);
+  if (cur && s.orig.fp && sheetDiff_(s.list, s.orig, sheetDraft_(s.list, cur))) op.fp = s.orig.fp;
+  return op;
+}
+
+// Delete: one delete through the queue, and "Deleted. Undo" for 6 s. The draft is dropped.
+function sheetDelete_() {
+  var s = SHEET;
+  if (!s || !s.orig) return;
+  sheetShut_('close');
+  var cur = listsItem_(s.list, s.id) || s.orig;
+  listsUndoStart_(s.list, todoCopy_(cur));
+  if (s.list === 'todo') TODO_FOCUS = 'undo';
+  else GRO_FOCUS = 'undo';
+  listsQueue_({ op: 'delete', list: s.list, id: s.id });
+}
+
+function listsUndoStart_(list, snap) {
+  listsUndoClear_();
+  LISTS_UNDO = { list: list, item: snap };
+  LISTS_UNDO_TIMER = setTimeout(function () {
+    LISTS_UNDO_TIMER = null;
+    LISTS_UNDO = null;
+    if (TODO_FOCUS === 'undo') TODO_FOCUS = 'add';
+    if (GRO_FOCUS === 'undo') GRO_FOCUS = '';
+    listsPaint_();
+  }, 6000);
+}
+
+function listsUndoClear_() {
+  if (LISTS_UNDO_TIMER !== null) clearTimeout(LISTS_UNDO_TIMER);
+  LISTS_UNDO_TIMER = null;
+  LISTS_UNDO = null;
+  LISTS_UNDO_SAY = null;
+}
+
+// Undo: a restore with the item as it was, so it shows again at once.
+function listsUndo_() {
+  var u = LISTS_UNDO;
+  if (!u) return;
+  listsUndoClear_();
+  if (u.list === 'todo') TODO_FOCUS = 'tick:' + u.item.id;
+  else GRO_FOCUS = 'tick:' + u.item.id;
+  listsQueue_({ op: 'restore', list: u.list, id: u.item.id, item: u.item });
+}
+
+// Everything behind the sheet is inert while it is open.
+function sheetInert_(on) {
+  ['home', 'month', 'trends', 'balance', 'todo', 'groceries', 'tabbar'].forEach(function (id) { $(id).inert = on; });
+}
+
+// A control in the sheet, in screen order, for the Tab loop. shown says when it is on screen.
+function sheetCtl_(s, e, shown) {
+  s.ctls.push({ e: e, shown: shown || null });
+  return e;
+}
+
+function sheetFocusables_(s) {
+  return s.ctls.filter(function (c) { return !c.e.disabled && (!c.shown || c.shown()); }).map(function (c) { return c.e; });
+}
+
+function sheetKey_(e) {
+  var s = SHEET;
+  if (!s || !e) return;
+  if (e.key === 'Escape') {
+    e.preventDefault();
+    closeItemSheet_('close');
+    return;
+  }
+  if (e.key !== 'Tab') return;
+  var list = sheetFocusables_(s);
+  if (!list.length) return;
+  var i = list.indexOf(e.target);
+  if (e.shiftKey && i <= 0) {
+    e.preventDefault();
+    list[list.length - 1].focus();
+  } else if (!e.shiftKey && (i === -1 || i === list.length - 1)) {
+    e.preventDefault();
+    list[0].focus();
+  }
+}
+
+function sheetPopState_() {
+  if (SHEET_POPS > 0) { SHEET_POPS--; return; }
+  if (!SHEET) return;
+  SHEET_IN_HISTORY = false;
+  closeItemSheet_('back');
+}
+
+// After a repaint: focus stays in the sheet (it normally never left; this is the fallback).
+function sheetClaimFocus_() {
+  var s = SHEET;
+  if (!s) return;
+  var a = document.activeElement;
+  var root = $('sheet');
+  if (a && typeof root.contains === 'function' && root.contains(a)) return;
+  var t = s.focusEl || s.els.panel;
+  if (t) t.focus({ preventScroll: true });
+}
+
+function sheetGrow_(ta) {
+  ta.style.height = 'auto';
+  if (ta.scrollHeight) ta.style.height = ta.scrollHeight + 'px';
+}
+
+function sheetTitle_(s) {
+  if (s.list === 'grocery') return s.orig ? 'Edit item' : 'New item';
+  return s.orig ? 'Edit to-do' : 'New to-do';
+}
+
+function sheetBuild_(s) {
+  var root = $('sheet');
+  root.textContent = '';
+  var shade = add(root, 'div', 'sheet-backdrop');
+  shade.addEventListener('click', function () { if (SHEET === s) closeItemSheet_('close'); });
+  var p = add(root, 'div', 'sheet-panel');
+  p.setAttribute('role', 'dialog');
+  p.setAttribute('aria-modal', 'true');
+  p.setAttribute('aria-label', sheetTitle_(s));
+  p.setAttribute('tabindex', '-1');
+  s.els.panel = p;
+  // A swipe down closes it; a short or sideways one, or one while the sheet is scrolled, does not.
+  p.addEventListener('touchstart', function (e) {
+    // M1: a drag that starts in a text or date field is selecting or scrolling there, never a close.
+    for (var n = e && e.target; n && n !== p; n = n.parentNode) {
+      if (/^(TEXTAREA|INPUT|SELECT)$/.test(String(n.tagName || ''))) {
+        s.touch = null;
+        return;
+      }
+    }
+    var t = e && e.touches && e.touches[0];
+    s.touch = t ? { x: t.clientX, y: t.clientY, top: p.scrollTop || 0 } : null;
+  }, { passive: true });
+  p.addEventListener('touchend', function (e) {
+    var a = s.touch;
+    var t = e && e.changedTouches && e.changedTouches[0];
+    s.touch = null;
+    if (!a || !t || SHEET !== s || a.top > 0) return;
+    var dy = t.clientY - a.y;
+    var dx = t.clientX - a.x;
+    if (dy > 80 && dy > Math.abs(dx) * 1.5) closeItemSheet_('close');
+  }, { passive: true });
+  add(p, 'div', 'sheet-handle').setAttribute('aria-hidden', 'true');
+  var ta = sheetCtl_(s, add(p, 'textarea', 'sheet-text'));
+  ta.setAttribute('aria-label', s.list === 'grocery' ? 'Item' : 'To-do');
+  ta.setAttribute('maxlength', '500');
+  ta.setAttribute('rows', '1');
+  ta.setAttribute('enterkeyhint', 'done');
+  ta.value = s.draft.text;
+  ta.addEventListener('input', function () {
+    if (SHEET !== s) return;
+    s.draft.text = ta.value;
+    sheetGrow_(ta);
+  });
+  // Enter saves and closes; a to-do is one line.
+  ta.addEventListener('keydown', function (e) {
+    if (e && e.key === 'Enter' && !e.isComposing && SHEET === s) {
+      e.preventDefault();
+      closeItemSheet_('close');
+    }
+  });
+  s.els.text = ta;
+  if (s.list === 'todo') sheetTodoFields_(p, s);
+  else {
+    s.els.shop = add(p, 'div', 'sheet-shop');
+    if (typeof sheetShop_ === 'function') sheetShop_(s.els.shop, s); // Task 8
+  }
+  var foot = add(p, 'div', 'sheet-foot');
+  if (s.orig) sheetCtl_(s, btn(foot, 'textbtn sheet-delete', 'Delete', sheetDelete_));
+  sheetCtl_(s, btn(foot, 'btn-main sheet-save', 'Save', function () { if (SHEET === s) closeItemSheet_('close'); }));
+  root.hidden = false;
+  sheetSync_(s);
+  sheetGrow_(ta);
+}
+
+// To do: When (day chips, Pick a day, No date), Who, and More with Time.
+function sheetTodoFields_(p, s) {
+  s.sync = [];
+  var group = function (id, label) {
+    add(p, 'p', 'sheet-label', label).setAttribute('id', id);
+    var g = add(p, 'div', 'sheet-chips');
+    g.setAttribute('role', 'group');
+    g.setAttribute('aria-labelledby', id);
+    return g;
+  };
+  var chip = function (g, label, onTap, isOn) {
+    var b = sheetCtl_(s, btn(g, 'schip', label, function () {
+      if (SHEET !== s) return;
+      onTap();
+      sheetSync_(s);
+    }));
+    s.sync.push(function () { b.setAttribute('aria-pressed', isOn() ? 'true' : 'false'); });
+    return b;
+  };
+  var when = group('sheet-when', 'When');
+  s.chips.forEach(function (c) {
+    chip(when, c.label, function () {
+      s.draft.due = c.due;
+      s.pick = false;
+    }, function () { return !s.pick && s.draft.due === c.due; });
+  });
+  chip(when, 'Pick a day', function () { s.pick = true; }, function () { return s.pick; });
+  chip(when, 'No date', function () {
+    s.draft.due = '';
+    s.draft.time = '';
+    s.pick = false;
+  }, function () { return !s.pick && !s.draft.due; });
+  var day = sheetCtl_(s, add(p, 'input', 'sheet-day'), function () { return s.pick; });
+  day.setAttribute('type', 'date');
+  day.setAttribute('aria-label', 'Pick a day');
+  if (s.today) day.setAttribute('min', s.today);
+  // I1: the field always shows the day that will be saved. A partial or cleared entry keeps the day; the
+  // field shows it again once the entry is done (change), never in the middle of typing (input).
+  var takeDay = function (resync) {
+    if (SHEET !== s) return;
+    var ok = todoValidDay_(day.value);
+    if (ok) s.draft.due = day.value;
+    if (ok || resync) sheetSync_(s);
+  };
+  day.addEventListener('input', function () { takeDay(false); });
+  day.addEventListener('change', function () { takeDay(true); });
+  s.sync.push(function () {
+    day.hidden = !s.pick;
+    if (s.pick) day.value = todoValidDay_(s.draft.due) ? s.draft.due : '';
+  });
+  var who = group('sheet-who', 'Who');
+  ['Kev', 'Lili', 'Either', 'Couple'].forEach(function (name) {
+    chip(who, name, function () { s.draft.who = name; }, function () { return sheetWho_(s.draft.who) === name; });
+  });
+  var more = sheetCtl_(s, btn(p, 'textbtn sheet-more', 'More', function () {
+    if (SHEET !== s) return;
+    s.more = !s.more;
+    sheetSync_(s);
+  }));
+  var box = add(p, 'div', 'sheet-time');
+  add(box, 'p', 'sheet-label', 'Time').setAttribute('aria-hidden', 'true');
+  var time = sheetCtl_(s, add(box, 'input', ''), function () { return s.more; });
+  time.setAttribute('type', 'time');
+  time.setAttribute('aria-label', 'Time');
+  time.value = s.draft.time;
+  var takeTime = function () {
+    if (SHEET !== s) return;
+    var v = String(time.value || '');
+    s.draft.time = /^\d{2}:\d{2}/.test(v) ? v.slice(0, 5) : '';
+  };
+  time.addEventListener('input', takeTime);
+  time.addEventListener('change', takeTime);
+  var needDay = add(box, 'p', 'small', 'Set a day to add a time.');
+  s.sync.push(function () {
+    var hasDay = todoValidDay_(s.draft.due);
+    more.setAttribute('aria-expanded', s.more ? 'true' : 'false');
+    box.hidden = !s.more;
+    time.disabled = !hasDay;
+    time.value = s.draft.time; // M3: shown is saved; No date clears draft.time itself
+    needDay.hidden = hasDay;
+  });
+}
+
+function sheetSync_(s) {
+  (s.sync || []).forEach(function (f) { f(); });
+}
+
+// ---- Groceries screen (Task 8) -----------------------------------------------------------------
+// A plain list: no shop names unless a shop is picked. The pinned "Add an item" field is built once per visit
+// and kept through every repaint (only the parts above and below it are rebuilt), so a reply or the 60 s
+// refresh never takes the phone keyboard away while someone types the next item.
+
+// The compare key for item and shop names: lowercase, accents removed, the typographic apostrophe as a
+// plain one, ends trimmed, inner spaces collapsed ("Pépito " is "pepito").
+function foldKey_(s) {
+  var t = String(s === undefined || s === null ? '' : s);
+  if (typeof t.normalize === 'function') t = t.normalize('NFD');
+  return t.replace(/[\u0300-\u036f]/g, '').replace(/[\u2018\u2019]/g, '\u0027').toLowerCase().replace(/\s+/g, ' ').trim();
+}
+
+// The shops known to this phone, one per folded name: the server's list (newest spelling first), then any
+// shop on an open item that it does not have yet.
+function groKnownShops_(lists) {
+  var out = [];
+  var seen = {};
+  var take = function (v) {
+    if (typeof v !== 'string') return;
+    var t = sheetOneLine_(v).replace(/\s+/g, ' ').slice(0, 40).trim();
+    var k = foldKey_(t);
+    if (!k || seen[k]) return;
+    seen[k] = true;
+    out.push(t);
+  };
+  (lists && Array.isArray(lists.shops) ? lists.shops : []).forEach(take);
+  (lists && Array.isArray(lists.groceries) ? lists.groceries : []).forEach(function (it) { if (it) take(it.shop); });
+  return out;
+}
+
+// How many open items each shop has, in the order of shops.
+function groShopCounts_(items, shops) {
+  return shops.map(function (shop) {
+    var k = foldKey_(shop);
+    return { shop: shop, n: items.filter(function (it) { return !!k && foldKey_(it.shop) === k; }).length };
+  });
+}
+
+// The filtered view: that shop's items, then items with no shop, then the rest. Order is kept in each part.
+function groSplit_(items, shop) {
+  var k = foldKey_(shop);
+  var out = { here: [], any: [], elsewhere: [] };
+  items.forEach(function (it) {
+    var s = foldKey_(it.shop);
+    if (!s) out.any.push(it);
+    else if (s === k) out.here.push(it);
+    else out.elsewhere.push(it);
+  });
+  return out;
+}
+
+// The shop in a stored kl.shop value ({shop, at}), or '' when there is none, it is malformed, or it was set
+// more than 3 hours before now (a time well ahead of the clock is not trusted either).
+function groShopFrom_(raw, now) {
+  if (!raw || typeof raw !== 'string') return '';
+  var o = null;
+  try { o = JSON.parse(raw); } catch (e) { return ''; }
+  if (!o || typeof o.shop !== 'string' || typeof o.at !== 'number') return '';
+  var shop = sheetOneLine_(o.shop);
+  if (!shop || shop.length > 40) return '';
+  var age = now - o.at;
+  return (age >= -60000 && age <= 3 * 3600 * 1000) ? shop : '';
+}
+
+// A shop as typed: one line, inner spaces collapsed, 40 characters at most; a known shop that matches it
+// without case or accents gives its own spelling.
+function groShopCanon_(v, shops) {
+  var t = sheetOneLine_(v).replace(/\s+/g, ' ').slice(0, 40).trim();
+  var k = foldKey_(t);
+  if (!k) return '';
+  for (var i = 0; i < shops.length; i++) if (foldKey_(shops[i]) === k) return String(shops[i]).slice(0, 40);
+  return t;
+}
+
+var LS_SHOP = 'kl.shop';  // the shop filter, as {shop, at}; ignored 3 hours after it was set
+var GRO_SHOP_RAW = null;  // memory copy of kl.shop, so the filter holds for this visit even without storage
+var GRO = null;           // the screen's kept parts on show now: {head, box, field, note, rest}
+var GRO_DRAFT = '';       // what is typed in the add field, kept in memory across visits (never stored)
+var GRO_NOTE = '';        // the line under the add field ("Already on the list")
+var GRO_STRUCK = {};      // id -> {item}: ticked here, struck in place until the screen is left
+var GRO_POS = {};         // id -> place on this visit, so an item ticked and unticked comes back in its place
+var GRO_SEQ = 0;
+var GRO_MENU = false;     // the Shop menu is open
+var GRO_ELSEWHERE = false; // the "N more elsewhere" items are shown
+var GRO_DONE_OPEN = false; // the collapsed Bought today section is open
+var GRO_FOCUS = '';       // the keyed control that had focus, given back after a repaint
+var GRO_FOCUS_EL = null;
+var GRO_TIMER = null;     // the 60 s refresh while Groceries is on show and the page is visible
+
+// Leaving Groceries: struck items go to Bought today, the menu and folds close, the refresh stops.
+function groLeave_() {
+  GRO_STRUCK = {};
+  GRO_POS = {};
+  GRO_SEQ = 0;
+  GRO_MENU = false;
+  GRO_ELSEWHERE = false;
+  GRO_DONE_OPEN = false;
+  GRO_FOCUS = '';
+  GRO_NOTE = '';
+  groTimerStop_();
+}
+
+// clearScreens: a repaint of Groceries keeps the add field (and its focus and text); anything else empties it.
+function groClear_() {
+  if (GRO && VIEW.screen === 'groceries' && TOKEN) {
+    GRO.head.textContent = '';
+    GRO.rest.textContent = '';
+    return;
+  }
+  $('groceries').textContent = '';
+  GRO = null;
+}
+
+function groKey_(e, key) {
+  e.setAttribute('data-focus', key);
+  if (key === GRO_FOCUS) GRO_FOCUS_EL = e;
+  return e;
+}
+
+function groShop_() {
+  if (GRO_SHOP_RAW === null) GRO_SHOP_RAW = lsGet_(LS_SHOP) || '';
+  var shop = groShopFrom_(GRO_SHOP_RAW, Date.now());
+  if (!shop && GRO_SHOP_RAW) {
+    GRO_SHOP_RAW = '';
+    GRO_ELSEWHERE = false;
+    lsDel_(LS_SHOP);
+  }
+  return shop;
+}
+
+function groSetShop_(shop) {
+  GRO_ELSEWHERE = false;
+  if (shop) {
+    GRO_SHOP_RAW = JSON.stringify({ shop: shop, at: Date.now() });
+    lsSet_(LS_SHOP, GRO_SHOP_RAW);
+  } else {
+    GRO_SHOP_RAW = '';
+    lsDel_(LS_SHOP);
+  }
+}
+
+function groSay_(t) {
+  GRO_NOTE = t;
+  if (GRO && GRO.note) GRO.note.textContent = t;
+}
+
+// One add, unless that text (without case or accents) is already on the list.
+function groAdd_(raw) {
+  var text = sheetOneLine_(raw).slice(0, 500).trim();
+  if (!text) return false;
+  var key = foldKey_(text);
+  var open = (LISTS && Array.isArray(LISTS.groceries)) ? LISTS.groceries : [];
+  if (open.some(function (it) { return foldKey_(it.text) === key; })) {
+    groSay_('Already on the list');
+    return false;
+  }
+  groSay_('');
+  listsQueue_({ op: 'add', list: 'grocery', fields: { text: text } });
+  return true;
+}
+
+function groTick_(it) {
+  GRO_STRUCK[it.id] = { item: todoCopy_(it) };
+  listsQueue_({ op: 'tick', list: 'grocery', id: it.id });
+}
+
+function groUntick_(it) {
+  delete GRO_STRUCK[it.id];
+  listsQueue_({ op: 'restore', list: 'grocery', id: it.id, item: todoCopy_(it) });
+}
+
+// The open items with the struck ones back in their places, in the order first seen on this visit.
+function groItems_(lists) {
+  var open = Array.isArray(lists.groceries) ? lists.groceries : [];
+  var ids = {};
+  open.forEach(function (it) { ids[it.id] = true; });
+  var all = open.slice();
+  Object.keys(GRO_STRUCK).forEach(function (id) {
+    if (ids[id]) delete GRO_STRUCK[id]; // open again (a conflict, or brought back elsewhere)
+    else all.push(GRO_STRUCK[id].item);
+  });
+  all.forEach(function (it) {
+    if (!Object.prototype.hasOwnProperty.call(GRO_POS, it.id)) GRO_POS[it.id] = GRO_SEQ++;
+  });
+  return all.map(function (it, i) { return { it: it, i: i }; }).sort(function (a, b) {
+    return (GRO_POS[a.it.id] - GRO_POS[b.it.id]) || (a.i - b.i);
+  }).map(function (x) { return x.it; });
+}
+
+// ---- the 60 s refresh: only while Groceries is on show and the page is visible, always through the shell
+function groVisible_() {
+  return document.visibilityState !== 'hidden';
+}
+
+function groOnShow_() {
+  return VIEW.screen === 'groceries' && !!TOKEN && APP_ON;
+}
+
+function groTimerEnsure_() {
+  if (GRO_TIMER === null && groOnShow_() && groVisible_()) GRO_TIMER = setTimeout(groRefresh_, 60000);
+}
+
+function groTimerStop_() {
+  if (GRO_TIMER !== null) clearTimeout(GRO_TIMER);
+  GRO_TIMER = null;
+}
+
+function groRefresh_() {
+  GRO_TIMER = null;
+  if (!groOnShow_() || !groVisible_()) return;
+  listsLoad_(true);
+  groTimerEnsure_();
+}
+
+// Hidden: no refresh. On show again: refreshed at once (unless this page loaded under 15 s ago), then every 60 s.
+function groVisibility_() {
+  if (!groVisible_()) { groTimerStop_(); return; }
+  if (!groOnShow_()) return;
+  listsLoad_(false);
+  groTimerEnsure_();
+}
+
+// ---- drawing
+function groAddBox_(root) {
+  var box = add(root, 'div', 'gro-add');
+  var w = add(box, 'div', 'wrap');
+  var f = add(w, 'input', '');
+  f.setAttribute('type', 'text');
+  f.setAttribute('aria-label', 'Add an item');
+  f.setAttribute('placeholder', 'Add an item');
+  f.setAttribute('maxlength', '500');
+  f.setAttribute('enterkeyhint', 'enter');
+  f.setAttribute('autocomplete', 'off');
+  f.setAttribute('data-focus', 'field');
+  f.value = GRO_DRAFT;
+  var note = add(w, 'p', 'gro-note', GRO_NOTE);
+  note.setAttribute('role', 'status');
+  f.addEventListener('input', function () {
+    GRO_DRAFT = f.value;
+    if (GRO_NOTE) groSay_('');
+  });
+  // Enter adds and keeps the field focused for the next item; lists come in bursts.
+  f.addEventListener('keydown', function (e) {
+    if (!e || e.key !== 'Enter' || e.isComposing) return;
+    e.preventDefault();
+    if (!sheetOneLine_(f.value)) return;
+    var v = f.value;
+    f.value = '';
+    GRO_DRAFT = '';
+    groAdd_(v);
+  });
+  return { box: box, field: f, note: note };
+}
+
+function renderGroceries_(data, shopFilter) {
+  var root = $('groceries');
+  var lists = data === undefined ? LISTS : data;
+  if (shopFilter === undefined) shopFilter = groShop_();
+  GRO_FOCUS_EL = null;
+  if (GRO && lists && !GRO.field) { root.textContent = ''; GRO = null; } // the lists arrived: build the field
+  if (!GRO) {
+    root.textContent = '';
+    GRO = { head: add(root, 'div', ''), box: null, field: null, note: null, rest: null };
+    if (lists) {
+      var a = groAddBox_(root);
+      GRO.box = a.box;
+      GRO.field = a.field;
+      GRO.note = a.note;
+    }
+    GRO.rest = add(root, 'div', '');
+  }
+  var title = listsPanel_(GRO.head, 'Groceries');
+  var top = add(GRO.head, 'div', 'wrap');
+  listsProblems_(top, lists);
+  if (!whoAmI_()) renderWhoCard_(top);
+  var body = add(GRO.rest, 'div', 'wrap');
+  var main = add(body, 'div', 'lists-main gro-main');
+  if (!lists) listsWaiting_(main);
+  else groMain_(main, lists, shopFilter);
+  add(body, 'div', 'list-end');
+  listsDock_(GRO.rest);
+  // The add field is never rebuilt, so it is never focused from here (that would raise the keyboard).
+  if (GRO_FOCUS_EL && !SHEET) GRO_FOCUS_EL.focus({ preventScroll: true });
+  groTimerEnsure_();
+  return title;
+}
+
+function groMain_(main, lists, shop) {
+  var open = Array.isArray(lists.groceries) ? lists.groceries : [];
+  var known = groKnownShops_(lists);
+  if (shop) shop = groShopCanon_(shop, known);
+  // Open items plus the ones struck in place on this visit: what decides the layout, so a tick moves nothing.
+  var all = groItems_(lists);
+  // Bought recently: one tap adds; what is on the list, or was ticked on this visit (M2), gets no chip.
+  var onList = {};
+  all.forEach(function (it) { onList[foldKey_(it.text)] = true; });
+  var recent = [];
+  (Array.isArray(lists.boughtRecently) ? lists.boughtRecently : []).forEach(function (t) {
+    var v = typeof t === 'string' ? sheetOneLine_(t) : '';
+    if (v && !onList[foldKey_(v)]) {
+      onList[foldKey_(v)] = true;
+      recent.push(v);
+    }
+  });
+  if (recent.length) {
+    var r = add(main, 'div', 'gro-recent');
+    add(r, 'p', 'gro-label', 'Bought recently').setAttribute('id', 'gro-recent-label');
+    var row = add(r, 'div', 'gro-chips');
+    row.setAttribute('role', 'group');
+    row.setAttribute('aria-labelledby', 'gro-recent-label');
+    recent.forEach(function (t, i) {
+      groKey_(btn(row, 'gchip', t, function () {
+        var next = recent[i + 1] || recent[i - 1];
+        GRO_FOCUS = next ? 'recent:' + foldKey_(next) : '';
+        groAdd_(t);
+      }), 'recent:' + foldKey_(t));
+    });
+  }
+  // The Shop filter, only once some item on screen has a shop (or a filter is on). I1: struck items count, so
+  // ticking the last item with a shop does not remove the button and move every row under the finger.
+  if (shop || all.some(function (it) { return !!foldKey_(it.shop); })) {
+    var tools = add(main, 'div', 'gro-tools');
+    var sb = groKey_(btn(tools, 'gro-shop', 'Shop: ' + (shop || 'all'), function () {
+      GRO_FOCUS = 'shop';
+      GRO_MENU = !GRO_MENU;
+      render(true);
+    }), 'shop');
+    sb.setAttribute('aria-expanded', GRO_MENU ? 'true' : 'false');
+    if (GRO_MENU) groMenu_(main, open, known, shop);
+  }
+  if (!all.length) add(main, 'p', 'gro-empty', 'Nothing on the list.');
+  if (!shop) {
+    all.forEach(function (it) { groRow_(main, it, !!GRO_STRUCK[it.id]); });
+  } else {
+    var sp = groSplit_(all, shop);
+    sp.here.forEach(function (it) { groRow_(main, it, !!GRO_STRUCK[it.id]); });
+    if (sp.any.length) {
+      add(main, 'h2', 'gro-head', 'Any shop');
+      sp.any.forEach(function (it) { groRow_(main, it, !!GRO_STRUCK[it.id]); });
+    }
+    if (sp.elsewhere.length) {
+      // M1: the count is of open items, as in the menu; struck ones stay shown, and the line stays without a 0.
+      var n = sp.elsewhere.filter(function (it) { return !GRO_STRUCK[it.id]; }).length;
+      var more = groKey_(btn(main, 'gro-more', n ? n + ' more elsewhere' : 'More elsewhere', function () {
+        GRO_FOCUS = 'elsewhere';
+        GRO_ELSEWHERE = !GRO_ELSEWHERE;
+        render(true);
+      }), 'elsewhere');
+      more.setAttribute('aria-expanded', GRO_ELSEWHERE ? 'true' : 'false');
+      if (GRO_ELSEWHERE) sp.elsewhere.forEach(function (it) { groRow_(main, it, !!GRO_STRUCK[it.id]); });
+    }
+  }
+  var done = (Array.isArray(lists.doneToday) ? lists.doneToday : []).filter(function (it) {
+    return it && it.list === 'grocery' && !GRO_STRUCK[it.id];
+  });
+  if (done.length) {
+    var d = add(main, 'div', 'gro-done');
+    var h = add(d, 'h2', 'todo-fold-h');
+    var fold = groKey_(btn(h, 'todo-fold', 'Bought today', function () {
+      GRO_FOCUS = 'fold:done';
+      GRO_DONE_OPEN = !GRO_DONE_OPEN;
+      render(true);
+    }), 'fold:done');
+    fold.setAttribute('aria-expanded', GRO_DONE_OPEN ? 'true' : 'false');
+    if (GRO_DONE_OPEN) done.forEach(function (it) { groRow_(d, it, true); });
+  }
+}
+
+// The Shop menu: All, then each shop with open items and how many (R60), plus the current filter.
+function groMenu_(main, open, known, shop) {
+  var menu = add(main, 'div', 'gro-menu');
+  menu.setAttribute('role', 'group');
+  menu.setAttribute('aria-label', 'Shop');
+  var cur = foldKey_(shop);
+  if (cur && !known.some(function (k) { return foldKey_(k) === cur; })) known = known.concat([shop]);
+  var pick = function (name) {
+    GRO_MENU = false;
+    GRO_FOCUS = 'shop';
+    groSetShop_(name);
+    render(true);
+  };
+  var all = groKey_(btn(menu, 'schip', 'All', function () { pick(''); }), 'shopopt:');
+  all.setAttribute('aria-pressed', cur ? 'false' : 'true');
+  groShopCounts_(open, known).forEach(function (c) {
+    var k = foldKey_(c.shop);
+    if (!c.n && k !== cur) return; // R60: only shops with open items, plus the current filter
+    var b = groKey_(btn(menu, 'schip', c.n ? c.shop + ' · ' + c.n : c.shop, function () { pick(c.shop); }), 'shopopt:' + k);
+    b.setAttribute('aria-pressed', k === cur ? 'true' : 'false');
+  });
+}
+
+// One row: the tick zone, then the text (2 lines at most). No shop name.
+function groRow_(parent, it, done) {
+  var row = add(parent, 'div', 'gro-row' + (done ? ' is-done' : ''));
+  var tick = groKey_(btn(row, 'tick-zone', null, function () {
+    GRO_FOCUS = 'tick:' + it.id;
+    if (done) groUntick_(it);
+    else groTick_(it);
+  }), 'tick:' + it.id);
+  tick.setAttribute('aria-label', 'Bought: ' + it.text);
+  tick.setAttribute('aria-pressed', done ? 'true' : 'false');
+  tick.appendChild(svgIcon_(done ? TICK_DONE_PATHS : TICK_OPEN_PATHS));
+  var main = done ? add(row, 'div', 'gro-open') : groKey_(btn(row, 'gro-open', null, function () {
+    GRO_FOCUS = 'open:' + it.id;
+    openItemSheet_(it, 'grocery');
+  }), 'open:' + it.id);
+  add(main, 'span', 'gro-text', it.text);
+}
+
+// The edit sheet's Shop field (called by sheetBuild_): a text field, then No shop and a chip for each of the
+// 12 newest shops the server knows.
+// Matching ignores case and accents; a typed known shop is saved with its known spelling; the same shop
+// typed differently is no change.
+function sheetShop_(slot, s) {
+  if (!s.sync) s.sync = [];
+  var shops = groKnownShops_({ shops: LISTS && LISTS.shops }).slice(0, 12); // R60: the 12 newest from the server list
+  add(slot, 'p', 'sheet-label', 'Shop').setAttribute('id', 'sheet-shop-label');
+  var input = sheetCtl_(s, add(slot, 'input', 'sheet-shop-input'));
+  input.setAttribute('type', 'text');
+  input.setAttribute('aria-labelledby', 'sheet-shop-label');
+  input.setAttribute('maxlength', '40');
+  input.setAttribute('autocomplete', 'off');
+  input.setAttribute('enterkeyhint', 'done');
+  input.value = s.draft.shop;
+  input.addEventListener('input', function () {
+    if (SHEET !== s) return;
+    s.draft.shop = input.value;
+    sheetSync_(s);
+  });
+  input.addEventListener('keydown', function (e) {
+    if (e && e.key === 'Enter' && !e.isComposing && SHEET === s) {
+      e.preventDefault();
+      closeItemSheet_('close');
+    }
+  });
+  var g = add(slot, 'div', 'sheet-chips');
+  g.setAttribute('role', 'group');
+  g.setAttribute('aria-labelledby', 'sheet-shop-label');
+  var chip = function (label, value) {
+    var b = sheetCtl_(s, btn(g, 'schip', label, function () {
+      if (SHEET !== s) return;
+      s.draft.shop = value;
+      input.value = value;
+      sheetSync_(s);
+    }));
+    s.sync.push(function () {
+      var k = foldKey_(s.draft.shop);
+      b.setAttribute('aria-pressed', (value ? k === foldKey_(value) : !k) ? 'true' : 'false');
+    });
+  };
+  chip('No shop', '');
+  shops.forEach(function (n) { chip(n, n); });
+  s.finish = function () {
+    var was = s.orig ? sheetOneLine_(s.orig.shop) : '';
+    if (sheetOneLine_(s.draft.shop) === was) return;
+    var c = groShopCanon_(s.draft.shop, groKnownShops_(LISTS));
+    s.draft.shop = (was && foldKey_(c) === foldKey_(was)) ? was : c;
+  };
+}
+
 // ---- start ---------------------------------------------------------------------
 $('go').addEventListener('click', submit);
 $('pin').addEventListener('keydown', function (e) { if (e.key === 'Enter') submit(); });
-$('retry').addEventListener('click', function () { loadData(false); });
+$('retry').addEventListener('click', function () {
+  if (isListScreen_(VIEW.screen)) listsEnter_();
+  else loadData(false);
+});
 window.addEventListener('hashchange', function () {
-  if (!DATA) return;
+  if (!TOKEN) return;
   var v = viewFromHash(location.hash);
   if (v.screen === VIEW.screen && v.key === (VIEW.key || null)) return;
-  if (v.screen === 'month' && !monthByKey(v.key)) v = { screen: 'home', key: null };
+  if (v.screen === 'month' && DATA && !monthByKey(v.key)) v = { screen: 'home', key: null };
   go(v, true);
 });
+// Back online: send what waits now, instead of at the end of the backoff.
+window.addEventListener('online', function () {
+  if (RETRY_TIMER !== null) {
+    clearTimeout(RETRY_TIMER);
+    RETRY_TIMER = null;
+  }
+  listsFlush_();
+});
 
+// Another tab wrote kl.queue (R48).
+window.addEventListener('storage', listsStorageChanged_);
+
+// Task 7: the To do focus key follows focus; the sheet keeps Tab inside, closes on Escape and on back.
+$('todo').addEventListener('focusin', function (e) {
+  var t = e && e.target;
+  TODO_FOCUS = (t && t.getAttribute && t.getAttribute('data-focus')) || '';
+});
+// Task 8: the same for Groceries; the 60 s refresh stops while the page is hidden.
+$('groceries').addEventListener('focusin', function (e) {
+  var t = e && e.target;
+  GRO_FOCUS = (t && t.getAttribute && t.getAttribute('data-focus')) || '';
+});
+if (typeof document.addEventListener === 'function') document.addEventListener('visibilitychange', groVisibility_);
+$('sheet').addEventListener('keydown', sheetKey_);
+$('sheet').addEventListener('focusin', function (e) { if (SHEET && e && e.target) SHEET.focusEl = e.target; });
+window.addEventListener('popstate', sheetPopState_);
+// R58: the page goes away (tab closed, put in the background cache) with the sheet open: save it.
+window.addEventListener('pagehide', function () { if (SHEET) closeItemSheet_('hide'); });
+
+listsQueueInit_();
 TOKEN = stored();
-if (TOKEN) loadData(false);
+if (TOKEN) openSession_();
 else showCover('gate', '');
 </script>
 </body>
