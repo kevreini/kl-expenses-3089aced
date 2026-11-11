@@ -390,6 +390,31 @@
     border-radius: 8px;
   }
   select:disabled { opacity: 0.55; }
+  .editor input {
+    display: block;
+    width: 100%;
+    min-width: 0;
+    min-height: 44px;
+    padding: 8px 10px;
+    font: inherit;
+    font-size: 16px;
+    color: var(--ink);
+    background: var(--paper);
+    border: 1px solid var(--muted);
+    border-radius: 8px;
+  }
+  .editor input:disabled { opacity: 0.55; }
+  .editor-delete {
+    display: block;
+    min-height: 44px;
+    margin-top: 10px;
+    padding: 0 4px;
+    font-size: 14px;
+    color: var(--accent);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+  .editor-delete:disabled { opacity: 0.55; cursor: default; }
   .editor-note { margin-top: 12px; font-size: 14px; color: var(--muted); }
   .editor-error { margin-top: 10px; font-size: 15px; font-weight: 500; color: var(--accent); }
   .editor-actions { display: flex; gap: 8px; margin-top: 14px; }
@@ -907,10 +932,15 @@ var FOCUS_ROW = null;
 var FIRST_LOAD = true;
 var SESSION = 0;   // moves on at lock-out, so a late reply from before it is ignored
 var FIELDS = [
+  { field: 'item', label: 'Item' },
+  { field: 'amount', label: 'Amount' },
+  { field: 'currency', label: 'Currency' },
+  { field: 'date', label: 'Date' },
   { field: 'category', label: 'Type' },
   { field: 'paidBy', label: 'Paid by' },
   { field: 'paidFor', label: 'Paid for' }
 ];
+var CURRENCIES = [['IDR', 'IDR'], ['EUR', 'EUR'], ['USD', 'USD']];
 
 // ---- plain helpers ---------------------------------------------------------
 function group(n) {
@@ -1001,27 +1031,129 @@ function iconPaths(name) {
     plane: ['M21 3L3 10.5l6.5 3l3 6.5z', 'M21 3L9.5 13.5'],
     dots: ['M21 12a9 9 0 1 1-18 0a9 9 0 1 1 18 0z', 'M8 12h.01', 'M12 12h.01', 'M16 12h.01'],
     swap: ['M4 8.5h14', 'M14.5 5l3.5 3.5l-3.5 3.5', 'M20 15.5H6', 'M9.5 12L6 15.5l3.5 3.5'],
-    tag: ['M3.5 4.5v7.5l8.5 8.5a1.5 1.5 0 0 0 2.1 0l6-6a1.5 1.5 0 0 0 0-2.1L12 4H4a.5.5 0 0 0-.5.5z', 'M8 8h.01']
+    tag: ['M3.5 4.5v7.5l8.5 8.5a1.5 1.5 0 0 0 2.1 0l6-6a1.5 1.5 0 0 0 0-2.1L12 4H4a.5.5 0 0 0-.5.5z', 'M8 8h.01'],
+    gift: ['M3.5 8h17v3.5h-17z', 'M5 11.5v9h14v-9', 'M12 8v12.5', 'M12 8C10.5 4.5 7 4 7 6.2C7 7.6 9.5 8 12 8', 'M12 8c1.5-3.5 5-4 5-1.8C17 7.6 14.5 8 12 8'],
+    briefcase: ['M3.5 8h17v11.5h-17z', 'M9 8V6a1.5 1.5 0 0 1 1.5-1.5h3A1.5 1.5 0 0 1 15 6v2', 'M3.5 13h17', 'M11 12v2h2v-2']
   };
   var byName = {
     'Groceries': 'cart', 'Restaurant': 'cutlery', 'Eating out': 'cutlery', 'Utilities': 'bolt', 'Transport': 'car', 'Health': 'health',
     'Leisure': 'ticket', 'Shopping': 'bag', 'Decoration': 'picture', 'Furniture': 'chair', 'Home': 'house', 'Household': 'house',
     'Subscriptions': 'repeat', 'Phone & subscriptions': 'phone', 'Pets': 'paw', 'Rent': 'key', 'Visa & admin': 'paper', 'Travel': 'plane',
-    'Other': 'dots', 'Settlement': 'swap'
+    'Gifts': 'gift', 'Business': 'briefcase', 'Other': 'dots', 'Settlement': 'swap'
   };
   var known = typeof name === 'string' && Object.prototype.hasOwnProperty.call(byName, name);
   return shapes[known ? byName[name] : 'tag'];
 }
 
-// What Save would send, in a fixed order. old is what Undo sends back.
+// What Save would send, in a fixed order. old is what Undo sends back. A field missing from draft is left alone.
 function pendingChanges(row, draft) {
-  var fields = [['category', 'Type'], ['paidBy', 'Paid by'], ['paidFor', 'Paid for']];
+  // Currency before amount: the server recomputes euros from the currency already on the row.
+  var fields = [['item', 'Item'], ['currency', 'Currency'], ['amount', 'Amount'], ['date', 'Date'], ['category', 'Type'], ['paidBy', 'Paid by'], ['paidFor', 'Paid for']];
   var out = [];
   for (var i = 0; i < fields.length; i++) {
     var f = fields[i][0];
-    if (draft[f] !== row[f]) out.push({ field: f, label: fields[i][1], old: row[f], value: draft[f] });
+    if (draft[f] !== undefined && draft[f] !== row[f]) out.push({ field: f, label: fields[i][1], old: row[f], value: draft[f] });
   }
   return out;
+}
+
+// The day after a yyyy-MM-dd day.
+function nextDay(iso) {
+  var d = new Date(Date.UTC(Number(iso.slice(0, 4)), Number(iso.slice(5, 7)) - 1, Number(iso.slice(8, 10)) + 1));
+  var m = d.getUTCMonth() + 1;
+  var day = d.getUTCDate();
+  return d.getUTCFullYear() + '-' + (m < 10 ? '0' : '') + m + '-' + (day < 10 ? '0' : '') + day;
+}
+
+// What a one-line text input holds for a value: browsers drop line breaks from it.
+function inputText(s) {
+  return String(s === undefined || s === null ? '' : s).replace(/[\r\n]/g, '');
+}
+
+// An item name the server takes: 1 to 100 characters after trimming, no control characters.
+function itemOk(s) {
+  if (typeof s !== 'string' || s.length > 200 || /[\u0000-\u001f\u007f]/.test(s)) return false;
+  var t = s.replace(/^\s+|\s+$/g, '');
+  return t.length >= 1 && t.length <= 100;
+}
+
+function currencyOk(c) {
+  return c === 'IDR' || c === 'EUR' || c === 'USD';
+}
+
+// The edit sheet's typed values, checked: {values} for pendingChanges, or {error} in plain words. Item, amount and
+// date are left out when they match the row, so a blank stays blank. Days run from 2020 to tomorrow (the server
+// checks again in Bali time).
+function editDraftValues(row, draft, todayIso) {
+  var out = { currency: draft.currency, category: draft.category, paidBy: draft.paidBy, paidFor: draft.paidFor };
+  var item = String(draft.item === undefined || draft.item === null ? '' : draft.item).replace(/^\s+|\s+$/g, '');
+  if (item !== inputText(row.item).replace(/^\s+|\s+$/g, '')) {
+    if (!item) return { error: 'Give it a name.' };
+    if (item.length > 100) return { error: 'Keep the name to 100 characters.' };
+    out.item = item;
+  }
+  var amount = String(draft.amount === undefined || draft.amount === null ? '' : draft.amount).replace(/\s/g, '');
+  var shown = row.amount === null || row.amount === undefined ? '' : String(row.amount);
+  if (amount !== shown) {
+    var digits = 'Type the amount as digits, like 85000 or 4.50.';
+    if (!/^\d+([.,]\d{1,2})?$/.test(amount)) return { error: digits };
+    var n = Number(amount.replace(',', '.'));
+    if (!(n > 0) || n >= 1e12) return { error: digits };
+    if (n !== row.amount) out.amount = n;
+  }
+  // Only an amount being sent needs a usable currency (the server refuses it otherwise); other fields go through.
+  if (out.amount !== undefined && !currencyOk(draft.currency)) return { error: 'Pick a currency.' };
+  var day = String(draft.date === undefined || draft.date === null ? '' : draft.date);
+  if (day !== (row.date || '')) {
+    var m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(day);
+    var real = !!m && dateOk(Number(m[1]), Number(m[2]), Number(m[3]));
+    if (!real) return { error: 'Pick a real day.' };
+    if (day < '2020-01-01' || day > nextDay(todayIso)) return { error: 'Pick a day from 2020 up to tomorrow.' };
+    out.date = day;
+  }
+  return { values: out };
+}
+
+function dateOk(y, m, d) {
+  var t = new Date(Date.UTC(y, m - 1, d));
+  return t.getUTCFullYear() === y && t.getUTCMonth() === m - 1 && t.getUTCDate() === d;
+}
+
+// The row as it should read once changes have landed. Euros are then unknown if amount, currency or date moved.
+function applyChanges(row, changes) {
+  var out = {};
+  for (var k in row) out[k] = row[k];
+  for (var i = 0; i < changes.length; i++) {
+    out[changes[i].field] = changes[i].value;
+    if (changes[i].field === 'amount' || changes[i].field === 'currency' || changes[i].field === 'date') out.eurUnknown = true;
+  }
+  return out;
+}
+
+// Undo is offered only when the server would take every old value back: the same rules as Edit.gs.
+// todayIso and categories are used when given (the day range, and the Type list).
+function canUndo(changes, todayIso, categories) {
+  for (var i = 0; i < changes.length; i++) {
+    var c = changes[i];
+    var v = c.old;
+    if (c.field === 'amount') {
+      if (typeof v !== 'number' || !isFinite(v) || !(v > 0) || v >= 1e12 || Math.round(v * 100) / 100 !== v) return false;
+    } else if (c.field === 'currency') {
+      if (!currencyOk(v)) return false;
+    } else if (c.field === 'date') {
+      var m = typeof v === 'string' ? /^(\d{4})-(\d{2})-(\d{2})$/.exec(v) : null;
+      if (!m || !dateOk(Number(m[1]), Number(m[2]), Number(m[3])) || v < '2020-01-01') return false;
+      if (todayIso && v > nextDay(todayIso)) return false;
+    } else if (c.field === 'item') {
+      if (!itemOk(v)) return false;
+    } else if (c.field === 'category') {
+      if (typeof v !== 'string' || v === '' || v.length > 100 || v === 'Settlement') return false;
+      if (categories && categories.indexOf(v) < 0) return false;
+    } else if (v !== 'Couple' && v !== 'Kev' && v !== 'Lili') {
+      return false;
+    }
+  }
+  return true;
 }
 
 function saveFailText(doneLabels, failLabel, reason) {
@@ -1413,7 +1545,9 @@ function loadData(quiet) {
       VIEW = viewFromHash(location.hash);
     }
     showApp_();
-    if (VIEW.screen === 'month' && !monthByKey(VIEW.key)) VIEW = { screen: 'home', key: null };
+    // A month emptied by a delete stays while its Undo bar is up.
+    var undoHere = TOAST && TOAST.restore && TOAST.key === VIEW.key;
+    if (VIEW.screen === 'month' && !monthByKey(VIEW.key) && !undoHere) VIEW = { screen: 'home', key: null };
     if (TOAST && TOAST.refreshing) TOAST = TOAST.after ? { text: TOAST.after, key: TOAST.key } : null;
     render(true);
   }, function (err) {
@@ -1884,9 +2018,18 @@ function renderBars(s) {
 }
 
 // ---- month ----------------------------------------------------------------------
+// A month the last change emptied out of the data (its only expense deleted or moved): shown empty, so the
+// screen and its Undo bar stay.
+function emptyMonth(key) {
+  return {
+    key: key, label: monthName(key) + ' ' + key.slice(0, 4), totalEur: 0, totalIdr: 0, comparisonEur: 0, partial: true,
+    categories: [], rows: [], needsAmountCount: 0, vsUsual: null
+  };
+}
+
 function renderMonth() {
   var root = $('month');
-  var m = monthByKey(VIEW.key);
+  var m = monthByKey(VIEW.key) || emptyMonth(VIEW.key);
   var today = DATA.today;
   var w = panel(root);
   panelBack(w);
@@ -2015,7 +2158,17 @@ function renderRow(parent, r) {
 // ---- fixing an expense ----------------------------------------------------------
 function startEdit(r) {
   EDIT_SEQ++;
-  EDIT = { id: EDIT_SEQ, rowNumber: r.rowNumber, draft: { category: r.category, paidBy: r.paidBy, paidFor: r.paidFor }, saving: false, error: '' };
+  EDIT = {
+    id: EDIT_SEQ,
+    rowNumber: r.rowNumber,
+    draft: {
+      item: inputText(r.item), amount: r.amount === null || r.amount === undefined ? '' : String(r.amount), currency: r.currency || '',
+      date: r.date || '', category: r.category, paidBy: r.paidBy, paidFor: r.paidFor
+    },
+    saving: false,
+    deleting: false,
+    error: ''
+  };
 }
 
 function toggleEdit(r) {
@@ -2030,9 +2183,29 @@ function toggleEdit(r) {
   render(true);
 }
 
+function fieldDef(name) {
+  for (var i = 0; i < FIELDS.length; i++) if (FIELDS[i].field === name) return FIELDS[i];
+  return null;
+}
+
 function renderEditor(parent, r) {
   var box = add(parent, 'div', 'editor');
   var controls = {};
+  function typed(f, type, extra) {
+    var id = 'edit-' + f.field;
+    var lab = add(box, 'label', '', f.label);
+    lab.setAttribute('for', id);
+    var input = add(box, 'input');
+    input.setAttribute('id', id);
+    input.setAttribute('type', type);
+    input.setAttribute('autocomplete', 'off');
+    for (var k in extra) input.setAttribute(k, extra[k]);
+    input.value = EDIT.draft[f.field];
+    input.disabled = EDIT.saving;
+    input.addEventListener('input', function () { EDIT.draft[f.field] = input.value; });
+    controls[f.field] = input;
+    return input;
+  }
   function picker(f, options, typeSlot, locked) {
     var id = 'edit-' + f.field;
     var lab = add(box, 'label', '', f.label);
@@ -2060,25 +2233,38 @@ function renderEditor(parent, r) {
   }
   var cats = (DATA.categories || []).map(function (c) { return [c, c]; });
   var typeLocked = !DATA.canChangeType;
-  picker(FIELDS[0], typeLocked ? [] : cats, true, typeLocked);
+  typed(fieldDef('item'), 'text', { maxlength: '100' });
+  typed(fieldDef('amount'), 'text', { inputmode: 'decimal' });
+  picker(fieldDef('currency'), CURRENCIES);
+  typed(fieldDef('date'), 'date', {});
+  picker(fieldDef('category'), typeLocked ? [] : cats, true, typeLocked);
   if (typeLocked) add(box, 'p', 'editor-note', 'Type cannot be changed right now.');
-  picker(FIELDS[1], [['Couple', 'Joint money'], ['Kev', 'Kev'], ['Lili', 'Lili']]);
-  picker(FIELDS[2], [['Couple', 'Both'], ['Kev', 'Kev'], ['Lili', 'Lili']]);
-  add(box, 'p', 'editor-note', 'To change the amount, edit the sheet or tell the bot.');
+  picker(fieldDef('paidBy'), [['Couple', 'Joint money'], ['Kev', 'Kev'], ['Lili', 'Lili']]);
+  picker(fieldDef('paidFor'), [['Couple', 'Both'], ['Kev', 'Kev'], ['Lili', 'Lili']]);
   if (EDIT.error) add(box, 'p', 'editor-error', EDIT.error).setAttribute('role', 'alert');
   var actions = add(box, 'div', 'editor-actions');
-  var save = btn(actions, 'btn-main', EDIT.saving ? 'Saving...' : 'Save', function () {
+  var save = btn(actions, 'btn-main', EDIT.saving && !EDIT.deleting ? 'Saving...' : 'Save', function () {
     FIELDS.forEach(function (f) { EDIT.draft[f.field] = controls[f.field].value; });
-    saveEdit(r.rowNumber);
+    var row = rowByNumber(DATA.months, r.rowNumber);
+    var checked = row ? editDraftValues(row, EDIT.draft, DATA.today) : { values: {} };
+    if (checked.error) {
+      EDIT.error = checked.error;
+      render(true);
+      return;
+    }
+    saveEdit(r.rowNumber, checked.values);
   });
   var cancel = btn(actions, 'btn-plain', 'Cancel', function () { toggleEdit(r); });
   save.disabled = EDIT.saving;
   cancel.disabled = EDIT.saving;
+  var del = btn(box, 'editor-delete', EDIT.deleting ? 'Deleting...' : 'Delete', function () { deleteExpense(r.rowNumber); });
+  del.disabled = EDIT.saving;
 }
 
 function refusalText(res) {
   if (res && res.retry) return 'Could not save. Try again.';
   if (res && res.settlement) return 'A settlement cannot be changed here.';
+  if (res && res.invalid && res.reason === 'needsCurrency') return 'Pick a currency.';
   if (res && res.invalid) return 'That choice is not allowed.';
   return 'Could not save. Try again.';
 }
@@ -2092,9 +2278,9 @@ function setToast(t, key) {
   TOAST = t;
 }
 
-// The expense itself: columns A to E, which an edit here can never change.
+// The expense itself: columns A to E, as a (from applyChanges) expects them. Euros are skipped once a change moved them.
 function sameExpense(a, b) {
-  return !!a && !!b && a.date === b.date && a.item === b.item && a.amount === b.amount && a.currency === b.currency && a.eur === b.eur;
+  return !!a && !!b && a.date === b.date && a.item === b.item && a.amount === b.amount && a.currency === b.currency && (!!a.eurUnknown || a.eur === b.eur);
 }
 
 // Sends job.changes one after another. Each one needs the fingerprint from the reply before it, and stops
@@ -2118,7 +2304,7 @@ function sendChanges(job) {
     if (!res.data) { job.noData(job.saved, job.changes); return; }
     DATA = res.data;
     var now = rowByNumber(DATA.months, job.rowNumber);
-    job.fingerprint = sameExpense(job.expect, now) ? now.fingerprint : null;
+    job.fingerprint = sameExpense(applyChanges(job.expect, job.saved), now) ? now.fingerprint : null;
     if (job.fingerprint === null && job.changes.length) {
       job.failed(job.saved, job.changes[0], { conflict: true }, null);
       return;
@@ -2173,13 +2359,15 @@ function savedUnsureRefresh(saved, change, rest, key, editId) {
   loadData(true);
 }
 
-function undoFor(rowNumber, fingerprint, expect, changes) {
-  return (fingerprint && changes.length) ? { rowNumber: rowNumber, fingerprint: fingerprint, expect: expect, changes: changes } : null;
+// after: the row as it reads once changes landed (applyChanges), which the undo checks the row against.
+function undoFor(rowNumber, fingerprint, after, changes) {
+  var cats = DATA && DATA.canChangeType ? DATA.categories : null;
+  return (fingerprint && changes.length && canUndo(changes, DATA && DATA.today, cats)) ? { rowNumber: rowNumber, fingerprint: fingerprint, expect: after, changes: changes } : null;
 }
 
-function saveEdit(rowNumber) {
+function saveEdit(rowNumber, values) {
   var row = rowByNumber(DATA.months, rowNumber);
-  var changes = row ? pendingChanges(row, EDIT.draft) : [];
+  var changes = row ? pendingChanges(row, values) : [];
   if (!changes.length) {
     EDIT = null;
     FOCUS_ROW = rowNumber;
@@ -2200,14 +2388,14 @@ function saveEdit(rowNumber) {
     saved: [],
     done: function (saved, fingerprint) {
       closeEdit(editId);
-      setToast({ text: 'Changed.', undo: undoFor(rowNumber, fingerprint, row, saved) }, key);
+      setToast({ text: 'Changed.', undo: undoFor(rowNumber, fingerprint, applyChanges(row, saved), saved) }, key);
       render(true);
     },
     failed: function (saved, change, res, fingerprint) {
       if (res && res.conflict) { conflictRefresh(saved, change.label, key, editId); return; }
       var reason = refusalText(res);
       if (saved.length) {
-        setToast({ text: saveFailText(labelsOf(saved), change.label, reason), undo: undoFor(rowNumber, fingerprint, row, saved) }, key);
+        setToast({ text: saveFailText(labelsOf(saved), change.label, reason), undo: undoFor(rowNumber, fingerprint, applyChanges(row, saved), saved) }, key);
       }
       if (EDIT && EDIT.id === editId) {
         // A saved Type can take the row out of the filtered list. The bar above still says what happened.
@@ -2249,7 +2437,7 @@ function undoLast() {
       if (res && res.conflict) { conflictRefresh([], change.label, key, null); return; }
       var left = undo.changes.slice(0, undo.changes.length - saved.length);
       var why = res && res.invalid ? 'That choice is not allowed.' : 'Try again.';
-      setToast({ text: 'Could not undo. ' + why, undo: undoFor(undo.rowNumber, fingerprint, undo.expect, left) }, key);
+      setToast({ text: 'Could not undo. ' + why, undo: undoFor(undo.rowNumber, fingerprint, applyChanges(undo.expect, saved), left) }, key);
       render(true);
     },
     noData: function (saved, rest) {
@@ -2270,13 +2458,110 @@ function undoLast() {
   });
 }
 
+// ---- deleting an expense ----------------------------------------------------------
+// The row moves to the sheet's hidden Deleted tab. "Deleted. Undo" stays 6 seconds; Undo puts it back.
+function deletedToast(text, deletedId, key) {
+  var t = { text: text, restore: deletedId };
+  setToast(t, key);
+  setTimeout(function () {
+    if (TOAST === t && !t.busy) {
+      TOAST = null;
+      render(true);
+    }
+  }, 6000);
+}
+
+function deleteExpense(rowNumber) {
+  var row = rowByNumber(DATA.months, rowNumber);
+  if (!row || !EDIT || EDIT.saving) return;
+  var key = VIEW.key;
+  var editId = EDIT.id;
+  var session = SESSION;
+  EDIT.saving = true;
+  EDIT.deleting = true;
+  EDIT.error = '';
+  TOAST = null;
+  render(true);
+  function stay(text) {
+    if (EDIT && EDIT.id === editId) {
+      EDIT.saving = false;
+      EDIT.deleting = false;
+      EDIT.error = text;
+    }
+    render(true);
+  }
+  call_('deleteExpense', { token: TOKEN, rowNumber: rowNumber, fingerprint: row.fingerprint }).then(function (res) {
+    if (session !== SESSION) return;
+    if (!res || !res.ok) {
+      if (res && res.conflict) { conflictRefresh([], 'Delete', key, editId); return; }
+      stay(res && res.settlement ? 'A settlement cannot be deleted here.' : 'Could not delete. Try again.');
+      return;
+    }
+    closeEdit(editId);
+    if (res.data) DATA = res.data;
+    deletedToast('Deleted.', res.deletedId, key);
+    render(true);
+    if (!res.data) loadData(true);
+  }, function (err) {
+    if (session !== SESSION) return;
+    if (err && err.code === 'NO_SESSION') { lockOut(); return; }
+    if (unreached(err)) {
+      var text = 'Could not reach the server, so check whether it was deleted. If it was, it can be put back from the Deleted tab in the sheet.';
+      closeEdit(editId);
+      setToast({ text: text + ' Refreshing.', refreshing: true, after: text }, key);
+      render(true);
+      loadData(true);
+      return;
+    }
+    stay('Could not delete. Try again.');
+  });
+}
+
+function restoreLast() {
+  var t = TOAST;
+  var key = t.key;
+  var session = SESSION;
+  t.busy = true;
+  render(true);
+  call_('restoreExpense', { token: TOKEN, deletedId: t.restore }).then(function (res) {
+    if (session !== SESSION) return;
+    if (res && res.ok) {
+      if (res.data) {
+        DATA = res.data;
+        setToast({ text: 'Put back.' }, key);
+        render(true);
+      } else {
+        setToast({ text: 'Put back. Refreshing.', refreshing: true, after: 'Put back.' }, key);
+        render(true);
+        loadData(true);
+      }
+      return;
+    }
+    if (res && res.invalid) setToast({ text: 'Could not undo. It is no longer in Deleted.' }, key);
+    else deletedToast('Could not undo. Try again.', t.restore, key);
+    render(true);
+  }, function (err) {
+    if (session !== SESSION) return;
+    if (err && err.code === 'NO_SESSION') { lockOut(); return; }
+    if (unreached(err)) {
+      var text = 'Could not reach the server, so check whether it came back.';
+      setToast({ text: text + ' Refreshing.', refreshing: true, after: text }, key);
+      render(true);
+      loadData(true);
+      return;
+    }
+    deletedToast('Could not undo. Try again.', t.restore, key);
+    render(true);
+  });
+}
+
 function renderToast(root) {
   if (!TOAST || TOAST.key !== VIEW.key) return;
   var bar = add(root, 'div', 'toast');
   bar.setAttribute('role', 'status');
   add(bar, 'span', '', TOAST.text);
-  if (TOAST.undo) {
-    var b = btn(bar, '', 'Undo', undoLast);
+  if (TOAST.undo || TOAST.restore) {
+    var b = btn(bar, '', 'Undo', TOAST.restore ? restoreLast : undoLast);
     b.disabled = !!TOAST.busy;
     if (!TOAST.busy && !EDIT) b.focus({ preventScroll: true });
   }
