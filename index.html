@@ -2,39 +2,61 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; connect-src https://script.google.com https://script.googleusercontent.com; base-uri 'none'; form-action 'none'">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; connect-src https://script.google.com https://script.googleusercontent.com; manifest-src 'self'; img-src 'self' data:; base-uri 'none'; form-action 'none'">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="robots" content="noindex,nofollow">
 <meta name="referrer" content="no-referrer">
 <meta name="color-scheme" content="light">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-title" content="Expenses">
-<meta name="theme-color" content="#fbd3b0">
-<title>Expenses</title>
+<meta name="apple-mobile-web-app-title" content="Abricot">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="theme-color" content="#fcf4ec">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icon-180.png">
+<title>Abricot</title>
 <style>
   :root {
     color-scheme: light;
-    --paper: #fbf7f3;
+    /* A1-T3 design tokens (mockup direction A "Calm cards", Global Constraints). Light theme only. */
+    --page: #fcf4ec;
+    --card: #ffffff;
+    --radius: 16px;
+    --hero: #fbd3b0;
+    --action: #a64a18;
+    --on-action: #ffffff;
     --ink: #2b1d14;
     --muted: #6b5a4e;
+    --gutter: 16px;
+    --card-gap: 12px;
+    --target: 44px;
+    --font: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    /* Type scale: weight, size and line height. Nothing uses weight 300. */
+    --type-numeral: 600 44px/1.1 var(--font);
+    --type-title: 700 30px/1.15 var(--font);
+    --type-card-title: 600 20px/1.25 var(--font);
+    --type-body: 400 17px/1.45 var(--font);
+    --type-secondary: 400 15px/1.4 var(--font);
+    --type-caption: 500 13px/1.35 var(--font);
+    --type-tab: 600 13px/1.2 var(--font);
+    /* The names the screens already use, now on the tokens */
+    --paper: #fcf4ec;
+    --accent: var(--action);
+    --cover: var(--hero);
     --rule: #eadfd5;
-    --accent: #a64a18;
     --tint: #fde6d2;
-    --cover: #fbd3b0;
     --on-cover: #3a2213;
     --on-cover-muted: #6e4a33;
     --on-cover-line: rgba(58, 34, 19, 0.55);
     --on-cover-fill: rgba(58, 34, 19, 0.08);
-    --gutter: 20px;
-    --bar-h: 57px;
-    /* To do who chips: one look per person, none of them the muted age chip */
-    --kev-bg: #d7ebf1;
-    --kev-ink: #114a5f;
-    --lili-bg: #f0e1f4;
-    --lili-ink: #622873;
-    --couple-bg: #dff0d8;
-    --couple-ink: #2c5420;
+    --bar-h: 58px;
+    /* Who chips (A1-T7, the mockup's colours): Kev sage, Lili apricot, Couple sand; none of them the muted age chip */
+    --kev-bg: #e1eae0;
+    --kev-ink: #46664c;
+    --lili-bg: #fde0c8;
+    --lili-ink: #9c4615;
+    --couple-bg: #efe6cf;
+    --couple-ink: #7a6224;
   }
 
   * { box-sizing: border-box; }
@@ -42,11 +64,12 @@
   html { -webkit-text-size-adjust: 100%; }
   body {
     margin: 0;
-    background: var(--paper);
+    background: var(--page);
     color: var(--ink);
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    font-family: var(--font);
     font-size: 16px;
     line-height: 1.45;
+    -webkit-font-smoothing: antialiased;
     font-variant-numeric: tabular-nums lining-nums;
     overflow-wrap: anywhere;
   }
@@ -65,7 +88,7 @@
   [tabindex="-1"]:focus { outline: none; }
   .wrap { max-width: 560px; margin: 0 auto; padding: 0 var(--gutter); }
 
-  /* The cover: the PIN screen, the loading state and the top of every screen share one apricot panel. */
+  /* The cover: the PIN screen and the loading state, on the apricot hero colour. */
   .cover {
     min-height: 100vh;
     background: var(--cover);
@@ -73,10 +96,15 @@
     display: flex;
     align-items: center;
   }
-  .cover .wrap { width: 100%; padding-top: 32px; padding-bottom: 64px; }
-  .names { font-size: 15px; color: var(--on-cover-muted); }
-  .cover h1 { font-size: 40px; font-weight: 300; letter-spacing: -0.02em; line-height: 1.15; margin-bottom: 36px; }
-  .cover :focus-visible, .panel :focus-visible { outline-color: var(--on-cover); }
+  .cover .wrap {
+    width: 100%;
+    padding-top: calc(32px + env(safe-area-inset-top));
+    padding-bottom: calc(64px + env(safe-area-inset-bottom));
+    padding-left: calc(var(--gutter) + env(safe-area-inset-left));
+    padding-right: calc(var(--gutter) + env(safe-area-inset-right));
+  }
+  .cover h1 { font: var(--type-title); letter-spacing: -0.025em; margin-bottom: 36px; }
+  .cover :focus-visible, .hero-card :focus-visible { outline-color: var(--on-cover); }
   .cover label { display: block; font-size: 15px; color: var(--on-cover-muted); margin-bottom: 8px; }
   #pin {
     display: block;
@@ -114,16 +142,30 @@
   @keyframes pulse { from { opacity: 0.25; } to { opacity: 0.9; } }
   @media (prefers-reduced-motion: reduce) { #pulse { animation: none; opacity: 0.6; } }
 
-  .panel { background: var(--cover); color: var(--on-cover); padding: 16px 0 28px; }
-  .panel-top { display: flex; align-items: center; min-height: 44px; margin-bottom: 14px; }
+  /* The top of every screen: a large title on the page colour (no header slab), then the hero card. */
+  .screen-top { padding-top: 8px; }
+  .large-title { display: flex; align-items: center; justify-content: space-between; gap: 12px; min-height: 52px; }
+  h1.title-big { font: var(--type-title); letter-spacing: -0.025em; color: var(--ink); }
+  h1.title-mid { font: var(--type-card-title); letter-spacing: -0.01em; color: var(--ink); margin-top: 4px; }
+  .title-note { font: var(--type-secondary); color: var(--muted); }
+  .hero-card {
+    margin-top: var(--card-gap);
+    padding: 16px 18px 18px;
+    border-radius: var(--radius);
+    background: var(--hero);
+    color: var(--on-cover);
+  }
+  .panel-top { display: flex; align-items: center; min-height: 44px; }
   .back {
     display: inline-flex;
     align-items: center;
-    gap: 8px;
-    min-height: 44px;
-    min-width: 44px;
+    gap: 6px;
+    min-height: var(--target);
+    min-width: var(--target);
+    margin-left: -4px;
     padding-right: 12px;
-    color: var(--on-cover);
+    font-size: 17px;
+    color: var(--action);
   }
   .back::before {
     content: "";
@@ -133,29 +175,11 @@
     border-bottom: 2px solid currentColor;
     transform: rotate(45deg);
   }
-  .panel h1 { font-size: 17px; font-weight: 500; }
-  .panel h1.title-mid { font-size: 26px; font-weight: 400; letter-spacing: -0.01em; line-height: 1.25; }
-  .panel h1.title-big { font-size: 40px; font-weight: 300; letter-spacing: -0.02em; line-height: 1.15; }
-  .hero { font-weight: 300; font-size: 54px; line-height: 1.1; letter-spacing: -0.025em; margin-top: 6px; }
-  .hero-cur { font-size: 20px; font-weight: 400; letter-spacing: 0; margin-right: 8px; color: var(--on-cover-muted); }
-  .hero-idr { font-size: 17px; color: var(--on-cover-muted); margin-top: 2px; }
-  .ruler { display: flex; justify-content: space-between; align-items: flex-end; height: 16px; margin-top: 22px; }
-  .tick { width: 2px; height: 8px; background: var(--on-cover); opacity: 0.28; }
-  .tick-past { opacity: 1; }
-  .tick-today { height: 16px; opacity: 1; }
+  .hero { font: var(--type-numeral); letter-spacing: -0.03em; margin-top: 6px; }
+  .hero-cur { font-size: 20px; font-weight: 600; letter-spacing: 0; margin-right: 8px; color: var(--on-cover-muted); }
   .panel-note { margin-top: 8px; font-size: 15px; }
   .panel-small { margin-top: 8px; font-size: 14px; color: var(--on-cover-muted); }
   .panel-verdict { margin-top: 20px; font-size: 18px; font-weight: 500; line-height: 1.3; }
-  .panel-action {
-    display: inline-flex;
-    align-items: center;
-    min-height: 44px;
-    margin-top: 16px;
-    padding: 0 16px;
-    border: 1px solid var(--on-cover-line);
-    border-radius: 10px;
-    font-size: 15px;
-  }
 
   section { padding-top: 34px; }
   h2 { font-size: 17px; font-weight: 600; margin-bottom: 12px; }
@@ -172,48 +196,11 @@
     text-decoration-thickness: 1px;
   }
 
-  /* Months */
+  /* Months: the bars scroll sideways when there are many */
   .scroller { overflow-x: auto; scrollbar-width: thin; -webkit-overflow-scrolling: touch; }
-  .chips {
-    display: flex;
-    gap: 8px;
-    margin: 0 calc(var(--gutter) * -1);
-    padding: 0 var(--gutter) 6px;
-    scroll-padding: 0 var(--gutter);
-  }
-  .chip {
-    flex: 0 0 auto;
-    min-width: 122px;
-    min-height: 44px;
-    padding: 11px 14px 12px;
-    border: 1px solid var(--rule);
-    border-radius: 10px;
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-  }
-  .chip-month { font-size: 14px; color: var(--muted); }
-  .chip-eur { font-size: 17px; font-weight: 500; white-space: nowrap; }
-  .chip-part { font-size: 13px; color: var(--muted); }
-  .chip:active, .barcol:active { background: var(--tint); }
+  .barcol:active { background: var(--tint); }
 
   /* Balance */
-  .balance-line {
-    display: flex;
-    width: 100%;
-    justify-content: space-between;
-    align-items: center;
-    gap: 12px;
-    min-height: 64px;
-    padding: 12px 0;
-    border-top: 1px solid var(--rule);
-    border-bottom: 1px solid var(--rule);
-    font-size: 21px;
-    font-weight: 500;
-    line-height: 1.3;
-    letter-spacing: -0.005em;
-  }
-  .balance-line small { display: block; font-size: 14px; font-weight: 400; letter-spacing: 0; color: var(--muted); margin-top: 2px; }
   .month-owes { display: flex; justify-content: space-between; gap: 16px; padding: 9px 0; border-bottom: 1px solid var(--rule); font-size: 15px; }
   .month-owes span:last-child { text-align: right; }
   .why { margin-top: -6px; }
@@ -246,7 +233,7 @@
   .bar { width: 26px; background: var(--accent); border-radius: 4px 4px 0 0; }
   .bar-partial { background: var(--tint); border: 1.5px dashed var(--accent); border-bottom: 0; }
   .barlabel { height: 40px; padding-top: 5px; text-align: center; font-size: 13px; line-height: 1.2; }
-  .barlabel span { display: block; color: var(--muted); font-size: 12px; }
+  .barlabel span { display: block; color: var(--muted); font-size: 13px; }
   .usualline { position: absolute; left: 0; right: 0; height: 0; border-top: 1px solid var(--ink); z-index: 1; pointer-events: none; }
   .caption { margin-top: 10px; font-size: 14px; color: var(--muted); }
   .caption + .caption { margin-top: 4px; }
@@ -276,43 +263,113 @@
   .notice { font-size: 15px; }
   .notice b { font-weight: 600; }
 
-  /* Categories */
-  .cat {
-    display: block;
-    width: calc(100% + 16px);
-    margin: 0 -8px;
-    min-height: 44px;
-    padding: 10px 8px 11px;
-    border-radius: 8px;
-  }
-  .cat[aria-pressed="true"] { background: var(--tint); }
-  .cat:active { background: var(--tint); }
-  .cat-top, .cat-bottom { display: flex; justify-content: space-between; align-items: center; gap: 12px; }
-  .cat-name { font-weight: 500; }
-  .cat-share { color: var(--muted); font-size: 14px; font-weight: 400; margin-left: 6px; white-space: nowrap; }
-  .cat-eur { white-space: nowrap; font-weight: 500; flex: none; }
-  .cat-bottom { align-items: center; margin-top: 3px; }
-  .cat-track { flex: 1; min-width: 0; }
-  .catbar { display: block; height: 6px; background: var(--accent); border-radius: 3px; min-width: 2px; }
-  .cat-idr { font-size: 14px; color: var(--muted); white-space: nowrap; flex: none; }
+  /* A1-T4 Money */
+  /* Hero card: the month so far, rupiah big and EUR small, one pace bar against the usual month. */
+  .hero-top { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; font: var(--type-caption); font-weight: 600; color: var(--on-cover-muted); }
+  .hero-sub { font-size: 15px; color: var(--on-cover-muted); margin-top: 2px; }
+  .hero-line { margin-top: 10px; font-size: 15px; color: var(--on-cover-muted); }
+  .pace { position: relative; height: 8px; margin: 14px 0 10px; border-radius: 4px; background: rgba(110, 74, 51, 0.16); }
+  .pace-fill { position: absolute; left: 0; top: 0; bottom: 0; border-radius: 4px; background: var(--action); }
+  .pace-day { position: absolute; top: -3px; bottom: -3px; width: 2px; margin-left: -1px; border-radius: 1px; background: var(--on-cover); opacity: 0.5; }
+  .hero-foot { display: flex; justify-content: space-between; gap: 12px; font-size: 13px; font-weight: 500; color: var(--on-cover-muted); }
+  .hero-pct { color: var(--on-cover); font-weight: 600; }
 
-  /* Donut */
-  .dchips { position: relative; margin-top: 2px; }
-  .dchip {
-    flex: 0 0 auto;
-    min-width: 56px;
+  /* The cards below the hero */
+  .card { background: var(--card); border-radius: var(--radius); box-shadow: 0 1px 2px rgba(58, 34, 19, 0.06), 0 0 0 1px rgba(58, 34, 19, 0.04); }
+  .dn-card, .bars-card { padding: 14px 14px 6px; }
+  .cat-card, .rows-card { padding: 2px 14px; }
+  .bars-card .barval { background: var(--card); }
+
+  /* Balance card: euros big (they settle in euros), rupiah small; Settle up beside the details */
+  .bal { display: flex; align-items: center; gap: 10px; margin-top: var(--card-gap); padding: 6px 12px 6px 16px; }
+  .bal-open { display: flex; flex: 1; min-width: 0; align-items: center; justify-content: space-between; gap: 10px; min-height: 64px; padding: 6px 0; }
+  .bal-words { display: block; min-width: 0; }
+  .bal-label, .bal-big, .bal-small, .bal-note { display: block; }
+  .bal-label { font-size: 15px; color: var(--muted); }
+  .bal-big { font: var(--type-card-title); font-weight: 700; letter-spacing: -0.015em; white-space: nowrap; }
+  .bal-small { font-size: 13px; color: var(--muted); white-space: nowrap; }
+  .bal-note { font-size: 13px; color: var(--muted); }
+  .bal-settle {
+    flex: none;
     min-height: 44px;
     padding: 0 16px;
-    border: 1px solid var(--rule);
     border-radius: 22px;
     font-size: 15px;
+    font-weight: 600;
+    color: var(--action);
+    background: var(--tint);
     white-space: nowrap;
   }
-  .dchip[aria-pressed="true"] { color: var(--paper); background: var(--accent); border-color: var(--accent); font-weight: 600; }
-  .dn-head { margin-top: 12px; font-size: 15px; font-weight: 600; }
+
+  /* Segmented control: This month, Last month, All time. Each segment is a 44 px target in a 2 px frame. */
+  .seg { display: flex; padding: 2px; margin-bottom: var(--card-gap); border-radius: 12px; background: #f3e6da; }
+  .seg-btn {
+    flex: 1;
+    min-height: 44px;
+    padding: 0 8px;
+    border-radius: 10px;
+    text-align: center;
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--muted);
+    white-space: nowrap;
+  }
+  .seg-btn[aria-pressed="true"] { color: var(--ink); background: var(--card); box-shadow: 0 1px 3px rgba(58, 34, 19, 0.16); }
+
+  /* Category avatars: the icon in the category colour on a pale disc of the same colour */
+  .cav { flex: none; display: flex; align-items: center; justify-content: center; width: 32px; height: 32px; border-radius: 50%; }
+  .cav .icon { width: 18px; height: 18px; color: inherit; }
+  .cav-need { background: var(--tint); }
+
+  /* Categories on the month screen: a card of rows, the top 5 then Show more */
+  .cat {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    width: 100%;
+    min-height: 52px;
+    padding: 8px 0;
+    border-top: 1px solid var(--rule);
+  }
+  .cat:first-child { border-top: 0; }
+  .cat[aria-pressed="true"] { background: var(--tint); margin: 0 -14px; width: calc(100% + 28px); padding: 8px 14px; }
+  .cat:active { background: var(--tint); }
+  .cat-words { flex: 1; min-width: 0; }
+  .cat-name { font-weight: 500; }
+  .cat-share { color: var(--muted); font-size: 14px; margin-left: 6px; white-space: nowrap; }
+  .cat-amts { flex: none; text-align: right; }
+  .cat-big { display: block; font-weight: 600; white-space: nowrap; }
+  .cat-small { display: block; font-size: 13px; color: var(--muted); white-space: nowrap; }
+  .cat-more, .dn-more {
+    display: block;
+    width: 100%;
+    min-height: 44px;
+    border-top: 1px solid var(--rule);
+    text-align: center;
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--action);
+  }
+  .cat-more:disabled { opacity: 0.55; cursor: default; }
+
+  /* Every expense: one card, rows with their avatar, rupiah big and EUR small */
+  .rows-card .day { padding: 14px 0 4px; border-bottom: 0; font-size: 13px; }
+  .rows-card .row-wrap { border-bottom: 0; border-top: 1px solid var(--rule); }
+  .rows-card .day + .row-wrap { border-top: 0; }
+  .rows-card .row { align-items: center; gap: 12px; min-height: 56px; padding: 10px 0; }
+  .rows-card .row-open { width: calc(100% + 28px); margin: 0 -14px; padding-left: 14px; padding-right: 14px; }
+  .rows-card .row-main { font-weight: 600; }
+  .rows-card .row-sub { font-size: 13px; }
+  .rows-card .receipt { margin-left: 44px; }
+  .rows-card .editor { padding: 4px 0 16px; }
+  .rows-card .editor input, .rows-card select { background: var(--page); border-color: var(--rule); border-radius: 12px; }
+  /* A1-T4 end */
+
+  /* Donut */
+  .dn-head { font-size: 15px; font-weight: 600; }
   .dn-fig { position: relative; width: 200px; height: 200px; margin: 16px auto 12px; }
   .dn-fig svg { display: block; width: 200px; height: 200px; }
-  .dn-slice { stroke: var(--paper); stroke-width: 2px; stroke-linejoin: round; }
+  .dn-slice { stroke: var(--card); stroke-width: 2px; stroke-linejoin: round; }
   .dn-centre {
     position: absolute;
     inset: 0;
@@ -324,29 +381,26 @@
     line-height: 1.2;
     pointer-events: none;
   }
-  .dn-c-cur { font-size: 13px; color: var(--muted); }
-  .dn-c-eur { font-size: 22px; font-weight: 600; letter-spacing: -0.01em; white-space: nowrap; }
-  .dn-c-idr { margin-top: 3px; font-size: 13px; color: var(--muted); white-space: nowrap; }
+  .dn-c-big { font-size: 20px; font-weight: 700; letter-spacing: -0.01em; white-space: nowrap; }
+  .dn-c-long { font-size: 17px; }
+  .dn-c-small { margin-top: 3px; font-size: 13px; color: var(--muted); white-space: nowrap; }
   .dn-row {
     display: flex;
     align-items: center;
     gap: 12px;
-    width: calc(100% + 16px);
-    margin: 0 -8px;
-    min-height: 44px;
-    padding: 9px 8px;
-    border-radius: 8px;
+    width: 100%;
+    min-height: 52px;
+    padding: 8px 0;
+    border-top: 1px solid var(--rule);
   }
   .dn-tap:active { background: var(--tint); }
-  .dn-sw { flex: none; width: 12px; height: 12px; border-radius: 3px; }
-  .dn-sw-none { border: 1.5px solid var(--muted); }
   .dn-words { flex: 1; min-width: 0; }
   .dn-name { font-weight: 500; }
   .dn-share { margin-left: 6px; font-size: 14px; color: var(--muted); white-space: nowrap; }
   .dn-amts { flex: none; text-align: right; }
-  .dn-eur { display: block; font-weight: 500; white-space: nowrap; }
-  .dn-idr { display: block; font-size: 13px; color: var(--muted); white-space: nowrap; }
-  .dn-empty { padding: 16px 0 4px; font-size: 15px; color: var(--muted); }
+  .dn-big { display: block; font-weight: 600; white-space: nowrap; }
+  .dn-small { display: block; font-size: 13px; color: var(--muted); white-space: nowrap; }
+  .dn-empty { padding: 16px 0 10px; font-size: 15px; color: var(--muted); }
 
   /* Icons */
   .icon { display: block; flex: none; width: 20px; height: 20px; color: var(--muted); }
@@ -427,7 +481,7 @@
     font-size: 15px;
     font-weight: 600;
   }
-  .btn-main { color: var(--paper); background: var(--accent); }
+  .btn-main { color: var(--on-action); background: var(--accent); }
   .btn-plain { border: 1px solid var(--rule); }
   .btn-main:disabled, .btn-plain:disabled { opacity: 0.55; cursor: default; }
   .toast {
@@ -485,7 +539,7 @@
   .sentence { margin-top: 12px; }
   .units { display: inline-flex; border: 1px solid var(--rule); border-radius: 10px; overflow: hidden; margin-bottom: 10px; }
   .unit { min-height: 44px; min-width: 88px; padding: 0 14px; text-align: center; font-size: 15px; }
-  .unit[aria-pressed="true"] { background: var(--accent); color: var(--paper); font-weight: 600; }
+  .unit[aria-pressed="true"] { background: var(--accent); color: var(--on-action); font-weight: 600; }
   .tablewrap { margin: 12px calc(var(--gutter) * -1) 0; }
   table { border-collapse: separate; border-spacing: 0; font-size: 14px; min-width: 100%; overflow-wrap: normal; }
   th, td { padding: 10px 12px; text-align: right; white-space: nowrap; border-bottom: 1px solid var(--rule); }
@@ -512,41 +566,135 @@
   .rolling-row { display: flex; justify-content: space-between; gap: 12px; padding: 9px 0; border-bottom: 1px solid var(--rule); font-size: 15px; }
   .rolling-row span:last-child { text-align: right; }
 
-  /* The bottom bar: Money, To do, Groceries. Fixed, above the phone's home bar. Toasts and the dock sit above it. */
-  #app { padding-bottom: calc(var(--bar-h) + env(safe-area-inset-bottom)); }
+  /* The bottom bar: Money, Add, To do, Groceries. Fixed, above the phone's home bar, inside the safe areas.
+     Toasts and the dock sit above it. Add is the one rust slot, the same on every tab. */
+  #app {
+    padding-top: env(safe-area-inset-top);
+    padding-right: env(safe-area-inset-right);
+    padding-bottom: calc(var(--bar-h) + env(safe-area-inset-bottom));
+    padding-left: env(safe-area-inset-left);
+  }
   .tabbar {
     position: fixed;
     left: 0;
     right: 0;
     bottom: 0;
     z-index: 6;
-    display: flex;
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 150px));
     justify-content: center;
-    padding: 0 env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
-    background: var(--paper);
-    border-top: 1px solid var(--rule);
+    padding: 4px env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+    background: rgba(252, 244, 236, 0.92);
+    -webkit-backdrop-filter: blur(20px) saturate(180%);
+    backdrop-filter: blur(20px) saturate(180%);
+    border-top: 0.5px solid rgba(58, 34, 19, 0.13);
   }
   .tab {
-    flex: 1 1 0;
-    max-width: 180px;
-    min-height: 56px;
+    min-height: 54px;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
     gap: 3px;
-    font-size: 13px;
+    font: var(--type-tab);
     color: var(--muted);
     text-align: center;
   }
-  .tab .icon { width: 22px; height: 22px; color: currentColor; }
-  .tab[aria-current="page"] { color: var(--accent); font-weight: 600; }
+  .tab-pill { display: flex; align-items: center; justify-content: center; width: 52px; height: 30px; border-radius: 15px; }
+  .tab .icon { width: 23px; height: 23px; color: currentColor; stroke-width: 1.8; }
+  .tab[aria-current="page"] { color: var(--action); }
+  .tab[aria-current="page"] .tab-pill { background: #fde3cc; }
+  .tab-add { color: var(--action); }
+  .tab-add .tab-pill { width: 50px; border-radius: 12px; color: var(--on-action); background: var(--action); box-shadow: 0 5px 12px -3px rgba(166, 74, 24, 0.5); }
+  .tab-add .icon { width: 22px; height: 22px; stroke-width: 2.5; }
+  .tab-add:active .tab-pill { opacity: 0.85; }
 
-  /* Lists shell: the phone's identity, the settings line and the dock above the bar */
-  .who-card { margin-top: 24px; padding: 16px; border: 1px solid var(--rule); border-radius: 10px; }
-  .who-card h2 { margin-bottom: 10px; }
-  .who-choices { display: flex; gap: 8px; margin-bottom: 10px; }
-  .lists-main { padding-top: 24px; }
+  /* Screens: a short fade when one comes on show. Browsers with View Transitions cross-fade instead. */
+  .screen { animation: screen-in 180ms ease-out; }
+  @keyframes screen-in { from { opacity: 0; } to { opacity: 1; } }
+  @supports (view-transition-name: none) {
+    .screen { animation: none; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .screen { animation: none; }
+    ::view-transition-group(*), ::view-transition-old(*), ::view-transition-new(*) { animation: none; }
+  }
+
+  /* Lists shell: the header avatar, the "Who uses this phone?" sheet, the settings line and the dock above the bar */
+  .avatar {
+    flex: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: var(--target);
+    height: var(--target);
+    margin-right: -6px;
+    border-radius: 50%;
+  }
+  .avatar > span, .avatar-dot {
+    display: flex;
+    font-size: 13px;
+    font-weight: 700;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+  }
+  .avatar-kev > span, .avatar-dot.avatar-kev { color: #46664c; background: #e1eae0; }
+  .avatar-lili > span, .avatar-dot.avatar-lili { color: #9c4615; background: #fde0c8; }
+  .avatar-q > span { color: #6b5a4e; background: #efe6dc; }
+  .who-title { font: var(--type-card-title); margin: 4px 0 6px; }
+  .who-line { font: var(--type-secondary); color: var(--muted); margin-bottom: 14px; }
+  .who-choices { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .who-choice {
+    min-height: 112px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 9px;
+    border-radius: 18px;
+    background: #faf3ec;
+    font-size: 17px;
+    font-weight: 700;
+    text-align: center;
+  }
+  .who-choice .avatar-dot { width: 52px; height: 52px; font-size: 21px; }
+  .who-choice[aria-pressed="true"] { box-shadow: inset 0 0 0 2px #dc966a; }
+  .who-foot { margin-top: 12px; font: var(--type-caption); color: var(--muted); text-align: center; }
+
+  /* The empty state: one disc, a title, a line. */
+  .empty { display: flex; flex-direction: column; align-items: center; text-align: center; padding: 40px 16px 16px; }
+  .empty-disc { display: flex; align-items: center; justify-content: center; width: 64px; height: 64px; margin-bottom: 14px; border-radius: 50%; color: var(--action); background: var(--tint); }
+  .empty-disc .icon { width: 30px; height: 30px; color: currentColor; stroke-width: 2; }
+  .empty-title { font: var(--type-card-title); }
+  .empty-line { max-width: 260px; margin-top: 6px; font: var(--type-secondary); color: var(--muted); }
+
+  /* Swipe on a list row: right ticks, left deletes. The page still scrolls up and down. */
+  .todo-row, .gro-row { touch-action: pan-y; }
+
+  /* A1-T7 list cards: a label on the page, then one white card per section; 56 px rows, a hairline between rows
+     that starts after the tick, the 28 px tick circle in a 56 px target. Rows slide inside their card. */
+  .list-lab { margin: 22px 4px 8px; font-size: 15px; font-weight: 700; line-height: 1.3; color: var(--ink); }
+  .lists-main > .list-lab:first-child, .todo-top + .list-lab { margin-top: 8px; }
+  .list-card { padding: 0 14px 0 0; overflow: hidden; }
+  .list-card :focus-visible { outline-offset: -2px; }
+  .list-card > * + .todo-row::before, .list-card > * + .gro-row::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 56px;
+    right: 0;
+    border-top: 1px solid #f3e9df;
+    pointer-events: none;
+  }
+  .list-card > .todo-day + .todo-row::before, .list-card > .todo-note + .todo-row::before { display: none; }
+  .todo-fold-h + .list-card, .gro-more + .list-card { margin-top: 8px; }
+  #app:has(#groceries:not([hidden])) .qa-toast { bottom: calc(var(--bar-h) + 12px + env(safe-area-inset-bottom) + var(--gro-dock-h, 150px)); }
+  /* A1-T7 end */
+
+  .lists-main { padding-top: 16px; }
   .lists-settings { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-top: 28px; }
   .dock {
     position: fixed;
@@ -587,14 +735,15 @@
   .todo-top { display: flex; justify-content: flex-end; margin-bottom: 4px; }
   .mine {
     min-height: 44px;
-    padding: 0 16px;
-    border: 1px solid var(--rule);
+    padding: 0 18px;
     border-radius: 22px;
     font-size: 15px;
+    font-weight: 600;
+    color: var(--muted);
+    background: #f6ece2;
   }
-  .mine[aria-pressed="true"] { color: var(--paper); background: var(--accent); border-color: var(--accent); font-weight: 600; }
-  .todo-sec { padding-top: 20px; }
-  .todo-sec > h2 { margin-bottom: 4px; }
+  .mine[aria-pressed="true"] { color: #9c4615; background: #fde3cc; box-shadow: inset 0 0 0 1.5px #dc966a; }
+  .todo-sec-later, .todo-sec-parked, .todo-sec-done { margin-top: 16px; }
   .todo-fold-h { margin: 0; }
   .todo-fold {
     display: flex;
@@ -603,8 +752,12 @@
     align-items: center;
     gap: 12px;
     min-height: 48px;
-    font-size: 17px;
-    font-weight: 600;
+    padding: 0 14px;
+    border-radius: 14px;
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--muted);
+    background: rgba(246, 236, 226, 0.7);
   }
   .todo-fold::after {
     content: "";
@@ -617,41 +770,69 @@
     transform: rotate(45deg);
   }
   .todo-fold[aria-expanded="true"]::after { transform: rotate(-135deg); }
-  .todo-day { font-size: 14px; font-weight: 600; color: var(--muted); padding: 12px 0 2px; }
-  .todo-row { display: flex; align-items: flex-start; min-height: 56px; border-bottom: 1px solid var(--rule); }
+  .todo-day { margin-left: 56px; padding: 10px 0 0; font-size: 13px; font-weight: 700; color: var(--muted); }
+  .list-card > * + .todo-day { border-top: 1px solid #f3e9df; }
+  .todo-row { position: relative; display: flex; align-items: center; min-height: 56px; background: var(--card); }
   .tick-zone {
     flex: none;
+    align-self: stretch;
     width: 56px;
     min-height: 56px;
-    margin-left: -12px;
     display: flex;
     align-items: center;
     justify-content: center;
     -webkit-tap-highlight-color: transparent;
   }
-  .tick-zone .icon { width: 26px; height: 26px; color: var(--muted); }
-  .tick-zone[aria-pressed="true"] .icon { color: var(--accent); }
-  .tick-zone:active { background: var(--tint); }
-  .todo-open { display: block; flex: 1; min-width: 0; padding: 15px 0 13px; text-align: left; }
+  /* The svg is the circle (its round border); its first path, the drawn circle, is not needed. Ticked: rust with a white tick. */
+  .tick-zone .icon { width: 28px; height: 28px; border: 2px solid #a38d7b; border-radius: 50%; color: var(--on-action); stroke-width: 2.6; }
+  .tick-zone .icon path:first-child { display: none; }
+  .tick-zone[aria-pressed="true"] .icon { background: var(--action); border-color: var(--action); }
+  .tick-zone:active .icon { background: var(--tint); }
+  .tick-zone[aria-pressed="true"]:active .icon { background: var(--action); }
+  .todo-open {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-self: stretch;
+    flex: 1;
+    min-width: 0;
+    min-height: 56px;
+    padding: 9px 0;
+    text-align: left;
+  }
   .todo-text {
     display: -webkit-box;
     -webkit-line-clamp: 2;
     line-clamp: 2;
     -webkit-box-orient: vertical;
     overflow: hidden;
-    font-size: 16px;
-    line-height: 1.4;
+    font-size: 17px;
+    line-height: 1.35;
   }
-  .is-done .todo-text { text-decoration: line-through; text-decoration-thickness: 1px; color: var(--muted); }
-  .todo-chips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 6px; }
-  .tchip { display: inline-block; max-width: 100%; padding: 1px 8px; border-radius: 4px; font-size: 13px; line-height: 1.4; }
-  .tchip-kev { color: var(--kev-ink); background: var(--kev-bg); font-weight: 600; }
-  .tchip-lili { color: var(--lili-ink); background: var(--lili-bg); font-weight: 600; }
-  .tchip-couple { color: var(--couple-ink); background: var(--couple-bg); font-weight: 600; }
-  .tchip-effort { color: var(--ink); background: var(--tint); }
-  .tchip-date { color: var(--ink); background: transparent; border: 1px solid var(--rule); padding: 0 7px; }
-  .tchip-age { color: var(--muted); background: transparent; padding: 1px 0; }
-  .tchip-from { color: var(--muted); background: transparent; padding: 1px 0; }
+  .is-done .todo-text { text-decoration: line-through; text-decoration-thickness: 1px; text-decoration-color: #d9b89c; color: var(--muted); }
+  .todo-chips { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 4px; }
+  .tchip {
+    display: inline-block;
+    max-width: 100%;
+    height: 22px;
+    padding: 0 8px;
+    border-radius: 999px;
+    font-size: 13px;
+    font-weight: 600;
+    line-height: 22px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    color: var(--muted);
+    background: #f6ece2;
+  }
+  .tchip-kev { color: var(--kev-ink); background: var(--kev-bg); }
+  .tchip-lili { color: var(--lili-ink); background: var(--lili-bg); }
+  .tchip-couple { color: var(--couple-ink); background: var(--couple-bg); }
+  .tchip-effort { color: var(--muted); background: #f6ece2; }
+  .tchip-date { color: var(--muted); background: #f6ece2; }
+  .tchip-age { color: var(--muted); background: transparent; padding: 0 2px; font-weight: 500; }
+  .tchip-from { color: var(--muted); background: transparent; padding: 0 2px; font-weight: 500; }
   .todo-revive { flex: none; align-self: center; min-height: 44px; padding-left: 10px; font-size: 14px; }
   .todo-note-lead {
     display: -webkit-box;
@@ -660,10 +841,9 @@
     -webkit-box-orient: vertical;
     overflow: hidden;
   }
-  .todo-note { margin: 6px 0 4px; padding: 14px 16px; border-radius: 10px; background: var(--tint); font-size: 15px; }
+  .todo-note { margin: 12px 0 6px 14px; padding: 14px 16px; border-radius: 14px; background: var(--tint); font-size: 15px; }
   .todo-note-actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
-  .todo-note-actions .btn-plain { flex: 0 0 auto; background: var(--paper); }
-  .todo-empty { padding: 28px 0 8px; font-size: 15px; color: var(--muted); }
+  .todo-note-actions .btn-plain { flex: 0 0 auto; border: 0; border-radius: 22px; background: var(--card); }
   .lists-settings + .lists-settings { margin-top: 4px; }
   .sep { color: var(--muted); }
   .pause-menu { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-top: 8px; }
@@ -680,23 +860,11 @@
   }
   .pause-error { width: 100%; font-size: 14px; color: var(--accent); font-weight: 500; }
 
-  /* Task 7: "+", Not today, the Undo line, and the item sheet (a dialog from the bottom; closing it saves) */
-  .todo-add {
-    align-self: flex-end;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 56px;
-    height: 56px;
-    border-radius: 28px;
-    color: var(--paper);
-    background: var(--accent);
-    box-shadow: 0 2px 8px rgba(43, 29, 20, 0.28);
-  }
-  .todo-add .icon { width: 28px; height: 28px; stroke-width: 2; }
+  /* Task 7: Not today, the Undo line, and the item sheet (a dialog from the bottom; closing it saves). A1-T5: the
+     To do "+" is gone; the Add slot in the bar opens the quick add. */
   .todo-nottoday { flex: none; align-self: center; min-height: 44px; padding-left: 10px; font-size: 14px; }
-  .todo-nottoday-menu { display: flex; flex-wrap: wrap; gap: 8px; padding: 4px 0 12px 44px; border-bottom: 1px solid var(--rule); }
-  .todo-nottoday-menu .btn-plain { flex: 0 0 auto; }
+  .todo-nottoday-menu { display: flex; flex-wrap: wrap; gap: 8px; padding: 0 0 12px 56px; }
+  .todo-nottoday-menu .btn-plain { flex: 0 0 auto; border: 0; border-radius: 22px; background: #f6ece2; }
   .dock-toast button {
     min-height: 44px;
     min-width: 44px;
@@ -724,10 +892,10 @@
     margin: 0 auto;
     overflow-y: auto;
     overscroll-behavior: contain;
-    padding: 6px var(--gutter) calc(16px + env(safe-area-inset-bottom));
-    border-radius: 16px 16px 0 0;
+    padding: 6px calc(var(--gutter) + env(safe-area-inset-right)) calc(16px + env(safe-area-inset-bottom)) calc(var(--gutter) + env(safe-area-inset-left));
+    border-radius: 22px 22px 0 0;
     color: var(--ink);
-    background: var(--paper);
+    background: var(--card);
     box-shadow: 0 -4px 24px rgba(43, 29, 20, 0.25);
   }
   .sheet-panel:focus { outline: none; }
@@ -742,42 +910,50 @@
     font-size: 17px;
     line-height: 1.4;
     color: var(--ink);
-    background: var(--paper);
-    border: 1px solid var(--muted);
-    border-radius: 10px;
+    background: #faf3ec;
+    border: 1px solid #eadfd5;
+    border-radius: 13px;
     resize: none;
     overflow-y: auto;
     field-sizing: content;
   }
-  .sheet-label { margin: 18px 0 8px; font-size: 14px; font-weight: 600; color: var(--muted); }
-  .sheet-chips { display: flex; flex-wrap: wrap; gap: 8px; }
+  .sheet-label { margin: 16px 2px 8px; font-size: 13px; font-weight: 700; color: var(--muted); }
+  .sheet-chips { display: flex; flex-wrap: wrap; gap: 6px; }
+  /* A1-T7: soft chips; the picked one is a tint with a ring (a person's colour for Kev, Lili, Couple), never solid rust.
+     A1 final fix 5: the ring is 2 px and dark (at least 3:1 against the resting chip), the label bold. */
   .schip {
     min-height: 44px;
     min-width: 44px;
     padding: 0 14px;
-    border: 1px solid var(--rule);
+    border: 0;
     border-radius: 22px;
     font-size: 15px;
+    font-weight: 600;
+    color: var(--muted);
+    background: #f6ece2;
     text-align: center;
   }
-  .schip[aria-pressed="true"] { color: var(--paper); background: var(--accent); border-color: var(--accent); font-weight: 600; }
+  .schip[aria-pressed="true"] { color: #9c4615; font-weight: 700; background: #fde3cc; box-shadow: inset 0 0 0 2px #b4541d; }
+  .schip-kev[aria-pressed="true"] { color: var(--kev-ink); background: var(--kev-bg); box-shadow: inset 0 0 0 2px var(--kev-ink); }
+  .schip-lili[aria-pressed="true"] { color: var(--lili-ink); background: var(--lili-bg); box-shadow: inset 0 0 0 2px var(--lili-ink); }
+  .schip-couple[aria-pressed="true"] { color: var(--couple-ink); background: var(--couple-bg); box-shadow: inset 0 0 0 2px var(--couple-ink); }
   .sheet-day, .sheet-time input {
     min-height: 44px;
     margin-top: 10px;
-    padding: 8px 10px;
+    padding: 8px 12px;
     font: inherit;
     font-size: 16px;
     color: var(--ink);
-    background: var(--paper);
-    border: 1px solid var(--muted);
-    border-radius: 8px;
+    background: #faf3ec;
+    border: 1px solid #eadfd5;
+    border-radius: 12px;
   }
   .sheet-time input:disabled { opacity: 0.55; }
   .sheet-time .small { margin-top: 6px; }
   .sheet-more { margin-top: 8px; }
   .sheet-foot { display: flex; align-items: center; gap: 12px; margin-top: 22px; }
-  .sheet-delete { min-height: 44px; font-size: 14px; color: var(--muted); }
-  .sheet-save { flex: 0 0 auto; min-width: 120px; margin-left: auto; }
+  .sheet-delete { min-height: 44px; font-size: 15px; font-weight: 600; color: var(--muted); }
+  .sheet-save { flex: 0 0 auto; min-width: 120px; min-height: 48px; margin-left: auto; border-radius: 14px; }
   .sheet-shop-input {
     display: block;
     width: 100%;
@@ -787,58 +963,95 @@
     font: inherit;
     font-size: 16px;
     color: var(--ink);
-    background: var(--paper);
-    border: 1px solid var(--muted);
-    border-radius: 8px;
+    background: #faf3ec;
+    border: 1px solid #eadfd5;
+    border-radius: 12px;
   }
 
-  /* Task 8: Groceries. A pinned add field, Bought recently chips, the shop filter, plain rows; the problems line */
+  /* Task 8: Groceries: Bought recently chips, the shop filter, rows; the problems line. A1-T7: the add field and the
+     chips dock above the tab bar (near the thumb), inside the safe areas, and ride on the keyboard while it is up. */
   .lists-problem { margin-top: 16px; padding: 10px 14px; border-radius: 10px; font-size: 14px; color: var(--ink); background: var(--tint); }
-  .gro-add { position: sticky; top: 0; z-index: 2; padding: 12px 0 6px; background: var(--paper); border-bottom: 1px solid var(--rule); }
+  .gro-dock {
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: calc(var(--bar-h) + env(safe-area-inset-bottom));
+    z-index: 5;
+    max-width: 560px;
+    margin: 0 auto;
+    padding: 10px calc(12px + env(safe-area-inset-right)) 2px calc(12px + env(safe-area-inset-left));
+    background: var(--page);
+    box-shadow: 0 -0.5px 0 rgba(58, 34, 19, 0.13);
+  }
+  .gro-dock.is-kb { padding-bottom: 0; }
+  .gro-dock-slot:empty { display: none; }
+  .gro-dock .dock { position: static; transform: none; width: auto; max-width: none; padding-bottom: 8px; }
+  .gro-add {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    min-height: 52px;
+    padding: 0 8px 0 8px;
+    border-radius: 26px;
+    background: var(--card);
+    box-shadow: 0 6px 16px rgba(58, 34, 19, 0.13), 0 0 0 1px rgba(58, 34, 19, 0.04);
+    cursor: text;
+  }
+  .gro-add:focus-within { box-shadow: 0 6px 16px rgba(58, 34, 19, 0.13), 0 0 0 2px var(--action); }
+  .gro-add-plus { flex: none; display: flex; align-items: center; justify-content: center; width: 32px; height: 32px; border-radius: 50%; color: var(--on-action); background: var(--action); }
+  .gro-add-plus .icon { width: 18px; height: 18px; color: currentColor; stroke-width: 2.5; }
   .gro-add input {
     display: block;
+    flex: 1;
     width: 100%;
+    min-width: 0;
     min-height: 48px;
-    padding: 10px 14px;
+    padding: 0 4px;
     font: inherit;
     font-size: 17px;
     color: var(--ink);
-    background: var(--paper);
-    border: 1px solid var(--muted);
-    border-radius: 10px;
+    background: transparent;
+    border: 0;
+    border-radius: 0;
   }
+  .gro-add input:focus-visible { outline: none; }
   .gro-add input::placeholder { color: var(--muted); opacity: 1; }
-  .gro-note { min-height: 24px; padding-top: 4px; font-size: 14px; line-height: 20px; color: var(--muted); }
+  .gro-note { min-height: 22px; padding: 2px 12px 0; font-size: 14px; line-height: 20px; color: var(--muted); }
+  .gro-end { height: calc(var(--gro-dock-h, 150px) + 24px); }
   .gro-main { padding-top: 14px; }
-  .gro-recent { padding-bottom: 6px; }
-  .gro-label { margin-bottom: 8px; font-size: 14px; font-weight: 600; color: var(--muted); }
+  .gro-recent { display: flex; align-items: center; gap: 8px; padding-bottom: 8px; }
+  .gro-label { flex: none; margin: 0 0 0 4px; font-size: 13px; font-weight: 700; color: var(--muted); }
   .gro-chips {
     display: flex;
-    gap: 8px;
+    flex: 1;
+    min-width: 0;
+    gap: 6px;
     overflow-x: auto;
-    margin: 0 calc(var(--gutter) * -1);
-    padding: 0 var(--gutter) 4px;
+    padding: 2px 2px 3px;
     scrollbar-width: none;
     -webkit-overflow-scrolling: touch;
   }
   .gchip {
     flex: none;
-    max-width: 70vw;
+    max-width: 60vw;
     min-height: 44px;
     padding: 0 14px;
-    border: 1px solid var(--rule);
+    border: 0;
     border-radius: 22px;
     font-size: 15px;
+    font-weight: 600;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+    background: var(--card);
+    box-shadow: 0 0 0 1px rgba(58, 34, 19, 0.06), 0 1px 2px rgba(58, 34, 19, 0.08);
   }
-  .gro-tools { display: flex; justify-content: flex-end; padding-top: 8px; }
-  .gro-shop { min-height: 44px; padding: 0 16px; border: 1px solid var(--rule); border-radius: 22px; font-size: 15px; }
-  .gro-shop[aria-expanded="true"] { border-color: var(--accent); }
-  .gro-menu { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 8px; padding: 10px 0 6px; }
+  .gro-tools { display: flex; justify-content: flex-end; padding-top: 4px; }
+  .gro-shop { min-height: 44px; padding: 0 16px; border-radius: 22px; font-size: 15px; font-weight: 600; color: var(--muted); background: #f6ece2; }
+  .gro-shop[aria-expanded="true"] { color: #9c4615; background: #fde3cc; box-shadow: inset 0 0 0 1.5px #dc966a; }
+  .gro-menu { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 6px; padding: 10px 0 6px; }
   .gro-menu .schip { min-height: 44px; }
-  .gro-head { margin: 0; padding: 18px 0 2px; font-size: 14px; font-weight: 600; color: var(--muted); }
+  .gro-head { margin: 0; padding: 20px 4px 8px; font-size: 15px; font-weight: 700; color: var(--ink); }
   .gro-more {
     display: flex;
     width: 100%;
@@ -846,8 +1059,13 @@
     align-items: center;
     gap: 12px;
     min-height: 48px;
+    margin-top: 12px;
+    padding: 0 14px;
+    border-radius: 14px;
     font-size: 15px;
+    font-weight: 700;
     color: var(--muted);
+    background: rgba(246, 236, 226, 0.7);
   }
   .gro-more::after {
     content: "";
@@ -860,8 +1078,18 @@
     transform: rotate(45deg);
   }
   .gro-more[aria-expanded="true"]::after { transform: rotate(-135deg); }
-  .gro-row { display: flex; align-items: flex-start; min-height: 56px; border-bottom: 1px solid var(--rule); }
-  .gro-open { display: block; flex: 1; min-width: 0; padding: 15px 0 13px; text-align: left; }
+  .gro-row { position: relative; display: flex; align-items: center; min-height: 56px; background: var(--card); }
+  .gro-open {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-self: stretch;
+    flex: 1;
+    min-width: 0;
+    min-height: 56px;
+    padding: 9px 0;
+    text-align: left;
+  }
   .gro-text {
     display: -webkit-box;
     -webkit-line-clamp: 2;
@@ -871,21 +1099,111 @@
     font-size: 17px;
     line-height: 1.4;
   }
-  .is-done .gro-text { text-decoration: line-through; text-decoration-thickness: 1px; color: var(--muted); }
-  .gro-empty { padding: 20px 0 8px; font-size: 15px; color: var(--muted); }
+  .is-done .gro-text { text-decoration: line-through; text-decoration-thickness: 1px; text-decoration-color: #d9b89c; color: var(--muted); }
   .gro-done { padding-top: 16px; }
 
+  /* A1-T5 quick add */
+  .qa-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 12px; }
+  .qa-title { font: var(--type-card-title); }
+  .qa-save { flex: 0 0 auto; min-width: 96px; min-height: 44px; }
+  .qa-seg { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 2px; padding: 2px; margin-bottom: 14px; border-radius: 12px; background: #f6ece2; }
+  .qa-segbtn { display: flex; align-items: center; justify-content: center; gap: 6px; min-height: 44px; border-radius: 10px; font: var(--type-caption); font-weight: 600; color: var(--muted); }
+  .qa-segbtn .icon { width: 18px; height: 18px; color: currentColor; }
+  .qa-segbtn[aria-pressed="true"] { color: var(--ink); background: var(--card); box-shadow: 0 1px 3px rgba(58, 34, 19, 0.16); }
+  .qa-segbtn[aria-pressed="true"] .icon { color: var(--action); }
+  .qa-amtline { display: flex; align-items: center; gap: 10px; }
+  .qa-cur { flex: none; min-width: 64px; min-height: 44px; padding: 0 12px; border-radius: 12px; font-size: 15px; font-weight: 600; color: var(--action); background: #f6ece2; }
+  .qa-amount {
+    flex: 1;
+    min-width: 0;
+    min-height: 56px;
+    padding: 0 4px;
+    font: var(--type-numeral);
+    letter-spacing: -0.03em;
+    font-variant-numeric: tabular-nums;
+    color: var(--ink);
+    background: transparent;
+    border: 0;
+    border-bottom: 2px solid var(--rule);
+    border-radius: 0;
+  }
+  .qa-amount:focus { outline: none; border-bottom-color: var(--action); }
+  .qa-amount::placeholder { color: #b9a796; opacity: 1; }
+  .qa-preview { min-height: 21px; margin-top: 6px; font: var(--type-secondary); color: var(--muted); font-variant-numeric: tabular-nums; }
+  .qa-status { font-size: 15px; font-weight: 600; color: var(--action); }
+  .qa-what {
+    display: block;
+    width: 100%;
+    min-height: 48px;
+    margin-top: 12px;
+    padding: 0 12px;
+    font: inherit;
+    font-size: 17px;
+    color: var(--ink);
+    background: var(--paper);
+    border: 1px solid var(--muted);
+    border-radius: 12px;
+  }
+  .qa-what::placeholder { color: var(--muted); opacity: 1; }
+  .qa-hint { min-height: 18px; margin: 6px 2px 0; font: var(--type-caption); color: var(--muted); }
+  .qa-row { display: flex; align-items: center; gap: 8px; margin-top: 10px; }
+  .qa-label { flex: 0 0 60px; font: var(--type-caption); font-weight: 600; color: var(--muted); }
+  .qa-row .sheet-chips { flex: 1; gap: 6px; }
+  .qa-row .schip { padding: 0 12px; }
+  .qa-type { display: inline-flex; align-items: center; gap: 8px; min-height: 44px; padding: 0 14px 0 5px; border: 1px solid var(--rule); border-radius: 22px; font-size: 15px; font-weight: 600; }
+  .qa-type .chev { margin: -4px 2px 0 4px; transform: rotate(135deg); }
+  .qa-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; margin-top: 10px; }
+  .qa-cat { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; min-height: 64px; padding: 6px 4px; border-radius: 12px; background: var(--paper); font-size: 13px; font-weight: 500; text-align: center; }
+  .qa-cat[aria-pressed="true"] { box-shadow: inset 0 0 0 2px var(--action); }
+  .qa-day { min-height: 44px; margin-top: 10px; padding: 8px 10px; font: inherit; font-size: 16px; color: var(--ink); background: var(--paper); border: 1px solid var(--muted); border-radius: 8px; }
+  .qa-wait { margin-top: 10px; }
+  .qa-toast {
+    position: fixed;
+    left: 50%;
+    bottom: calc(var(--bar-h) + 12px + env(safe-area-inset-bottom));
+    z-index: 7;
+    transform: translateX(-50%);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    width: calc(100% - 32px);
+    max-width: 520px;
+    min-height: 52px;
+    padding: 4px 6px 4px 16px;
+    border-radius: 14px;
+    font-size: 15px;
+    font-weight: 500;
+    color: #fbeee2;
+    background: var(--ink);
+  }
+  .qa-toast[hidden] { display: none; }
+  .qa-toast button { flex: none; min-height: 44px; min-width: 44px; padding: 0 10px; font-size: 15px; font-weight: 700; color: #fbcda4; }
+  .qa-toast :focus-visible { outline-color: #fbcda4; }
+  /* A1-T5 end */
+
+  /* A1-T6 settle up */
+  .settle-head { margin-bottom: 8px; }
+  .settle-title { font: var(--type-card-title); }
+  .settle-who { margin: 0; font-size: 17px; color: var(--muted); }
+  .settle-big { margin: 4px 0 0; font: var(--type-numeral); letter-spacing: -0.03em; font-variant-numeric: tabular-nums; color: var(--ink); }
+  .settle-small { min-height: 21px; margin: 2px 0 0; font: var(--type-secondary); color: var(--muted); font-variant-numeric: tabular-nums; }
+  .settle-note { margin: 12px 0 0; font-size: 15px; color: var(--muted); }
+  .settle-go { display: block; width: 100%; min-height: 52px; margin-top: 16px; }
+  .settle-later { display: block; width: 100%; min-height: 44px; margin-top: 4px; font-size: 15px; font-weight: 600; color: var(--muted); }
+  /* A1-T6 end */
+
   @media (hover: hover) {
-    .chip:hover, .barcol:hover, .cat:hover { background: var(--tint); }
-    .dn-tap:hover, .dchip[aria-pressed="false"]:hover { background: var(--tint); }
-    .panel-action:hover, .back:hover { opacity: 0.8; }
+    .barcol:hover, .cat:hover, .dn-tap:hover, .row-btn:hover { background: var(--tint); }
+    .seg-btn[aria-pressed="false"]:hover { color: var(--ink); }
+    .back:hover, .bal-open:hover, .bal-settle:hover { opacity: 0.8; }
   }
 </style>
 </head>
 <body>
 <div id="cover" class="cover">
   <div class="wrap">
-    <h1>Expenses</h1>
+    <h1>Abricot</h1>
     <div id="pulse" aria-hidden="true" hidden></div>
     <div id="gate" hidden>
       <label for="pin">Your PIN</label>
@@ -897,14 +1215,16 @@
   </div>
 </div>
 <div id="app" hidden>
-  <div id="home"></div>
-  <div id="month" hidden></div>
-  <div id="trends" hidden></div>
-  <div id="balance" hidden></div>
-  <div id="todo" hidden></div>
-  <div id="groceries" hidden></div>
+  <div id="home" class="screen"></div>
+  <div id="month" class="screen" hidden></div>
+  <div id="trends" class="screen" hidden></div>
+  <div id="balance" class="screen" hidden></div>
+  <div id="todo" class="screen" hidden></div>
+  <div id="groceries" class="screen" hidden></div>
   <nav id="tabbar" class="tabbar" aria-label="Sections"></nav>
   <div id="sheet" class="sheet" hidden></div>
+  <div id="who" class="sheet" hidden></div>
+  <div id="qa-toast" class="qa-toast" role="status" hidden></div>
 </div>
 <script>
 // Never run inside someone else's frame: show nothing and stop.
@@ -999,9 +1319,17 @@ function whoText(r) {
   return by + ', for ' + (r.paidFor === 'Couple' ? 'both' : r.paidFor);
 }
 
+// The one balance rule (A1-T4 fix 5): under half a cent is square; otherwise who pays whom, and how many euros.
+// net < 0: Lili owes Kev. The balance sentence and the home balance card both read it.
+function balanceSide_(net) {
+  if (Math.abs(net) < 0.005) return { square: true, who: '', eur: 0 };
+  return { square: false, who: net < 0 ? 'Lili pays Kev' : 'Kev pays Lili', eur: Math.abs(net) };
+}
+
 function balanceText(net) {
-  if (Math.abs(net) < 0.005) return 'All square';
-  return 'To even up: ' + (net < 0 ? 'Lili pays Kev ' : 'Kev pays Lili ') + fmtEur(Math.abs(net));
+  var b = balanceSide_(net);
+  if (b.square) return 'All square';
+  return 'To even up: ' + b.who + ' ' + fmtEur(b.eur);
 }
 
 // A positive effect moves the balance toward Lili, a negative one toward Kev.
@@ -1197,17 +1525,19 @@ function comparison(m, usual, rate, todayIso) {
   return { verdict: null, text: 'Too few full months yet to compare.' };
 }
 
-// What was actually paid comes first, the other currency second.
-function rowAmounts(r) {
+// A1-T4: rupiah big, EUR small (rowIdr_: an IDR row's own amount, others from the stored euros at the rate). A USD
+// row also shows what was paid. With no rate, a row that is not in rupiah shows its euros big and no rupiah.
+function rowAmounts(r, rate) {
   function paid() {
     if (r.currency === 'IDR') return fmtIdr(r.amount);
     if (r.currency === 'EUR') return fmtEur(r.amount);
     return (r.currency ? r.currency + ' ' : '') + fixed2(r.amount);
   }
   if (r.needsAmount) return { main: r.amount === null ? 'No amount' : paid(), sub: [] };
-  if (r.currency === 'IDR') return { main: paid(), sub: [fmtEur(r.eur)] };
-  if (r.currency === 'EUR') return { main: paid(), sub: [fmtIdr(r.idr)] };
-  return { main: paid(), sub: [fmtIdr(r.idr), fmtEur(r.eur)] };
+  var idr = rowIdr_(r, rate);
+  if (idr === null) return { main: fmtEur(r.eur), sub: r.currency === 'EUR' ? [] : [paid()] };
+  if (r.currency === 'IDR' || r.currency === 'EUR') return { main: fmtIdr(idr), sub: [fmtEur(r.eur)] };
+  return { main: fmtIdr(idr), sub: [fmtEur(r.eur), paid()] };
 }
 
 function rowsFor(m, filter) {
@@ -1285,11 +1615,14 @@ function store(t) { try { localStorage.setItem(KEY, t); } catch (e) {} }
 function stored() { try { return localStorage.getItem(KEY); } catch (e) { return null; } }
 function unstore() { try { localStorage.removeItem(KEY); } catch (e) {} }
 
-// ---- lists storage: four kl.* keys, each read and write inside try, so the page works without storage ----
+// ---- page storage: the kl.* keys, each read and write inside try, so the page works without storage ----
 var LS_TAB = 'kl.tab';     // the last bottom bar tab: money, todo or groceries
 var LS_ME = 'kl.me';       // who this phone is: Kev or Lili
 var LS_LISTS = 'kl.lists'; // the last lists reply, as {at, result}
 var LS_QUEUE = 'kl.queue'; // the list ops not yet answered, oldest first
+var LS_MONEY = 'kl.money'; // A1-T3: the last data reply, as {v, at, data}; drawn first, then refreshed
+var LS_KEPT = 'kl.kept';   // A1-T5: expenses the server refused, as [{key, at, draft}], kept until saved again
+var MONEY_V = 2;           // A1-T4: version 2, Money reads data.fx; a version 1 snapshot is ignored
 function lsGet_(k) { try { return localStorage.getItem(k); } catch (e) { return null; } }
 function lsSet_(k, v) { try { localStorage.setItem(k, v); return true; } catch (e) { return false; } }
 function lsDel_(k) { try { localStorage.removeItem(k); } catch (e) {} }
@@ -1481,10 +1814,22 @@ function lockOut() {
   LOADING = false;
   TOKEN = null;
   closeItemSheet_('lock'); // Task 7: an open sheet's change goes into the queue, sent after the unlock
+  whoShut_();
+  QA_DRAFT = null; // A1-T5: an unsaved expense goes with the session; a queued one stays for after the PIN
+  // A1 final fix 3: so does one kept as 'unsaved' in kl.kept; refused ones stay, as the queue does.
+  if (qaKept_().some(function (e) { return e.why === 'unsaved'; })) {
+    qaKeptChange_(function (list) { for (var i = list.length - 1; i >= 0; i--) if (list[i].why === 'unsaved') list.splice(i, 1); });
+  }
+  qaToastSet_(null);
   DATA = null;
+  MONEY_AT = 0;
+  MONEY_LIVE = false;
+  lsDel_(LS_MONEY); // A1-T3: the Money snapshot goes with the token
   VIEW = { screen: 'home', key: null };
   FILTER = null;
-  DONUT_KEY = null;
+  DONUT_VIEW = 'cur';
+  DONUT_MORE = false;
+  MONTH_MORE = false;
   EDIT = null;
   TOAST = null;
   FIRST_LOAD = true;
@@ -1511,7 +1856,8 @@ function loadFailed(quiet, err) {
       TOAST = { text: (TOAST.after ? TOAST.after + ' ' : '') + 'Could not refresh. These are the last numbers loaded.', key: TOAST.key };
     }
     render(true);
-    homeStatus('Could not update. These are the last numbers loaded.');
+    // A1-T3 fix 1: after a failed refresh, the age of the numbers on show, as the lists say it.
+    homeStatus('Could not update. These are the last numbers loaded.' + (MONEY_AT ? ' ' + updatedText_(MONEY_AT, Date.now()) + '.' : ''));
     return;
   }
   if (code === 'NOT_CONFIGURED') {
@@ -1539,7 +1885,7 @@ function loadData(quiet) {
     if (session !== SESSION) return;
     LOADING = false;
     if (!p || !p.months) { loadFailed(quiet, ''); return; }
-    DATA = p;
+    moneySet_(p);
     if (FIRST_LOAD) {
       FIRST_LOAD = false;
       VIEW = viewFromHash(location.hash);
@@ -1564,6 +1910,73 @@ function homeStatus(text) {
 }
 var HOME_STATUS = null;
 
+// ---- the Money snapshot (kl.money, A1-T3): drawn at once on the next visit, then refreshed ---------------
+var MONEY_AT = 0; // when the numbers on show were read from the server (ms)
+// A1 final fix 2: true once a data reply from the server has been on show in this session (the snapshot alone
+// never sets it). Settle up waits for it, so a settlement is never confirmed from figures the server has not just sent.
+var MONEY_LIVE = false;
+
+// A1 final fix 8: the session token's first segment is its expiry in ms (Auth.gs signToken_). True only while that
+// expiry is ahead; a token that cannot be read counts as expired.
+function tokenLive_(t) {
+  var m = typeof t === 'string' ? /^([0-9]{1,15})\./.exec(t) : null;
+  return !!m && Number(m[1]) > Date.now();
+}
+
+// A data reply from the server: on show from now, and kept as the snapshot.
+function moneySet_(p) {
+  // A1-T4: fx is kept only as a usable rate, else null, so the screens and the snapshot read one shape.
+  if (p && typeof p === 'object') p.fx = pageRate_(p) ? p.fx : null;
+  DATA = p;
+  MONEY_AT = Date.now();
+  MONEY_LIVE = true;
+  // A write that fails (storage full) drops the older snapshot, so a later visit never draws stale numbers.
+  if (!lsSet_(LS_MONEY, JSON.stringify({ v: MONEY_V, at: MONEY_AT, data: p }))) lsDel_(LS_MONEY);
+}
+
+// The snapshot's data when it is this version and has the parts every Money screen reads; otherwise null.
+function moneyCacheData_(c) {
+  if (!c || typeof c !== 'object' || c.v !== MONEY_V || typeof c.at !== 'number' || !isFinite(c.at)) return null;
+  var d = c.data;
+  if (!d || typeof d !== 'object' || !Array.isArray(d.months)) return null;
+  if (typeof d.today !== 'string' || !/^\d{4}-\d{2}-\d{2}$/.test(d.today)) return null;
+  if (!d.balance || typeof d.balance.net !== 'number') return null;
+  if (d.fx !== null && !pageRate_(d)) return null; // A1-T4: fx is null or a usable rate
+  return d;
+}
+
+// Shows view v from the snapshot, before the server answers. False when there is no usable snapshot: a broken,
+// older or unreadable one (one that cannot be drawn) is dropped and nothing of it stays on screen.
+function moneyFromCache_(v) {
+  if (!tokenLive_(TOKEN)) return false; // A1 final fix 8: an expired session draws nothing; the server decides
+  var c = lsJson_(LS_MONEY);
+  var d = moneyCacheData_(c);
+  if (!d) return false;
+  try {
+    DATA = d;
+    MONEY_AT = c.at;
+    FIRST_LOAD = false;
+    VIEW = (v.screen === 'month' && !monthByKey(v.key)) ? { screen: 'home', key: null } : v;
+    showApp_();
+    render(false);
+    return true;
+  } catch (e) {
+    DATA = null;
+    MONEY_AT = 0;
+    FIRST_LOAD = true;
+    VIEW = v;
+    lsDel_(LS_MONEY);
+    clearScreens();
+    return false;
+  }
+}
+
+// "Updated N min ago" for numbers over 10 minutes old; nothing while they are fresh.
+function moneyAgeText_() {
+  var now = Date.now();
+  return MONEY_AT && now - MONEY_AT > 600000 ? updatedText_(MONEY_AT, now) + '.' : '';
+}
+
 // ---- navigation ---------------------------------------------------------------
 // The screen lives in the address after #, so the phone's back button steps through screens.
 function remember(view) {
@@ -1575,10 +1988,12 @@ function remember(view) {
 
 function go(view, fromHistory) {
   if (SHEET) closeItemSheet_('nav');
+  whoShut_();
+  var newTab = tabOf_(view.screen) !== tabOf_(VIEW.screen);
   if (VIEW.screen === 'home') HOME_Y = window.scrollY || 0;
   if (VIEW.screen === 'todo' && view.screen !== 'todo') todoLeave_();
   if (VIEW.screen === 'groceries' && view.screen !== 'groceries') groLeave_();
-  if (view.screen !== 'month' || view.key !== VIEW.key) FILTER = null;
+  if (view.screen !== 'month' || view.key !== VIEW.key) { FILTER = null; MONTH_MORE = false; }
   VIEW = view;
   EDIT = null;
   TOAST = null;
@@ -1587,6 +2002,8 @@ function go(view, fromHistory) {
   // Money opened for the first time this session (the page started on a list tab): load its numbers first.
   if (tabOf_(view.screen) === 'money' && !DATA) {
     if (!fromHistory) remember(view);
+    // A1-T3: the Money snapshot shows at once, then the numbers refresh quietly.
+    if (moneyFromCache_(view)) { loadData(true); return; }
     if (!APP_ON) { loadData(false); return; }
     // M1: the app and its bar stay; the money screen says it is loading, or why it could not.
     MONEY_FAILED = false;
@@ -1603,9 +2020,27 @@ function go(view, fromHistory) {
     if (r) startEdit(r);
   }
   if (!fromHistory) remember(view);
-  render(false);
+  if (newTab && !view.editRow) withTransition_(function () { render(false); });
+  else render(false);
   if (view.editRow && EDIT_EL) EDIT_EL.scrollIntoView({ block: 'center' });
   if (isListScreen_(view.screen)) listsLoad_(false);
+}
+
+// A1-T3: a tab switch through the View Transitions API (a cross-fade) when the browser has it and motion is
+// welcome; otherwise paint at once and the CSS fade on .screen plays. A refusing API still paints.
+function withTransition_(paint) {
+  var calm = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if (!calm && typeof document.startViewTransition === 'function') {
+    var t = null;
+    try { t = document.startViewTransition(paint); } catch (e) { t = null; }
+    if (t) {
+      ['ready', 'finished', 'updateCallbackDone'].forEach(function (k) {
+        if (t[k] && typeof t[k].then === 'function') t[k].then(null, function () {});
+      });
+      return;
+    }
+  }
+  paint();
 }
 
 function goHome() { go({ screen: 'home', key: null }); }
@@ -1634,15 +2069,58 @@ function render(keepScroll) {
   else renderHome();
   if (!keepScroll) {
     window.scrollTo(0, VIEW.screen === 'home' ? HOME_Y : 0);
-    if (title && !SHEET) title.focus({ preventScroll: true });
+    if (title && !modalOpen_()) title.focus({ preventScroll: true });
   }
   if (SHEET) sheetClaimFocus_();
+  if (SHEET && SHEET.list === 'expense') qaSync_(SHEET); // A1-T5: the preview reads the numbers just loaded
+  // A1-T3: the first open of a list tab asks who uses this phone, once per visit.
+  if (isListScreen_(VIEW.screen) && APP_ON && !whoAmI_() && !WHO_ASKED && !modalOpen_()) openWhoSheet_();
+}
+
+// True while a sheet (the item sheet or the who sheet) is open: a repaint behind it never takes focus.
+function modalOpen_() {
+  return !!SHEET || WHO_OPEN;
 }
 
 // ---- shared pieces --------------------------------------------------------------
-function panel(parent) {
-  var p = add(parent, 'div', 'panel');
-  return add(p, 'div', 'wrap');
+// A1-T3: the top of a screen is a large title on the page colour, with an optional node on its right (the
+// list headers put the avatar there). Returns the title, focusable for the screen change.
+function largeTitle_(root, title, rightNode) {
+  return largeTitleBox_(root, title, rightNode).h;
+}
+
+function largeTitleBox_(root, title, rightNode) {
+  var w = add(root, 'div', 'wrap screen-top');
+  var row = add(w, 'div', 'large-title');
+  var h = add(row, 'h1', 'title-big', title);
+  h.setAttribute('tabindex', '-1');
+  if (rightNode) row.appendChild(rightNode);
+  return { wrap: w, h: h };
+}
+
+// A screen under Money: Back, then its title (title-big, or title-mid for a sentence). Returns {wrap, h}.
+function subTop_(root, title, cls) {
+  var w = add(root, 'div', 'wrap screen-top');
+  panelBack(w);
+  var h = add(w, 'h1', cls || 'title-big', title);
+  h.setAttribute('tabindex', '-1');
+  return { wrap: w, h: h };
+}
+
+// The hero card: the apricot block under the title (no full-width slab).
+function heroCard_(wrap) {
+  return add(wrap, 'div', 'hero-card');
+}
+
+// A1-T3: a calm empty state: one disc, a title and an optional line, all as text.
+function emptyState_(root, title, line) {
+  var box = add(root, 'div', 'empty');
+  var disc = add(box, 'span', 'empty-disc');
+  disc.setAttribute('aria-hidden', 'true');
+  disc.appendChild(svgIcon_(['M8 12.3l2.8 2.8l5.2-5.8']));
+  add(box, 'p', 'empty-title', title);
+  if (line) add(box, 'p', 'empty-line', line);
+  return box;
 }
 
 function panelBack(w) {
@@ -1654,58 +2132,357 @@ function panelBack(w) {
   back.disabled = busy();
 }
 
-function heroAmount(w, m) {
-  var h = add(w, 'p', 'hero');
-  add(h, 'span', 'hero-cur', 'EUR');
-  h.appendChild(document.createTextNode((m.totalEur < 0 ? '-' : '') + fixed2(m.totalEur)));
-  add(w, 'p', 'hero-idr', fmtIdr(m.totalIdr));
-}
-
-function dayRuler(w, iso) {
-  var d = dayOfMonth(iso);
-  var r = add(w, 'div', 'ruler');
-  r.setAttribute('aria-hidden', 'true');
-  for (var i = 1; i <= d.days; i++) {
-    add(r, 'span', 'tick' + (i < d.day ? ' tick-past' : '') + (i === d.day ? ' tick-today' : ''));
-  }
-}
-
 function section(parent, title) {
   var s = add(parent, 'section');
   if (title) add(s, 'h2', '', title);
   return s;
 }
 
+// ---- A1-T4: rupiah first --------------------------------------------------------------------
+// The rate the page turns euros into rupiah with: data.fx.idrPerEur (Task 2: the month's ECB average, the
+// FX row of this Bali month or the latest one before it). null when the payload has no usable rate.
+function pageRate_(d) {
+  var fx = d && d.fx;
+  if (!fx || typeof fx !== 'object') return null;
+  var n = fx.idrPerEur;
+  return typeof n === 'number' && isFinite(n) && n > 0 ? n : null;
+}
+
+// Rupiah of one row. An IDR row is its own amount, exact. An EUR or USD row is its stored euros (column E) at the
+// rate, rounded to the nearest 1000: a display figure only, never written anywhere. null when the row needs an
+// amount, or when there is no rate, so the page never shows a rupiah figure it cannot stand behind.
+function rowIdr_(r, rate) {
+  if (!r || r.needsAmount || typeof r.amount !== 'number' || !isFinite(r.amount)) return null;
+  if (r.currency === 'IDR') return Math.round(r.amount);
+  if (!rate || typeof r.eur !== 'number' || !isFinite(r.eur)) return null;
+  return Math.round(r.eur * rate / 1000) * 1000;
+}
+
+// Rupiah total of rows: the sum of each counted row's rupiah (rows needing an amount and settlements are not
+// counted, as in every total). null without a rate: the page then shows euros big.
+function totalIdr_(rows, rate) {
+  if (!rate) return null;
+  var sum = 0;
+  for (var i = 0; i < rows.length; i++) {
+    var r = rows[i];
+    if (!r || r.needsAmount || r.settlement) continue;
+    var v = rowIdr_(r, rate);
+    if (v === null) return null;
+    sum += v;
+  }
+  return sum;
+}
+
+// Categories of rows, largest first by euros, then by name (the order rule of Calc.gs): {name, eur, idr, share}.
+// idr is the sum of the rows' rupiah, or null without a rate.
+function catsOf_(rows, rate) {
+  var by = Object.create(null);
+  var list = [];
+  var total = 0;
+  rows.forEach(function (r) {
+    if (!r || r.needsAmount || r.settlement) return;
+    var cents = Math.round(r.eur * 100);
+    var name = r.category;
+    total += cents;
+    if (!by[name]) { by[name] = { name: name, cents: 0, idr: 0 }; list.push(by[name]); }
+    by[name].cents += cents;
+    by[name].idr += rowIdr_(r, rate) || 0;
+  });
+  var cats = list.map(function (c) {
+    return { name: c.name, eur: c.cents / 100, idr: rate ? c.idr : null, share: total > 0 ? Math.round(c.cents / total * 10000) / 10000 : 0 };
+  });
+  cats.sort(function (a, b) {
+    if (b.eur !== a.eur) return b.eur - a.eur;
+    return a.name < b.name ? -1 : (a.name > b.name ? 1 : 0);
+  });
+  return cats;
+}
+
+// The big and the small figure of an amount: rupiah big and EUR small, or EUR big alone when there is no rupiah.
+function bigSmall_(idr, eur) {
+  if (idr === null || idr === undefined) return { big: fmtEur(eur), small: '' };
+  return { big: fmtIdr(idr), small: fmtEur(eur) };
+}
+
+// The donut centre (A1-T4 fix 2): the ring's hole is about 140 px wide. From 100 million rupiah the big figure
+// reads in millions (102.4 M after the Rp); a figure longer than 11 characters is drawn smaller (long).
+function donutCentre_(idr, eur) {
+  var bs = bigSmall_(idr, eur);
+  if (idr !== null && idr !== undefined && Math.abs(idr) >= 100000000) bs.big = (idr < 0 ? '-' : '') + 'Rp ' + millions_(Math.abs(idr)) + ' M';
+  return { big: bs.big, small: bs.small, long: bs.big.length > 11 };
+}
+
+// Rupiah in millions with one decimal, for the bar labels: 12755000 reads 12.8.
+function millions_(n) {
+  return (Math.round(n / 100000) / 10).toFixed(1);
+}
+
+// The calendar month before a yyyy-MM key.
+function monthBefore_(key) {
+  var y = Number(key.slice(0, 4));
+  var m = Number(key.slice(5, 7)) - 1;
+  if (m < 1) { m = 12; y -= 1; }
+  return y + '-' + (m < 10 ? '0' : '') + m;
+}
+
+// One colour per category name, the same on every screen and in every month (A1-T4). Hues follow the bot's
+// CAT_PALETTE in Code.gs, darkened so each is at least 3:1 on the white cards. Other is the warm grey. A name off
+// the list gets one of four spare colours, picked from its letters, so it always wears the same one.
+function catColour_(name) {
+  var map = {
+    'Groceries': '#448335', 'Restaurant': '#ba5d1d', 'Eating out': '#ba5d1d', 'Utilities': '#b5820c', 'Transport': '#116d8a',
+    'Health': '#b9454c', 'Leisure': '#7555a8', 'Shopping': '#ac4785', 'Decoration': '#9d6762', 'Furniture': '#5d3f35',
+    'Subscriptions': '#1b8278', 'Phone & subscriptions': '#1b8278', 'Pets': '#8b551c', 'Household': '#3f602a', 'Home': '#3f602a',
+    'Rent': '#42428c', 'Visa & admin': '#7d7728', 'Travel': '#2d78bd', 'Gifts': '#90314e', 'Business': '#364452',
+    'Other': '#8c857f', 'Settlement': '#8c857f'
+  };
+  if (typeof name === 'string' && Object.prototype.hasOwnProperty.call(map, name)) return map[name];
+  var spare = ['#6a5f8f', '#4d6f7c', '#8a5b4c', '#5c6b3c'];
+  var s = typeof name === 'string' ? name : '';
+  var h = 0;
+  for (var i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) % 9973;
+  return spare[h % spare.length];
+}
+
+// A category's avatar: its icon in its colour on a pale disc of the same colour. Drawing only (the name is text).
+function catAvatar_(parent, name) {
+  var col = catColour_(name);
+  var a = add(parent, 'span', 'cav');
+  a.setAttribute('aria-hidden', 'true');
+  a.style.color = col;
+  a.style.background = col + '1f';
+  a.appendChild(icon(name));
+  return a;
+}
+
+// The usual month in the unit on show: the average of the payload's usual months (Calc.gs picks them), each added
+// up the same way as every other total on the page. null when there is no usual month yet.
+function usualOf_(rate) {
+  var u = DATA.usual;
+  if (!u || !u.keys || !u.keys.length) return null;
+  var sum = 0;
+  var n = 0;
+  u.keys.forEach(function (k) {
+    var m = monthByKey(k);
+    if (!m) return;
+    var v = rate ? totalIdr_(m.rows, rate) : m.totalEur;
+    if (v === null) return;
+    sum += v;
+    n++;
+  });
+  if (!n) return null;
+  return rate ? Math.round(sum / n) : Math.round(sum / n * 100) / 100;
+}
+
+// The big number of a hero card: a small currency, then the figure; EUR small underneath when it is rupiah.
+function heroNumber_(w, idr, eur) {
+  var h = add(w, 'p', 'hero');
+  var v = idr !== null ? idr : eur;
+  add(h, 'span', 'hero-cur', idr !== null ? 'Rp' : 'EUR');
+  h.appendChild(document.createTextNode((v < 0 ? '-' : '') + (idr !== null ? group(Math.abs(Math.round(idr))) : fixed2(eur))));
+  if (idr !== null) add(w, 'p', 'hero-sub', fmtEur(eur));
+}
+
+// The hero card: the month's total, rupiah big and EUR small. The current month adds the day of the month and one
+// pace bar against the usual month, with the day marked on the same bar. Past the usual month the bar is simply
+// full: the same colour, no warning words.
+function moneyHero_(wrap, m, label, today, rate) {
+  var w = heroCard_(wrap);
+  var isCur = m.key === today.slice(0, 7);
+  var d = dayOfMonth(today);
+  if (label || isCur) {
+    var top = add(w, 'div', 'hero-top');
+    add(top, 'span', '', label);
+    if (isCur) add(top, 'span', '', 'Day ' + d.day + ' of ' + d.days);
+  }
+  var idr = totalIdr_(m.rows, rate);
+  heroNumber_(w, idr, m.totalEur);
+  if (!isCur) return w;
+  var usual = usualOf_(rate);
+  if (usual === null || !(usual > 0)) {
+    add(w, 'p', 'hero-line', 'Your usual month appears once there are 3 full months.');
+    return w;
+  }
+  var now = idr !== null ? idr : m.totalEur;
+  var pct = Math.round(Math.max(0, now) / usual * 100);
+  var bar = add(w, 'div', 'pace');
+  bar.setAttribute('aria-hidden', 'true');
+  add(bar, 'span', 'pace-fill').style.width = Math.min(100, pct) + '%';
+  add(bar, 'span', 'pace-day').style.left = Math.round(d.day / d.days * 100) + '%';
+  var foot = add(w, 'div', 'hero-foot');
+  add(foot, 'span', '', (rate ? fmtIdr(usual) : fmtEur(usual)) + ' in a usual month');
+  add(foot, 'span', 'hero-pct', pct + '%');
+  return w;
+}
+
+// ---- settle up (A1-T6) ------------------------------------------------------------------------
+// The confirm sheet, then one Settlement expense through the same queued op as quick add. A settlement row credits
+// its payer in full: the debtor pays, the creditor is paid for. No Undo (the server refuses to delete Settlement
+// rows); the sheet is the safety.
+var SETTLE_ANIM = null; // {from, at}: a settlement was saved; the card counts down once the balance is square
+var SETTLE_EL = null;   // the number on the card that is counting
+
+function settlePending_() {
+  return QUEUE.some(function (q) { return q.op === 'expense' && q.settle === true; });
+}
+
+// A1 final fix 2: the figures on show are the server's own: a data reply came in this session and no plain expense
+// is queued or on its way (it is in QUEUE until answered), so the balance holds every expense typed here.
+function settleReady_() {
+  return MONEY_LIVE && !QUEUE.some(function (q) { return q.op === 'expense' && q.settle !== true; });
+}
+var SETTLE_WAIT = 'Checking the latest numbers.';
+
+function openSettle_() {
+  if (!DATA || !DATA.balance || settlePending_() || !settleReady_()) return;
+  var side = balanceSide_(DATA.balance.net);
+  if (side.square) return;
+  whoShut_();
+  if (SHEET) closeItemSheet_('replace');
+  var rate = pageRate_(DATA);
+  var s = { list: 'settle', side: side, done: false, els: {}, ctls: [], sync: [], focusEl: null, touch: null };
+  var p = sheetFrame_(s, 'Settle up');
+  var head = add(p, 'div', 'qa-head settle-head');
+  add(head, 'h2', 'settle-title', 'Settle up');
+  s.els.who = add(p, 'p', 'settle-who', side.who);
+  s.els.big = add(p, 'p', 'settle-big');
+  s.els.small = add(p, 'p', 'settle-small');
+  settleShow_(s);
+  s.els.status = add(p, 'p', 'settle-note');
+  s.els.status.setAttribute('role', 'status');
+  s.focusEl = sheetCtl_(s, btn(p, 'btn-main settle-go', 'Mark as settled', function () { settleConfirm_(s); }));
+  sheetCtl_(s, btn(p, 'settle-later', 'Not now', function () { if (SHEET === s) closeItemSheet_('close'); }));
+  SHEET = s;
+  $('sheet').hidden = false;
+  sheetInert_(true);
+  sheetHistory_();
+  s.focusEl.focus({ preventScroll: true });
+}
+
+// The figures on the sheet, from s.side.
+function settleShow_(s) {
+  var rate = pageRate_(DATA);
+  var eur = settleAmount_(s.side.eur);
+  s.els.who.textContent = s.side.who;
+  s.els.big.textContent = fmtEur(eur);
+  s.els.small.textContent = rate ? fmtIdr(Math.round(eur * rate / 1000) * 1000) : '';
+}
+
+function settleAmount_(eur) {
+  return Math.round(eur * 100) / 100;
+}
+
+// Mark as settled. The balance is read again from the latest data: square or turned round since the sheet opened
+// means no row.
+function settleConfirm_(s) {
+  if (SHEET !== s || s.done) return;
+  if (!settleReady_()) { // A1 final fix 2: an expense still waits (another tab), or the numbers are not the server's
+    s.els.status.textContent = SETTLE_WAIT;
+    return;
+  }
+  s.done = true;
+  var now = DATA && DATA.balance ? balanceSide_(DATA.balance.net) : null;
+  if (!now || now.square || now.who !== s.side.who) {
+    sheetShut_('close');
+    if (now && !now.square) qaToastSet_({ text: 'The balance changed: ' + now.who + ' ' + fmtEur(settleAmount_(now.eur)) + '.' });
+    moneyRepaint_();
+    return;
+  }
+  if (settleAmount_(now.eur) !== settleAmount_(s.side.eur)) {
+    // Same direction, other figure: show it and wait for one more tap. Never save a figure that was not seen.
+    s.side = now;
+    settleShow_(s);
+    s.els.status.textContent = 'The amount changed. Check it, then confirm.';
+    s.done = false;
+    return;
+  }
+  var lili = DATA.balance.net < 0; // net < 0: Lili owes Kev
+  var op = expenseOp_({
+    amount: settleAmount_(now.eur), currency: 'EUR', item: 'Settle up', category: 'Settlement',
+    paidBy: lili ? 'Lili' : 'Kev', paidFor: lili ? 'Kev' : 'Lili', date: qaToday_()
+  }, {});
+  op.settle = true;
+  sheetShut_('close');
+  expenseEnqueue_(op);
+  moneyRepaint_();
+  qaFocusAdd_();
+}
+
+// The saved settlement: the card counts the old figure down to zero, then reads All square. (no motion when the
+// phone asks for none).
+function settleCalm_() {
+  return !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
+}
+
+function settleStep_(i) {
+  var a = SETTLE_ANIM;
+  if (!a) return;
+  var n = 12;
+  if (i >= n) {
+    SETTLE_ANIM = null;
+    SETTLE_EL = null;
+    moneyRepaint_();
+    return;
+  }
+  var left = a.from * (1 - (i + 1) / n);
+  if (SETTLE_EL) SETTLE_EL.textContent = fmtEur(settleAmount_(left));
+  setTimeout(function () { settleStep_(i + 1); }, 40);
+}
+
+// The balance card: who pays whom, euros big (they settle in euros, exact to the cent), rupiah small at the
+// month's rate. The card opens the details; Settle up sits beside it and is gone when the balance is square.
+function renderBalanceCard_(parent, rate) {
+  var side = balanceSide_(DATA.balance.net);
+  var square = side.square;
+  var bal = add(parent, 'div', 'card bal');
+  var open = btn(bal, 'bal-open', null, function () { go({ screen: 'balance', key: null }); });
+  var words = add(open, 'span', 'bal-words');
+  if (!square) SETTLE_ANIM = null;
+  var counting = square && SETTLE_ANIM && Date.now() - SETTLE_ANIM.at < 20000 && !settleCalm_();
+  if (SETTLE_ANIM && (settleCalm_() || (square && !counting))) SETTLE_ANIM = null;
+  var pending = !square && settlePending_();
+  var waiting = !square && !pending && !settleReady_(); // A1 final fix 2
+  if (counting) {
+    add(words, 'span', 'bal-label', 'Settled');
+    SETTLE_EL = add(words, 'span', 'bal-big', fmtEur(SETTLE_ANIM.from));
+    if (!SETTLE_ANIM.running) {
+      SETTLE_ANIM.running = true;
+      setTimeout(function () { settleStep_(0); }, 40);
+    }
+  } else if (square) {
+    add(words, 'span', 'bal-label', 'All square.');
+    add(words, 'span', 'bal-note', 'Nothing to settle. See how it adds up');
+  } else {
+    add(words, 'span', 'bal-label', 'To even up: ' + side.who);
+    add(words, 'span', 'bal-big', fmtEur(side.eur));
+    if (rate) add(words, 'span', 'bal-small', fmtIdr(Math.round(side.eur * rate / 1000) * 1000));
+    if (pending) add(words, 'span', 'bal-note', 'Settling up. Waiting to be sent.');
+    else if (waiting) add(words, 'span', 'bal-note', SETTLE_WAIT);
+  }
+  add(open, 'span', 'chev').setAttribute('aria-hidden', 'true');
+  if (!square && !pending && !waiting) btn(bal, 'bal-settle', 'Settle up', function () { openSettle_(); });
+}
+
 // ---- home -----------------------------------------------------------------------
+// A1-T4: four cards. The hero (this month so far), the balance, where it goes, month by month. The bars are the
+// only month picker.
 function renderHome() {
   var root = $('home');
   var today = DATA.today;
   var curKey = today.slice(0, 7);
-  var cur = monthByKey(curKey);
+  var rate = pageRate_(DATA);
+  var cur = monthByKey(curKey) || emptyMonth(curKey);
 
-  var w = panel(root);
-  add(w, 'div', 'panel-top').appendChild(el('p', 'names', 'Kev & Lili'));
-  add(w, 'h1', '', monthName(curKey) + ' ' + curKey.slice(0, 4));
-  if (cur) heroAmount(w, cur);
-  dayRuler(w, today);
-  add(w, 'p', 'panel-note', 'So far: ' + dayText(today));
-  btn(w, 'panel-action', 'See all of ' + monthName(curKey), function () { goMonth(curKey); });
+  var top = largeTitleBox_(root, 'Money');
+  moneyHero_(top.wrap, cur, monthName(curKey) + ' so far', today, rate);
+  // A1-T5: an expense added here that has not reached the sheet yet (offline, or behind another change).
+  var waiting = QUEUE.filter(function (q) { return q.op === 'expense' && q.uid !== INFLIGHT; }).length;
+  if (waiting) add(top.wrap, 'p', 'title-note qa-wait', waiting === 1 ? '1 new expense is waiting to be sent.' : waiting + ' new expenses are waiting to be sent.');
+  renderBalanceCard_(top.wrap, rate);
 
   var body = add(root, 'div', 'wrap');
-
-  var ms = section(body, 'Every month');
-  var chips = add(ms, 'div', 'scroller chips');
-  DATA.months.forEach(function (m) {
-    var c = btn(chips, 'chip', null, function () { goMonth(m.key); });
-    add(c, 'span', 'chip-month', shortMonth(m.key));
-    add(c, 'span', 'chip-eur', fmtEur(m.totalEur));
-    var part = partialLabel(m, today);
-    if (part) add(c, 'span', 'chip-part', part);
-  });
-
-  renderBalance(section(body));
-  renderDonut_(section(body, 'Where the money goes'));
-  var barsEl = renderBars(section(body, 'Month by month, in euros'));
+  renderDonut_(section(body, 'Where it goes'));
+  var barsEl = renderBars(section(body, rate ? 'Month by month' : 'Month by month, in euros'), rate);
 
   if (DATA.notCountedYet > 0) {
     var nc = section(body);
@@ -1726,115 +2503,51 @@ function renderHome() {
 
   var foot = add(body, 'div', 'foot');
   btn(foot, 'textbtn', 'Refresh', function () { loadData(true); });
-  HOME_STATUS = add(foot, 'p', 'small');
+  HOME_STATUS = add(foot, 'p', 'small', moneyAgeText_());
 
   barsEl.scrollLeft = barsEl.scrollWidth; // newest month in view when there are many
 }
 
-// ---- where the money goes (home donut, ruling R65) ---------------------------------
-var DONUT_KEY = null; // the chip chosen on the home screen, kept for this visit only; null is the current month
+// ---- where it goes (home donut, ruling R65; A1-T4 segmented control and fixed colours) ---------------
+var DONUT_VIEW = 'cur'; // This month ('cur'), Last month ('last') or All time ('all'); for this visit only
+var DONUT_MORE = false; // the list past the top 5 is open
 
-// Six type colours, by a type's rank in All, then Other (R69): apricot, terracotta, dusty teal, sand, brick, sage,
-// warm grey. Each is at least 3:1 on --paper and every pair is at least 15 apart in OKLab for normal vision, since a
-// month's own size order can put any two side by side. The largest types get the most distinct ones.
-function donutColors_() {
-  return ['#da720d', '#781d00', '#136c7a', '#765d00', '#b93d42', '#22462a', '#8c857f'];
-}
-
-// Every month added up per type, in cents and Rp, largest first (same order rule as Calc.gs).
-function donutAll_(months) {
-  var by = Object.create(null);
-  var list = [];
-  var totalCents = 0;
-  var totalIdr = 0;
-  months.forEach(function (m) {
-    totalCents += Math.round(m.totalEur * 100);
-    totalIdr += m.totalIdr;
-    m.categories.forEach(function (c) {
-      if (!by[c.name]) { by[c.name] = { name: c.name, cents: 0, idr: 0 }; list.push(by[c.name]); }
-      by[c.name].cents += Math.round(c.eur * 100);
-      by[c.name].idr += c.idr;
-    });
-  });
-  var cats = list.map(function (c) {
-    return { name: c.name, eur: c.cents / 100, idr: c.idr, share: totalCents > 0 ? Math.round(c.cents / totalCents * 10000) / 10000 : 0 };
-  });
-  cats.sort(function (a, b) {
-    if (b.eur !== a.eur) return b.eur - a.eur;
-    return a.name < b.name ? -1 : (a.name > b.name ? 1 : 0);
-  });
-  return { cats: cats, totalCents: totalCents, totalIdr: totalIdr };
-}
-
-// R68: a type's colour is its rank among the top 6 of All, so it is the same in every month.
-function donutColourMap_(allCats) {
-  var colours = donutColors_();
-  var map = Object.create(null);
-  var n = 0;
-  allCats.forEach(function (c) {
-    if (n < 6 && c.eur > 0 && c.name !== 'Other') { map[c.name] = colours[n]; n++; }
-  });
-  return map;
-}
-
-function donutChipLabel_(key, todayIso) {
-  return key.slice(0, 4) === todayIso.slice(0, 4) ? monthName(key).slice(0, 3) : shortMonth(key);
-}
-
-// One month (by key) or 'all': the header, the totals and the list rows. Month numbers are the payload's own,
-// so they match the month screen; All adds every month up in cents.
-function donutModel_(months, key, todayIso) {
+// One view: the header, the totals and the list rows. Every figure is added up from the rows, the same way as the
+// hero and the month screen, so the numbers match. Each category with a positive total has its own slice in its
+// own colour; one at zero or below (refunds) is listed without a slice.
+function donutModel_(months, view, todayIso, rate) {
   var cur = todayIso.slice(0, 7);
-  var cats = [];
-  var totalCents = 0;
-  var totalIdr = 0;
+  var key = view === 'all' ? 'all' : (view === 'last' ? monthBefore_(cur) : cur);
+  var rows = [];
+  var totalEur = 0;
   var head;
   var emptyText;
-  var all = donutAll_(months);
-  var colourOf = donutColourMap_(all.cats);
   if (key === 'all') {
-    cats = all.cats;
-    totalCents = all.totalCents;
-    totalIdr = all.totalIdr;
+    var cents = 0;
+    months.forEach(function (m) {
+      rows = rows.concat(m.rows);
+      cents += Math.round(m.totalEur * 100);
+    });
+    totalEur = cents / 100;
     head = months.length ? 'All, since ' + shortMonth(months[months.length - 1].key) : 'All';
     emptyText = 'Nothing spent yet.';
   } else {
     var m = null;
     for (var i = 0; i < months.length; i++) if (months[i].key === key) m = months[i];
     var part = m ? partialLabel(m, todayIso) : (key === cur ? 'so far' : '');
-    if (m) {
-      cats = m.categories;
-      totalCents = Math.round(m.totalEur * 100);
-      totalIdr = m.totalIdr;
-    }
+    if (m) { rows = m.rows; totalEur = m.totalEur; }
     head = monthName(key) + ' ' + key.slice(0, 4) + (part ? ', ' + part : '');
     emptyText = key === cur ? 'Nothing spent yet this month.' : 'Nothing spent this month.';
   }
-  var colours = donutColors_();
-  var own = [];
-  var rest = [];
-  var tail = [];
-  // In this view's size order: a top 6 type of All keeps its slice and colour, every other type goes into Other.
-  cats.forEach(function (c) {
-    if (c.name === 'Other') rest.push(c); // a real Other always joins the one Other row, whatever its sign
-    else if (!(c.eur > 0)) tail.push(c);
-    else if (colourOf[c.name]) own.push(c);
-    else rest.push(c);
-  });
-  var rows = own.map(function (c) {
-    return { name: c.name, eur: c.eur, idr: c.idr, share: c.share, color: colourOf[c.name] };
-  });
-  if (rest.length) {
-    var oc = 0;
-    var oi = 0;
-    rest.forEach(function (c) { oc += Math.round(c.eur * 100); oi += c.idr; });
-    rows.push({ name: 'Other', eur: oc / 100, idr: oi, share: totalCents > 0 ? Math.round(oc / totalCents * 10000) / 10000 : 0, color: oc > 0 ? colours[6] : null });
-  }
-  // A type that came out at zero or below (refunds) has no slice; it is still listed, without a colour.
-  tail.forEach(function (c) { rows.push({ name: c.name, eur: c.eur, idr: c.idr, share: c.share, color: null }); });
+  var cats = catsOf_(rows, rate);
+  var list = cats.filter(function (c) { return c.eur > 0; }).map(function (c) {
+    return { name: c.name, eur: c.eur, idr: c.idr, share: c.share, color: catColour_(c.name) };
+  }).concat(cats.filter(function (c) { return !(c.eur > 0); }).map(function (c) {
+    return { name: c.name, eur: c.eur, idr: c.idr, share: c.share, color: null };
+  }));
   return {
-    key: key, head: head, emptyText: emptyText, totalEur: totalCents / 100, totalIdr: totalIdr, rows: rows,
-    empty: !rows.some(function (r) { return r.color; })
+    key: key, head: head, emptyText: emptyText, totalEur: totalEur, totalIdr: totalIdr_(rows, rate), rows: list,
+    empty: !list.some(function (r) { return r.color; })
   };
 }
 
@@ -1866,49 +2579,32 @@ function donutPath_(start, end, R, r, c) {
     ' L ' + donutPoint_(end, r, c) + inner + donutPoint_(mid, r, c) + inner + donutPoint_(start, r, c) + ' Z';
 }
 
-// Brings the chosen chip into the visible part of its sideways-scrolling row (no animation).
-function donutReveal_(row, el) {
-  var left = el.offsetLeft;
-  var w = el.offsetWidth;
-  var view = row.clientWidth;
-  if (typeof left !== 'number' || typeof w !== 'number' || !view) return;
-  var pad = 20;
-  if (left - pad < row.scrollLeft) row.scrollLeft = Math.max(0, left - pad);
-  else if (left + w + pad > row.scrollLeft + view) row.scrollLeft = left + w + pad - view;
-}
-
 function renderDonut_(s) {
   var today = DATA.today;
-  var cur = today.slice(0, 7);
-  var keys = DATA.months.map(function (m) { return m.key; });
-  if (keys.indexOf(cur) < 0) { keys.push(cur); keys.sort().reverse(); }
-  var chosen = DONUT_KEY === 'all' || keys.indexOf(DONUT_KEY) >= 0 ? DONUT_KEY : cur;
-  var row = add(s, 'div', 'scroller chips dchips');
-  row.setAttribute('role', 'group');
-  row.setAttribute('aria-label', 'Choose a month, or all months');
-  var chips = [];
-  keys.concat(['all']).forEach(function (k) {
-    var c = btn(row, 'dchip', k === 'all' ? 'All' : donutChipLabel_(k, today), function () {
-      DONUT_KEY = k;
-      chosen = k;
+  var rate = pageRate_(DATA);
+  var seg = add(s, 'div', 'seg');
+  seg.setAttribute('role', 'group');
+  seg.setAttribute('aria-label', 'Show this month, last month or all time');
+  var segs = [];
+  [['cur', 'This month'], ['last', 'Last month'], ['all', 'All time']].forEach(function (o) {
+    var b = btn(seg, 'seg-btn', o[1], function () {
+      if (DONUT_VIEW !== o[0]) DONUT_MORE = false;
+      DONUT_VIEW = o[0];
       paint();
     });
-    c.setAttribute('aria-label', k === 'all' ? 'All months' : monthName(k) + ' ' + k.slice(0, 4));
-    chips.push({ key: k, el: c });
+    segs.push({ view: o[0], el: b });
   });
-  var body = add(s, 'div', 'dn-body');
+  var card = add(s, 'div', 'card dn-card');
+  var body = add(card, 'div', 'dn-body');
   function paint() {
-    chips.forEach(function (x) {
-      x.el.setAttribute('aria-pressed', x.key === chosen ? 'true' : 'false');
-      if (x.key === chosen) donutReveal_(row, x.el);
-    });
+    segs.forEach(function (x) { x.el.setAttribute('aria-pressed', x.view === DONUT_VIEW ? 'true' : 'false'); });
     body.textContent = '';
-    drawDonut_(body, donutModel_(DATA.months, chosen, today));
+    drawDonut_(body, donutModel_(DATA.months, DONUT_VIEW, today, rate), paint);
   }
   paint();
 }
 
-function drawDonut_(body, model) {
+function drawDonut_(body, model, repaint) {
   add(body, 'p', 'dn-head', model.head);
   if (model.empty) {
     add(body, 'p', 'dn-empty', model.emptyText);
@@ -1923,7 +2619,7 @@ function drawDonut_(body, model) {
   svg.setAttribute('height', '200');
   svg.setAttribute('role', 'img');
   svg.setAttribute('focusable', 'false');
-  svg.setAttribute('aria-label', 'Where the money goes, ' + model.head + ': ' + parts.slice(0, 3).map(function (r) {
+  svg.setAttribute('aria-label', 'Where it goes, ' + model.head + ': ' + parts.slice(0, 3).map(function (r) {
     return r.name + ' ' + shareText(r.share);
   }).join(', ') + '.');
   fig.appendChild(svg);
@@ -1953,67 +2649,69 @@ function drawDonut_(body, model) {
     });
   }
   var mid = add(fig, 'div', 'dn-centre');
-  add(mid, 'span', 'dn-c-cur', 'EUR');
-  add(mid, 'span', 'dn-c-eur', (model.totalEur < 0 ? '-' : '') + fixed2(model.totalEur));
-  add(mid, 'span', 'dn-c-idr', fmtIdr(model.totalIdr));
+  var total = donutCentre_(model.totalIdr, model.totalEur);
+  add(mid, 'span', 'dn-c-big' + (total.long ? ' dn-c-long' : ''), total.big);
+  if (total.small) add(mid, 'span', 'dn-c-small', total.small);
   var list = add(body, 'div', 'dn-list');
-  model.rows.forEach(function (r) {
+  var many = model.rows.length > 5;
+  model.rows.slice(0, many && !DONUT_MORE ? 5 : model.rows.length).forEach(function (r) {
     var line = open ? btn(list, 'dn-row dn-tap', null, open) : add(list, 'div', 'dn-row');
-    var sw = add(line, 'span', r.color ? 'dn-sw' : 'dn-sw dn-sw-none');
-    sw.setAttribute('aria-hidden', 'true');
-    if (r.color) sw.style.background = r.color;
+    catAvatar_(line, r.name);
     var words = add(line, 'span', 'dn-words');
     add(words, 'span', 'dn-name', r.name);
     add(words, 'span', 'dn-share', shareText(r.share));
     var amts = add(line, 'span', 'dn-amts');
-    add(amts, 'span', 'dn-eur', fmtEur(r.eur));
-    add(amts, 'span', 'dn-idr', fmtIdr(r.idr));
+    var bs = bigSmall_(r.idr, r.eur);
+    add(amts, 'span', 'dn-big', bs.big);
+    if (bs.small) add(amts, 'span', 'dn-small', bs.small);
   });
+  if (many) {
+    var more = btn(body, 'dn-more', DONUT_MORE ? 'Show less' : 'Show ' + (model.rows.length - 5) + ' more', function () {
+      DONUT_MORE = !DONUT_MORE;
+      repaint();
+    });
+    more.setAttribute('aria-expanded', DONUT_MORE ? 'true' : 'false');
+  }
 }
 
-function renderBalance(s) {
-  var line = btn(s, 'balance-line', null, function () { go({ screen: 'balance', key: null }); });
-  var words = add(line, 'span');
-  add(words, 'span', '', nb(balanceText(DATA.balance.net)));
-  add(words, 'small', '', 'See how it adds up');
-  add(line, 'span', 'chev').setAttribute('aria-hidden', 'true');
-}
-
-function renderBars(s) {
+// Month by month: one bar per month, the only month picker. Rupiah in millions (added up from the rows like every
+// other total), or euros when there is no rate. The line is the usual month.
+function renderBars(s, rate) {
   var PLOT = 118; // px height of the tallest bar; the rest of the plot leaves room for its label
-  var usual = DATA.usual;
-  var max = usual ? usual.avgIdr : 0;
-  DATA.months.forEach(function (m) { if (m.totalIdr > max) max = m.totalIdr; });
-  function px(idr) { return max > 0 ? Math.max(0, Math.round(idr / max * PLOT)) : 0; }
+  var usual = usualOf_(rate);
+  function value(m) { var v = rate ? totalIdr_(m.rows, rate) : m.totalEur; return v === null ? 0 : v; }
+  var max = usual || 0;
+  DATA.months.forEach(function (m) { if (value(m) > max) max = value(m); });
+  function px(v) { return max > 0 ? Math.max(0, Math.round(v / max * PLOT)) : 0; }
 
-  var sc = add(s, 'div', 'scroller');
+  var card = add(s, 'div', 'card bars-card');
+  var sc = add(card, 'div', 'scroller');
   sc.setAttribute('tabindex', '0');
   sc.setAttribute('role', 'group');
   sc.setAttribute('aria-label', 'Spending by month. Tap a month to open it.');
   var inner = add(sc, 'div', 'barsin');
   if (usual) {
     var line = add(inner, 'div', 'usualline');
-    line.style.bottom = (40 + px(usual.avgIdr)) + 'px';
+    line.style.bottom = (40 + px(usual)) + 'px';
   }
   var today = DATA.today;
   DATA.months.slice().reverse().forEach(function (m) {
     var part = partialLabel(m, today);
+    var v = value(m);
     var col = btn(inner, 'barcol', null, function () { goMonth(m.key); });
-    col.setAttribute('aria-label', m.label + ': ' + fmtEur(m.comparisonEur) + (part ? ', ' + part : '') + '. Open this month.');
+    col.setAttribute('aria-label', m.label + ': ' + (rate ? fmtIdr(v) : fmtEur(v)) + (part ? ', ' + part : '') + '. Open this month.');
     var plot = add(col, 'div', 'barplot');
-    add(plot, 'span', 'barval', group(Math.round(m.comparisonEur)));
+    add(plot, 'span', 'barval', rate ? millions_(v) : group(Math.round(v)));
     var bar = add(plot, 'div', 'bar' + (m.partial ? ' bar-partial' : ''));
-    bar.style.height = px(m.totalIdr) + 'px';
+    bar.style.height = px(v) + 'px';
     var lab = add(col, 'div', 'barlabel', monthName(m.key).slice(0, 3));
     if (part) add(lab, 'span', '', part === 'so far' ? 'so far' : 'part');
   });
 
-  add(s, 'p', 'caption', nb(rateText() + ' ' + rateNote(DATA.months)));
-  var hasPartial = DATA.months.some(function (m) { return m.partial; });
-  var legend = [];
-  if (usual) legend.push('The line is your usual month, ' + fmtEur(usual.avgEur) + '.');
-  if (hasPartial) legend.push('Dashed bars are not full months.');
-  if (legend.length) add(s, 'p', 'caption', nb(legend.join(' ')));
+  var legend = [rate ? 'Rupiah, in millions.' : 'Euros, as in the sheet.'];
+  if (usual) legend.push('The line is your usual month, ' + (rate ? fmtIdr(usual) : fmtEur(usual)) + '.');
+  if (DATA.months.some(function (m) { return m.partial; })) legend.push('Dashed bars are not full months.');
+  add(s, 'p', 'caption', nb(legend.join(' ')));
   return sc;
 }
 
@@ -2027,23 +2725,24 @@ function emptyMonth(key) {
   };
 }
 
+var MONTH_MORE = false; // A1-T4: the month's categories past the top 5 are open (reset on another month)
+
 function renderMonth() {
   var root = $('month');
   var m = monthByKey(VIEW.key) || emptyMonth(VIEW.key);
   var today = DATA.today;
-  var w = panel(root);
-  panelBack(w);
-  var title = add(w, 'h1', '', m.label);
-  title.setAttribute('tabindex', '-1');
-  heroAmount(w, m);
+  var rate = pageRate_(DATA);
+  var isCur = m.key === today.slice(0, 7);
+  var top = subTop_(root, m.label);
+  var title = top.h;
+  var w = moneyHero_(top.wrap, m, isCur ? 'So far' : (m.partial ? 'Part month' : ''), today, rate);
 
   var cmp = comparison(m, DATA.usual, DATA.rate, today);
-  if (m.partial && m.key === today.slice(0, 7)) dayRuler(w, today);
   if (cmp.verdict) {
     add(w, 'p', 'panel-verdict', nb(cmp.text));
     add(w, 'p', 'panel-small', nb('Your usual is ' + fmtIdr(DATA.usual.avgIdr) + ' (' + fmtEur(DATA.usual.avgEur) + '), the average of ' + andList(DATA.usual.keys.map(monthName)) + '.'));
     add(w, 'p', 'panel-small', rateText());
-  } else {
+  } else if (!isCur) {
     add(w, 'p', 'panel-note', cmp.text);
   }
   if (m.needsAmountCount > 0) {
@@ -2064,34 +2763,44 @@ function renderMonth() {
     }
   }
 
-  if (m.categories.length || m.needsAmountCount > 0) {
-    var cs = section(body, 'By type of expense');
-    var top = m.categories.length ? m.categories[0].share : 0;
-    m.categories.forEach(function (c) {
-      var b = btn(cs, 'cat', null, function () { choose(c.name); });
+  var cats = catsOf_(m.rows, rate);
+  if (cats.length || m.needsAmountCount > 0) {
+    var cs = section(body, 'By category');
+    var box = add(cs, 'div', 'card cat-card');
+    // The top 5, then Show more; a category that is the open filter stays in view.
+    var shown = MONTH_MORE ? cats : cats.filter(function (c, i) { return i < 5 || c.name === FILTER; });
+    shown.forEach(function (c) {
+      var b = btn(box, 'cat', null, function () { choose(c.name); });
       b.disabled = busy();
       b.setAttribute('aria-pressed', FILTER === c.name ? 'true' : 'false');
-      var line1 = add(b, 'span', 'cat-top');
-      var nameBox = add(line1, 'span', 'cat-name-box');
-      nameBox.appendChild(icon(c.name));
-      add(nameBox, 'span', 'cat-name', c.name);
-      add(nameBox, 'span', 'cat-share', shareText(c.share));
-      add(line1, 'span', 'cat-eur', fmtEur(c.eur));
-      var line2 = add(b, 'span', 'cat-bottom');
-      var track = add(line2, 'span', 'cat-track');
-      var fill = add(track, 'span', 'catbar');
-      fill.style.width = (top > 0 ? Math.round(c.share / top * 100) : 0) + '%';
-      add(line2, 'span', 'cat-idr', fmtIdr(c.idr));
+      catAvatar_(b, c.name);
+      var words = add(b, 'span', 'cat-words');
+      add(words, 'span', 'cat-name', c.name);
+      add(words, 'span', 'cat-share', shareText(c.share));
+      var amts = add(b, 'span', 'cat-amts');
+      var bs = bigSmall_(c.idr, c.eur);
+      add(amts, 'span', 'cat-big', bs.big);
+      if (bs.small) add(amts, 'span', 'cat-small', bs.small);
       if (FOCUS_FILTER === c.name) { b.focus({ preventScroll: true }); FOCUS_FILTER = null; }
     });
     if (m.needsAmountCount > 0) {
-      var needBtn = btn(cs, 'cat', null, function () { choose(NEEDS); });
+      var needBtn = btn(box, 'cat', null, function () { choose(NEEDS); });
       needBtn.disabled = busy();
       needBtn.setAttribute('aria-pressed', FILTER === NEEDS ? 'true' : 'false');
-      var nl = add(needBtn, 'span', 'cat-top');
-      add(nl, 'span', 'cat-name', 'Needs an amount');
-      add(nl, 'span', 'cat-eur', m.needsAmountCount + (m.needsAmountCount === 1 ? ' expense' : ' expenses'));
+      add(needBtn, 'span', 'cav cav-need').setAttribute('aria-hidden', 'true');
+      var nw = add(needBtn, 'span', 'cat-words');
+      add(nw, 'span', 'cat-name', 'Needs an amount');
+      var na = add(needBtn, 'span', 'cat-amts');
+      add(na, 'span', 'cat-big', m.needsAmountCount + (m.needsAmountCount === 1 ? ' expense' : ' expenses'));
       if (FOCUS_FILTER === NEEDS) { needBtn.focus({ preventScroll: true }); FOCUS_FILTER = null; }
+    }
+    if (cats.length > 5) {
+      var more = btn(box, 'cat-more', MONTH_MORE ? 'Show less' : 'Show ' + (cats.length - shown.length) + ' more', function () {
+        MONTH_MORE = !MONTH_MORE;
+        render(true);
+      });
+      more.setAttribute('aria-expanded', MONTH_MORE ? 'true' : 'false');
+      more.disabled = busy();
     }
   }
 
@@ -2105,14 +2814,17 @@ function renderMonth() {
   else add(head, 'span', 'small', rows.length + (rows.length === 1 ? ' expense' : ' expenses'));
 
   if (!rows.length) add(ls, 'p', 'small', FILTER === null ? 'No expenses in this month.' : 'No expenses left here.');
-  var lastDate;
-  rows.forEach(function (r) {
-    if (r.date !== lastDate) {
-      add(ls, 'div', 'day', dateLabel(r.date));
-      lastDate = r.date;
-    }
-    renderRow(ls, r);
-  });
+  else {
+    var list = add(ls, 'div', 'card rows-card');
+    var lastDate;
+    rows.forEach(function (r) {
+      if (r.date !== lastDate) {
+        add(list, 'div', 'day', dateLabel(r.date));
+        lastDate = r.date;
+      }
+      renderRow(list, r, rate);
+    });
+  }
   add(body, 'div', 'list-end');
   renderToast(root);
   return title;
@@ -2120,7 +2832,9 @@ function renderMonth() {
 var LIST_TOP = null;
 var EDIT_EL = null;
 
-function renderRow(parent, r) {
+// One expense: its category avatar, the item and who paid, rupiah big and EUR small. Tapping it opens the editor
+// in place, inside the same card.
+function renderRow(parent, r, rate) {
   var wrap = add(parent, 'div', 'row-wrap');
   var editable = r.rowNumber && r.fingerprint && !r.settlement;
   var open = editable && EDIT && EDIT.rowNumber === r.rowNumber;
@@ -2133,14 +2847,14 @@ function renderRow(parent, r) {
   } else {
     row = add(wrap, 'div', 'row');
   }
-  row.appendChild(icon(r.category));
+  catAvatar_(row, r.category);
   var left = add(row, 'span', 'row-left');
   add(left, 'span', 'row-item', r.item || 'No name');
   var who = whoText(r) + '.';
   add(left, 'span', 'row-meta', (FILTER === null || FILTER === NEEDS) ? r.category + '. ' + who : who);
   if (r.needsAmount) add(left, 'span', 'flag', 'Needs an amount');
   var right = add(row, 'span', 'row-right');
-  var amt = rowAmounts(r);
+  var amt = rowAmounts(r, rate);
   add(right, 'span', 'row-main', amt.main);
   amt.sub.forEach(function (t) { add(right, 'span', 'row-sub', t); });
   if (r.receipt && /^https:\/\/(drive|docs)\.google\.com\//.test(r.receipt)) {
@@ -2302,7 +3016,7 @@ function sendChanges(job) {
     job.saved = job.saved.concat([change]);
     job.changes = job.changes.slice(1);
     if (!res.data) { job.noData(job.saved, job.changes); return; }
-    DATA = res.data;
+    moneySet_(res.data);
     var now = rowByNumber(DATA.months, job.rowNumber);
     job.fingerprint = sameExpense(applyChanges(job.expect, job.saved), now) ? now.fingerprint : null;
     if (job.fingerprint === null && job.changes.length) {
@@ -2498,7 +3212,7 @@ function deleteExpense(rowNumber) {
       return;
     }
     closeEdit(editId);
-    if (res.data) DATA = res.data;
+    if (res.data) moneySet_(res.data);
     deletedToast('Deleted.', res.deletedId, key);
     render(true);
     if (!res.data) loadData(true);
@@ -2527,7 +3241,7 @@ function restoreLast() {
     if (session !== SESSION) return;
     if (res && res.ok) {
       if (res.data) {
-        DATA = res.data;
+        moneySet_(res.data);
         setToast({ text: 'Put back.' }, key);
         render(true);
       } else {
@@ -2572,10 +3286,7 @@ function renderBalanceScreen() {
   var root = $('balance');
   var d = DATA.balanceDetail;
   var net = DATA.balance.net;
-  var w = panel(root);
-  panelBack(w);
-  var title = add(w, 'h1', 'title-mid', nb(balanceText(net)));
-  title.setAttribute('tabindex', '-1');
+  var title = subTop_(root, nb(balanceText(net)), 'title-mid').h;
   var body = add(root, 'div', 'wrap');
 
   var ts = section(body, 'The totals in plain words');
@@ -2644,10 +3355,7 @@ function renderTrends() {
   var root = $('trends');
   var t = DATA.tendencies;
   var today = DATA.today;
-  var w = panel(root);
-  panelBack(w);
-  var title = add(w, 'h1', 'title-big', 'Tendencies');
-  title.setAttribute('tabindex', '-1');
+  var title = subTop_(root, 'Tendencies').h;
 
   var body = add(root, 'div', 'wrap');
   var ss = section(body);
@@ -2745,10 +3453,7 @@ var MONEY_FAILED = false; // Money's first load, started from a list tab, failed
 // Money before its numbers are in, when it was opened from a list tab: the bar stays usable (M1).
 function renderMoneyWaiting_() {
   var root = $(VIEW.screen === 'trends' ? 'trends' : (VIEW.screen === 'month' ? 'month' : (VIEW.screen === 'balance' ? 'balance' : 'home')));
-  var w = panel(root);
-  add(w, 'div', 'panel-top').appendChild(el('p', 'names', 'Kev & Lili'));
-  var title = add(w, 'h1', 'title-big', 'Money');
-  title.setAttribute('tabindex', '-1');
+  var title = largeTitle_(root, 'Money');
   var body = add(root, 'div', 'wrap');
   var s = section(body);
   if (MONEY_FAILED) {
@@ -2781,11 +3486,14 @@ function openSession_() {
     VIEW = v;
     remember(v);
     listsEnter_();
+  } else if (moneyFromCache_(v)) {
+    loadData(true); // A1-T3: the snapshot is on show; the numbers refresh quietly
   } else {
     loadData(false);
   }
   if (QUEUE.length) setTimeout(listsNoteUpdate_, 10000);
   listsFlush_();
+  qaKeptToast_(); // fix round 1: an expense the server refused earlier still waits in Add
 }
 
 // Writes kl.tab only when it changes, so a Money-only visit stores nothing new.
@@ -2794,17 +3502,35 @@ function rememberTab_(tab) {
 }
 
 // ---- bottom bar -------------------------------------------------------------------------
+// A1-T3: Money, Add, To do, Groceries. Add is the same rust slot on every tab and opens the quick add on the
+// current tab's type (Money screens: an expense).
 function renderTabs_() {
   var bar = $('tabbar');
   var cur = tabOf_(VIEW.screen);
-  [['money', 'Money'], ['todo', 'To do'], ['groceries', 'Groceries']].forEach(function (t) {
-    var b = btn(bar, 'tab', null, function () {
-      go(t[0] === 'money' ? { screen: 'home', key: null } : { screen: t[0], key: null });
+  var segment = cur === 'todo' ? 'todo' : (cur === 'groceries' ? 'grocery' : 'expense');
+  [['money', 'Money'], ['add', 'Add'], ['todo', 'To do'], ['groceries', 'Groceries']].forEach(function (t) {
+    var isAdd = t[0] === 'add';
+    var b = btn(bar, isAdd ? 'tab tab-add' : 'tab', null, function () {
+      if (isAdd) openQuickAdd_(segment);
+      else go(t[0] === 'money' ? { screen: 'home', key: null } : { screen: t[0], key: null });
     });
     if (t[0] === cur) b.setAttribute('aria-current', 'page');
-    b.appendChild(svgIcon_(tabIconPaths_(t[0])));
-    add(b, 'span', '', t[1]);
+    if (isAdd) ADD_SLOT = b;
+    add(b, 'span', 'tab-pill').appendChild(svgIcon_(isAdd ? PLUS_PATHS : tabIconPaths_(t[0])));
+    add(b, 'span', 'tab-label', t[1]);
   });
+}
+
+// A1-T5: the quick add. To-do and Grocery are the item sheet for a new item (the existing add, unchanged) with the
+// segments on top; Expense is its own sheet. Closing either gives focus back to the Add slot.
+function openQuickAdd_(segment) {
+  if (segment === 'todo' || segment === 'grocery') {
+    if (segment === 'todo') TODO_FOCUS = 'add';
+    else GRO_FOCUS = 'add';
+    openItemSheet_(null, segment, null, true);
+    return;
+  }
+  openExpenseSheet_();
 }
 
 // ---- this phone's identity: sets the default Who for new to-dos ------------------------------
@@ -2875,6 +3601,7 @@ function listsApplyOp_(lists, op) {
     for (var k in o) if (Object.prototype.hasOwnProperty.call(o, k)) out[k] = o[k];
     return out;
   }
+  if (op.op === 'expense') return lists; // A1-T5: an expense in the queue changes no list
   var f = op.fields || {};
   if (op.op === 'pause') {
     if (!lists.prefs || typeof lists.prefs !== 'object') lists.prefs = {};
@@ -3238,7 +3965,7 @@ function listsWaitKey_(op) {
 // (a tick or delete whose item the fresh read no longer lists is done; an edit of a gone item is dropped as a
 // conflict would be). Only ever called for the head with nothing in flight, so no earlier op for its item exists.
 function listsHeadReady_(op) {
-  if (op.op === 'pause') return 'go';
+  if (op.op === 'pause' || op.op === 'expense') return 'go';
   var key = listsWaitKey_(op);
   var blank = listsNeedsFp_(op) && !op.fp;
   if (!Object.prototype.hasOwnProperty.call(WAIT_KEYS, key)) {
@@ -3270,7 +3997,7 @@ function listsHeadReady_(op) {
 // read keeps the mark: its fp predates the unsure change, so an op queued later must still wait (case G).
 function listsDropIdleWaits_() {
   var used = {};
-  QUEUE.forEach(function (q) { if (q.op !== 'pause') used[listsWaitKey_(q)] = true; });
+  QUEUE.forEach(function (q) { if (q.op !== 'pause' && q.op !== 'expense') used[listsWaitKey_(q)] = true; });
   for (var k in WAIT_KEYS) {
     if (Object.prototype.hasOwnProperty.call(WAIT_KEYS, k) && !used[k] && WAIT_KEYS[k] <= LANDED_N) delete WAIT_KEYS[k];
   }
@@ -3290,6 +4017,7 @@ function listsFlush_() {
   if (ready === 'wait') return;
   WAITING_READ = false;
   var op = QUEUE[0];
+  if (op.op === 'expense') { expenseSend_(op); return; } // A1-T5 (R-A5): on its own, through addExpense
   var sent = JSON.parse(JSON.stringify(op));
   if (HEAD_FAIL_UID !== op.uid) { HEAD_FAIL_UID = op.uid; HEAD_FAIL_N = 0; } // a new head starts from zero
   INFLIGHT = op.uid;
@@ -3485,27 +4213,104 @@ function listsLockOut_() {
 }
 
 // ---- lists: screens (Tasks 6 to 8 fill the lists-main container) ---------------------------------
+// A1-T3: the large title with this phone's avatar on its right. Under it, line (the Today count), and the age
+// of the lists only when they are over 10 minutes old or a refresh failed.
 function listsPanel_(root, title, line) {
-  var w = panel(root);
-  add(w, 'div', 'panel-top').appendChild(el('p', 'names', 'Kev & Lili'));
-  var h = add(w, 'h1', 'title-big', title);
-  h.setAttribute('tabindex', '-1');
-  if (line) add(w, 'p', 'panel-note', line);
-  if (LISTS_AT) add(w, 'p', 'panel-small', (LISTS_FAILED ? 'Could not refresh. ' : '') + updatedText_(LISTS_AT, Date.now()) + '.');
-  return h;
+  var top = largeTitleBox_(root, title, whoAvatar_());
+  if (line) add(top.wrap, 'p', 'title-note', line);
+  var now = Date.now();
+  if (LISTS_AT && (LISTS_FAILED || now - LISTS_AT > 600000)) {
+    add(top.wrap, 'p', 'title-note', (LISTS_FAILED ? 'Could not refresh. ' : '') + updatedText_(LISTS_AT, now) + '.');
+  }
+  return top.h;
 }
 
-function renderWhoCard_(parent) {
-  var card = add(parent, 'div', 'who-card');
-  add(card, 'h2', '', 'This phone is');
-  var row = add(card, 'div', 'who-choices');
+// ---- who uses this phone (A1-T3): a first-run sheet, then a small avatar in the list headers ------------------
+var WHO_ASKED = false;  // the sheet opened on this visit already: the first open of a list tab asks once
+var WHO_OPEN = false;
+var WHO_AVATAR = null;  // the header avatar on show now; it gets focus back when the sheet closes
+var WHO_CTLS = [];      // the two choices, for the Tab loop
+
+function whoAvatar_() {
+  var me = whoAmI_();
+  var b = el('button', 'avatar avatar-' + (me ? me.toLowerCase() : 'q'));
+  b.setAttribute('type', 'button');
+  b.setAttribute('aria-label', me ? 'This phone: ' + me + '. Change' : 'Who uses this phone?');
+  add(b, 'span', '', me ? me.charAt(0) : '?').setAttribute('aria-hidden', 'true');
+  b.addEventListener('click', openWhoSheet_);
+  WHO_AVATAR = b;
+  return b;
+}
+
+// A bottom sheet with two big choices. A choice sets this phone's person (kl.me); a tap outside or Escape
+// closes it with no change. It lives in the static #who, so repaints behind it never rebuild it.
+function openWhoSheet_() {
+  if (SHEET) return;
+  WHO_ASKED = true;
+  WHO_OPEN = true;
+  var root = $('who');
+  root.textContent = '';
+  add(root, 'div', 'sheet-backdrop').addEventListener('click', function () { closeWhoSheet_(); });
+  var p = add(root, 'div', 'sheet-panel');
+  p.setAttribute('role', 'dialog');
+  p.setAttribute('aria-modal', 'true');
+  p.setAttribute('aria-labelledby', 'who-title');
+  p.setAttribute('tabindex', '-1');
+  add(p, 'div', 'sheet-handle').setAttribute('aria-hidden', 'true');
+  add(p, 'h2', 'who-title', 'Who uses this phone?').setAttribute('id', 'who-title');
+  add(p, 'p', 'who-line', 'New to-dos from this phone are for this person unless you pick someone else.');
+  var row = add(p, 'div', 'who-choices');
+  var me = whoAmI_();
+  WHO_CTLS = [];
   ['Kev', 'Lili'].forEach(function (name) {
-    btn(row, 'btn-plain', name, function () {
+    var b = btn(row, 'who-choice', null, function () {
       setWhoAmI_(name);
-      render(true);
+      closeWhoSheet_();
     });
+    b.setAttribute('aria-pressed', me === name ? 'true' : 'false');
+    add(b, 'span', 'avatar-dot avatar-' + name.toLowerCase(), name.charAt(0)).setAttribute('aria-hidden', 'true');
+    add(b, 'span', '', name);
+    WHO_CTLS.push(b);
   });
-  add(card, 'p', 'small', 'New to-dos from this phone are for this person unless you pick someone else.');
+  add(p, 'p', 'who-foot', 'Change it any time: tap your letter, top right.');
+  root.hidden = false;
+  sheetInert_(true);
+  p.focus({ preventScroll: true });
+}
+
+// Closes the sheet with nothing on screen changed but the avatar; focus goes back to it.
+function closeWhoSheet_() {
+  if (!WHO_OPEN) return;
+  whoShut_();
+  listsPaint_();
+  if (WHO_AVATAR && !SHEET) WHO_AVATAR.focus({ preventScroll: true });
+}
+
+// Takes the sheet off the screen, quietly (a screen change, a lock-out, an item sheet opening).
+function whoShut_() {
+  if (!WHO_OPEN) return;
+  WHO_OPEN = false;
+  WHO_CTLS = [];
+  var root = $('who');
+  root.textContent = '';
+  root.hidden = true;
+  sheetInert_(false);
+}
+
+function whoKey_(e) {
+  if (!WHO_OPEN || !e) return;
+  if (e.key === 'Escape') {
+    e.preventDefault();
+    closeWhoSheet_();
+    return;
+  }
+  // Tab stays on the two choices.
+  if (e.key !== 'Tab' || WHO_CTLS.length < 2) return;
+  e.preventDefault();
+  var i = WHO_CTLS.indexOf(e.target);
+  // From the panel itself: Tab goes to the first choice, Shift+Tab to the last.
+  if (i < 0) WHO_CTLS[e.shiftKey ? 1 : 0].focus();
+  else WHO_CTLS[i === 0 ? 1 : 0].focus();
 }
 
 // True when there are no lists to show yet; it says why in parent.
@@ -3531,8 +4336,7 @@ function listsProblems_(parent, lists) {
   return lines.length ? add(parent, 'p', 'lists-problem', lines.join(' ')) : null;
 }
 
-// The fixed strip above the bar: "Not saved yet", the lists toast and the "Deleted. Undo" line. To do adds
-// its "+" button at the end, so it stays nearest the bar.
+// The fixed strip above the bar: "Not saved yet", the lists toast and the "Deleted. Undo" line.
 function listsDock_(root) {
   var dock = add(root, 'div', 'dock');
   LISTS_NOTE = add(dock, 'p', 'dock-note');
@@ -3879,7 +4683,6 @@ function renderTodo_(data, me, mineOnly) {
   var title = listsPanel_(root, 'To do', view && view.dueToday > 0 ? 'Today: ' + view.dueToday : '');
   var body = add(root, 'div', 'wrap');
   listsProblems_(body, lists);
-  if (!me) renderWhoCard_(body);
   var main = add(body, 'div', 'lists-main');
   if (!view) {
     listsWaiting_(main);
@@ -3897,24 +4700,19 @@ function renderTodo_(data, me, mineOnly) {
   }
   if (me) todoSettings_(body, lists, me);
   add(body, 'div', 'list-end');
-  var dock = listsDock_(root);
-  if (view) {
-    var plus = todoKey_(btn(dock, 'todo-add', null, function () {
-      TODO_FOCUS = 'add';
-      openItemSheet_(null, 'todo');
-    }), 'add');
-    plus.setAttribute('aria-label', 'Add a to-do');
-    plus.appendChild(svgIcon_(PLUS_PATHS));
-  }
+  listsDock_(root);
+  // A1-T5: one Add button. The To do "+" is gone; a new to-do starts from the Add slot, and focus goes back there.
+  if (!TODO_FOCUS_EL && TODO_FOCUS === 'add' && ADD_SLOT) TODO_FOCUS_EL = ADD_SLOT;
   // An open sheet keeps focus: a repaint behind it never moves focus (iOS would close the keyboard).
-  if (TODO_FOCUS_EL && !SHEET) TODO_FOCUS_EL.focus({ preventScroll: true });
+  if (TODO_FOCUS_EL && !modalOpen_()) TODO_FOCUS_EL.focus({ preventScroll: true });
   return title;
 }
 
 function todoMain_(main, view) {
   var s = view.sections;
   var today = view.today;
-  if (!view.count) add(main, 'p', 'todo-empty', 'Nothing here. Tap + or tell the bot.');
+  // A1-T7: nothing open is the calm "All clear" state, never an error; the line points to the Add slot below.
+  if (!view.count) emptyState_(main, 'All clear', 'Nothing planned. Add one with the button below, or tell the bot.');
   if (s.today.length) {
     var t = todoSection_(main, 'today', 'Today');
     s.today.forEach(function (it) { todoRow_(t, it, today, 'today'); });
@@ -3929,7 +4727,8 @@ function todoMain_(main, view) {
   if (s.later.length) {
     var l = add(main, 'div', 'todo-sec todo-sec-later');
     if (todoFold_(l, 'later', 'Later · ' + s.later.length + ' · next ' + todoDayLabel_(s.later[0].due, today))) {
-      s.later.forEach(function (it) { todoRow_(l, it, today, 'later'); });
+      var lc = listCard_(l);
+      s.later.forEach(function (it) { todoRow_(lc, it, today, 'later'); });
     }
   }
   if (s.anytime.length) {
@@ -3942,21 +4741,28 @@ function todoMain_(main, view) {
   if (s.parked.length) {
     var p = add(main, 'div', 'todo-sec todo-sec-parked');
     if (todoFold_(p, 'parked', 'Parked · ' + s.parked.length)) {
-      s.parked.forEach(function (it) { todoRow_(p, it, today, 'parked'); });
+      var pc = listCard_(p);
+      s.parked.forEach(function (it) { todoRow_(pc, it, today, 'parked'); });
     }
   }
   if (view.done.length) {
     var d = add(main, 'div', 'todo-sec todo-sec-done');
     if (todoFold_(d, 'done', 'Done today')) {
-      view.done.forEach(function (it) { todoRow_(d, it, today, 'done'); });
+      var dc = listCard_(d);
+      view.done.forEach(function (it) { todoRow_(dc, it, today, 'done'); });
     }
   }
 }
 
+// A1-T7: the section label on the page, then the section itself as one white card holding its rows.
 function todoSection_(main, key, heading) {
-  var sec = add(main, 'div', 'todo-sec todo-sec-' + key);
-  add(sec, 'h2', '', heading);
-  return sec;
+  add(main, 'h2', 'list-lab', heading);
+  return add(main, 'div', 'todo-sec todo-sec-' + key + ' card list-card');
+}
+
+// A1-T7: a white grouped card for rows (under a fold, a shop heading, or the whole Groceries list).
+function listCard_(parent) {
+  return add(parent, 'div', 'card list-card');
 }
 
 // A collapsed section's header. True when it is open.
@@ -3975,6 +4781,11 @@ function todoFold_(sec, key, label) {
 function todoRow_(parent, it, today, where) {
   var done = where === 'done' || !!TODO_STRUCK[it.id];
   var row = add(parent, 'div', 'todo-row' + (done ? ' is-done' : ''));
+  listsSwipe_(row, function () {
+    TODO_FOCUS = 'tick:' + it.id;
+    if (done) todoUntick_(it);
+    else todoTick_(it);
+  }, done ? null : function () { listsDelete_('todo', it); });
   var tick = todoKey_(btn(row, 'tick-zone', null, function () {
     TODO_FOCUS = 'tick:' + it.id;
     if (done) todoUntick_(it);
@@ -4040,17 +4851,9 @@ function todoNote_(parent, it, today) {
   btn(actions, 'btn-plain', 'Not now', function () { todoSnooze_(today); });
 }
 
-// The two lines at the bottom: this phone, and its reminders.
+// The line at the bottom: this phone's reminders. (A1-T3: the "This phone" line is gone; the header avatar
+// says who this phone is and changes it.)
 function todoSettings_(body, lists, me) {
-  var phone = add(body, 'p', 'lists-settings small');
-  phone.appendChild(document.createTextNode('This phone: ' + me));
-  add(phone, 'span', 'sep', '·').setAttribute('aria-hidden', 'true');
-  btn(phone, 'textbtn', 'Change', function () {
-    TODO_FOCUS = '';
-    setWhoAmI_('');
-    TODO_MINE = false;
-    render(true);
-  });
   var today = lists ? listsToday_(lists) : '';
   if (!todoIsDay_(today)) return;
   var until = todoPausedUntil_(lists, me);
@@ -4212,9 +5015,11 @@ function sheetAddFields_(list, d) {
   return f;
 }
 
-// item null opens an empty sheet for a new item. prefill: {text} sets the starting text.
-function openItemSheet_(it, list, prefill) {
+// item null opens an empty sheet for a new item. prefill: {text} sets the starting text. quick (A1-T5): a new item
+// from the Add slot, with the Expense / To-do / Grocery segments on top.
+function openItemSheet_(it, list, prefill, quick) {
   list = list === 'grocery' ? 'grocery' : 'todo';
+  whoShut_();
   if (SHEET) closeItemSheet_('replace');
   var cur = it && it.id ? (listsItem_(list, it.id) || it) : null;
   var orig = cur ? JSON.parse(JSON.stringify(cur)) : null;
@@ -4226,29 +5031,51 @@ function openItemSheet_(it, list, prefill) {
   };
   s.more = !!s.draft.time;
   s.pick = !!s.draft.due && !s.chips.some(function (c) { return c.due === s.draft.due; });
+  s.quick = !orig && !!quick;
   SHEET = s;
   sheetBuild_(s);
   sheetInert_(true);
-  if (!SHEET_IN_HISTORY) {
-    var h = window.history;
-    if (h && typeof h.pushState === 'function') {
-      try {
-        h.pushState({ sheet: 1 }, '');
-        SHEET_IN_HISTORY = true;
-      } catch (e) {}
-    }
-  }
+  sheetHistory_();
   // A new item or a smaller first step: straight into the text. An edit: the dialog itself, so the phone
   // keyboard does not cover the chips.
   s.focusEl = (orig && !prefill) ? s.els.panel : s.els.text;
   s.focusEl.focus({ preventScroll: true });
 }
 
+// The open sheet adds one history step, so the phone's back closes it (a sheet replacing another adds none).
+function sheetHistory_() {
+  if (SHEET_IN_HISTORY) return;
+  var h = window.history;
+  if (h && typeof h.pushState === 'function') {
+    try {
+      h.pushState({ sheet: 1 }, '');
+      SHEET_IN_HISTORY = true;
+    } catch (e) {}
+  }
+}
+
 // how: 'close' (tap outside, Escape, swipe, Save, Enter), 'back' (the phone's back), 'nav' (the screen changes),
 // 'lock' (lock-out), 'replace' (another sheet opens), 'hide' (pagehide, R58). Every one saves; only close and back give focus back.
+// A1-T5: the expense sheet saves only on its Save button; any other close keeps what was typed for the next Add.
+// A1 final fix 3: with an amount typed, a close, back, screen change or pagehide keeps it in kl.kept (a reload keeps
+// it) and close, back and a screen change say so; an empty one closes silently.
 function closeItemSheet_(how) {
   var s = SHEET;
   if (!s) return null;
+  if (s.list === 'settle') {
+    sheetShut_(how); // nothing typed, nothing kept
+    if (how === 'close' || how === 'back') moneyRepaint_();
+    return null;
+  }
+  if (s.list === 'expense') {
+    sheetShut_(how);
+    if (!s.done) qaKeepOnClose_(s, how);
+    if (how === 'close' || how === 'back' || how === 'nav') {
+      qaKeptToast_(); // fix round 1: a refused (or, final fix 3, unsaved) expense waits in Add; the line says so
+      if (how !== 'nav') qaFocusAdd_();
+    }
+    return null;
+  }
   sheetShut_(how);
   var op = sheetOp_(s);
   var quiet = how === 'nav' || how === 'lock' || how === 'replace' || how === 'hide';
@@ -4299,11 +5126,54 @@ function sheetDelete_() {
   var s = SHEET;
   if (!s || !s.orig) return;
   sheetShut_('close');
-  var cur = listsItem_(s.list, s.id) || s.orig;
-  listsUndoStart_(s.list, todoCopy_(cur));
-  if (s.list === 'todo') TODO_FOCUS = 'undo';
+  listsDelete_(s.list, listsItem_(s.list, s.id) || s.orig);
+}
+
+// One item deleted (from the sheet or by a swipe): the delete goes through the queue, "Deleted. Undo" for 6 s.
+function listsDelete_(list, it) {
+  var cur = listsItem_(list, it.id) || it;
+  listsUndoStart_(list, todoCopy_(cur));
+  if (list === 'todo') TODO_FOCUS = 'undo';
   else GRO_FOCUS = 'undo';
-  listsQueue_({ op: 'delete', list: s.list, id: s.id });
+  listsQueue_({ op: 'delete', list: list, id: it.id });
+}
+
+// ---- swipe on a list row (A1-T3): right ticks (a struck row unticks), left deletes; both as their taps do --------
+// A sideways move of 80 px or more counts; a mostly up-and-down move is the page scrolling and does nothing.
+// onLeft null: no delete by swipe (a struck row). The row follows the finger while it moves sideways.
+var SWIPE_MIN = 80;
+
+function listsSwipe_(row, onRight, onLeft) {
+  var s = null;
+  var reset = function () { row.style.transform = ''; };
+  row.addEventListener('touchstart', function (e) {
+    var t = e && e.touches && e.touches[0];
+    s = t && e.touches.length === 1 ? { x: t.clientX, y: t.clientY, side: false } : null;
+  }, { passive: true });
+  row.addEventListener('touchmove', function (e) {
+    var t = e && e.touches && e.touches[0];
+    if (!s || !t) return;
+    var dx = t.clientX - s.x;
+    var dy = t.clientY - s.y;
+    if (!s.side) {
+      if (Math.abs(dy) > 10 && Math.abs(dy) >= Math.abs(dx)) { s = null; reset(); return; }
+      if (Math.abs(dx) > 10 && Math.abs(dx) > Math.abs(dy) * 1.5) s.side = true;
+    }
+    if (s.side && (dx > 0 ? onRight : onLeft)) row.style.transform = 'translateX(' + Math.round(dx * 0.6) + 'px)';
+  }, { passive: true });
+  row.addEventListener('touchend', function (e) {
+    var a = s;
+    var t = e && e.changedTouches && e.changedTouches[0];
+    s = null;
+    reset();
+    if (!a || !a.side || !t) return;
+    var dx = t.clientX - a.x;
+    var dy = t.clientY - a.y;
+    if (Math.abs(dx) < SWIPE_MIN || Math.abs(dx) < Math.abs(dy) * 1.5) return;
+    if (dx > 0 && onRight) onRight();
+    else if (dx < 0 && onLeft) onLeft();
+  }, { passive: true });
+  row.addEventListener('touchcancel', function () { s = null; reset(); }, { passive: true });
 }
 
 function listsUndoStart_(list, snap) {
@@ -4337,7 +5207,7 @@ function listsUndo_() {
 
 // Everything behind the sheet is inert while it is open.
 function sheetInert_(on) {
-  ['home', 'month', 'trends', 'balance', 'todo', 'groceries', 'tabbar'].forEach(function (id) { $(id).inert = on; });
+  ['home', 'month', 'trends', 'balance', 'todo', 'groceries', 'tabbar', 'qa-toast'].forEach(function (id) { $(id).inert = on; });
 }
 
 // A control in the sheet, in screen order, for the Tab loop. shown says when it is on screen.
@@ -4399,7 +5269,9 @@ function sheetTitle_(s) {
   return s.orig ? 'Edit to-do' : 'New to-do';
 }
 
-function sheetBuild_(s) {
+// The sheet's frame in the static #sheet: the backdrop (a tap closes), the dialog panel (a swipe down closes) and
+// its handle. Shared by the item sheet and the expense sheet (A1-T5). Returns the panel.
+function sheetFrame_(s, label) {
   var root = $('sheet');
   root.textContent = '';
   var shade = add(root, 'div', 'sheet-backdrop');
@@ -4407,7 +5279,7 @@ function sheetBuild_(s) {
   var p = add(root, 'div', 'sheet-panel');
   p.setAttribute('role', 'dialog');
   p.setAttribute('aria-modal', 'true');
-  p.setAttribute('aria-label', sheetTitle_(s));
+  p.setAttribute('aria-label', label);
   p.setAttribute('tabindex', '-1');
   s.els.panel = p;
   // A swipe down closes it; a short or sideways one, or one while the sheet is scrolled, does not.
@@ -4432,6 +5304,13 @@ function sheetBuild_(s) {
     if (dy > 80 && dy > Math.abs(dx) * 1.5) closeItemSheet_('close');
   }, { passive: true });
   add(p, 'div', 'sheet-handle').setAttribute('aria-hidden', 'true');
+  return p;
+}
+
+function sheetBuild_(s) {
+  var root = $('sheet');
+  var p = sheetFrame_(s, sheetTitle_(s));
+  if (s.quick) qaSegments_(p, s); // A1-T5
   var ta = sheetCtl_(s, add(p, 'textarea', 'sheet-text'));
   ta.setAttribute('aria-label', s.list === 'grocery' ? 'Item' : 'To-do');
   ta.setAttribute('maxlength', '500');
@@ -4474,8 +5353,8 @@ function sheetTodoFields_(p, s) {
     g.setAttribute('aria-labelledby', id);
     return g;
   };
-  var chip = function (g, label, onTap, isOn) {
-    var b = sheetCtl_(s, btn(g, 'schip', label, function () {
+  var chip = function (g, label, onTap, isOn, cls) {
+    var b = sheetCtl_(s, btn(g, 'schip' + (cls ? ' ' + cls : ''), label, function () {
       if (SHEET !== s) return;
       onTap();
       sheetSync_(s);
@@ -4515,8 +5394,10 @@ function sheetTodoFields_(p, s) {
     if (s.pick) day.value = todoValidDay_(s.draft.due) ? s.draft.due : '';
   });
   var who = group('sheet-who', 'Who');
+  // A1-T7: Kev, Lili and Couple carry their person's colour when picked (as the row chips); Either stays plain.
   ['Kev', 'Lili', 'Either', 'Couple'].forEach(function (name) {
-    chip(who, name, function () { s.draft.who = name; }, function () { return sheetWho_(s.draft.who) === name; });
+    chip(who, name, function () { s.draft.who = name; }, function () { return sheetWho_(s.draft.who) === name; },
+      name === 'Either' ? '' : 'schip-' + name.toLowerCase());
   });
   var more = sheetCtl_(s, btn(p, 'textbtn sheet-more', 'More', function () {
     if (SHEET !== s) return;
@@ -4549,6 +5430,735 @@ function sheetTodoFields_(p, s) {
 
 function sheetSync_(s) {
   (s.sync || []).forEach(function (f) { f(); });
+}
+
+// ---- A1-T5 quick add: Expense, To-do, Grocery behind the Add slot ---------------------------------------------
+// The expense sheet is a sheet like the item sheet (SHEET.list 'expense', in the static #sheet), so Escape, back,
+// a tap outside, a swipe down, a screen change and a lock-out all close it the same way; only Save saves. Save puts
+// one 'expense' op on the list queue (kl.queue) with an 'x:' id made at that tap: it is sent on its own through
+// addExpense (R-A5), and the server appends at most one row for an id, so a resend after a lost reply, a replay
+// after a reload and a double tap are all safe.
+var QA_SEGMENTS = [['expense', 'Expense'], ['todo', 'To-do'], ['grocery', 'Grocery']];
+var QA_CURRENCIES = ['IDR', 'EUR', 'USD'];
+var QA_WHO = ['Couple', 'Kev', 'Lili'];
+var QA_WHEN = [['today', 'Today'], ['yesterday', 'Yesterday'], ['pick', 'Pick a day']];
+var QA_DRAFT = null;       // an expense typed and not saved (closed, switched away, refused); memory only, this visit
+var QA_TOAST = null;       // the line above the bar: {text, action ('undo', 'open' or none), uid, row, answered}
+var QA_TOAST_TIMER = null;
+var ADD_SLOT = null;       // the Add slot on show; focus goes back to it when a quick add closes
+var QA_UNDO_FAIL = 'Could not undo here. Open it in the month to delete it.';
+
+// A copy of CATEGORY_KEYWORDS in Code.gs, the bot's words-to-category table, kept as text: a test checks it is the
+// same as the bot's, line for line. It is read into regular expressions at run time (qaKeywords_), so a phone whose
+// browser cannot read one rule only loses that rule's guess, never the page.
+var QA_KEYWORDS_SRC = String.raw`
+  [/^(?![\s\S]*(?:settle|remboursement entre nous))[\s\S]*(?:lemon ?(?:(?:&|\+|and|et|n) ?)?pepper|\bl ?& ?p\b)/i, 'Business'],
+  // Packet noodles are a grocery even when the text says "mie goreng" (checked before the dish words).
+  [/indomie|\bmie instan/i, 'Groceries'],
+  [/resto|restaurant|warung|dinner|lunch|breakfast|brunch|coffee|cafe|drink|(?<!(?:choco|chocolate|chocolat|protein|granola|cereal|candy|energy|soap) )bar\b|meal|\bnasi\b|(?<!de )\bmie\b(?! ?instan)|\bsate\b|(?<!minyak |bawang )goreng|bakar|kfc|mcdo|burger|pizza|kebab|canai|\bdiner\b|dejeuner|milkshake|\bchaud\b|grab ?food|gojek ?food|gofood|shopee ?food/i, 'Restaurant'],
+  [/gaz\b|gas\b|electric|listrik|pln\b|(?<!bottled )water\b(?! ?bottles?)|wifi|internet|\bpdam\b|\bpam\b|facture (?:de l.|d.)?eau/i, 'Utilities'],
+  [/grab|gojek|taxi|essence|petrol|bensin|parking|fuel|transport|oil change|ganti oli|engine oil|motor oil|\boli\b|scooter|huile moteur|sewa motor|sewa mobil|\brent (?:a |an )?(?:car|bike|motorbike|motor|scooter|cycle)|\b(?:car|bike|motorbike|motor|scooter|cycle) rental/i, 'Transport'],
+  [/doctor|docteur|pharma|apotek|blood|\bsang(?:uine?)?\b|psy|clinic|dentist|hospital|medic/i, 'Health'],
+  [/cinema|massage|spa\b|yoga|padel|gym|surf|leisure|badminton|tennis|football|foot\b|basket|swim|pool\b|golf|running|(?<!pas)sport|bowling|dance|climb|hike|diving|snorkel/i, 'Leisure'],
+  [/cloth|h ?& ?m|zara|stradivarius|shoe|dress|shopping/i, 'Shopping'],
+  [/deco\b|decoration|shells|plant\b|vase|candle/i, 'Decoration'],
+  [/furniture|meuble|ikea|\btable\b|chair|sofa|mattress/i, 'Furniture'],
+  [/spotify|netflix|telekomsel|telkomsel|pulsa|credit|abonnement|subscription|yolla/i, 'Subscriptions'],
+  [/vet\b|chico|pet\b|croquettes/i, 'Pets'],
+  [/laundry|cleaning|savon|soap|household|sodastream/i, 'Household'],
+  [/settle|settlement|remboursement entre nous/i, 'Settlement'],
+  // E-R8: tabs the couple added by hand to the sheet's dropdown.
+  [/\brent\b(?! (?:a |an )?(?:car|bike|motorbike|motor|scooter|cycle))|\bloyer\b|\bsewa\b/i, 'Rent'],
+  [/(?<!(?:by|par|with|avec|carte|card|via) )\bvisa\b(?! ?(?:card|carte|debit|credit))|kitas|kitap|immigration|imigrasi|passport|passeport|notaire|notary|^(?![\s\S]*\b(?:bank|wise|transfer)\b)[\s\S]*\badmin\b(?! ?fees?)/i, 'Visa & admin'],
+  [/flight|\bvol\b|avion|airasia|garuda|lion air|hotel|booking\.com|airbnb|ferry|\btrain\b/i, 'Travel'],
+  [/cadeau|\bgifts?\b|\bkado\b|hadiah|anniversaire|birthday/i, 'Gifts'],
+  [/squarespace|business|\bclients?\b|invoice/i, 'Business'],
+  [/fruit|market|gran lucky|island organic|soilfood|grocer|food|veggie|vegetable|legumes|supermarket|pepito|bintang|choco|\blait\b|\bmilk|\bsusu\b|\bpain\b(?! ?killers?)|bread|\broti\b|croissant|baguette|boulangerie|bakery|oeufs?\b|\u0153ufs?\b|\beggs?\b|\btelur\b|\briz\b|\brice\b(?! ?cookers?)|\bberas\b|fromage|cheese|\bkeju\b|yaourt|yogh?o?urt|beurre|\bbutter\b|biscuit|cookie|snack|\bchips\b|cereal|\bpates\b|\bpasta\b|farine|\bflour\b|\bsucre\b|sugar|\bgula\b|\bsel\b|\bsalt\b(?! ?lamps?)|huile|\boil\b|poulet|chicken|\bayam\b|viande|\bmeats?\b|\bdaging\b|poisson|\bfish\b|\bikan\b|banan|pisang|mangue|mango|\btomat|\bjus\b|juice|epicerie|alfamart|alfamidi|indomaret|circle ?k\b|minimart|mini ?market|\beau\b(?! de (?:toilette|parfum|cologne))|water bottles?|bottled water|\bgalon\b|\bminyak\b|\bbawang\b|carrefour|\blotte\b|hypermart|papaya|coco ?mart|frestive|\btofu\b|\btempeh?\b|\blemons?\b|\bcitrons?\b/i, 'Groceries']
+`;
+var QA_KEYWORDS = null;
+
+// The table as [RegExp, category] pairs, in order. Comment lines are skipped.
+function qaKeywords_() {
+  if (QA_KEYWORDS) return QA_KEYWORDS;
+  var out = [];
+  QA_KEYWORDS_SRC.split('\n').forEach(function (line) {
+    var m = /^\s*\[\/(.*)\/([a-z]*), '([^']+)'\],?\s*$/.exec(line);
+    if (!m) return;
+    try { out.push([new RegExp(m[1], m[2]), m[3]]); } catch (e) {}
+  });
+  QA_KEYWORDS = out;
+  return out;
+}
+
+// The words as the bot reads them: accents removed, lowercase.
+function qaFold_(t) {
+  var s = String(t === undefined || t === null ? '' : t);
+  if (typeof s.normalize === 'function') s = s.normalize('NFD');
+  return s.replace(/[\u0300-\u036f]/g, '').toLowerCase();
+}
+
+// The category the bot would give these words, among cats. Never Settlement (only Settle up makes one); a category
+// the sheet does not have, or no match, gives Other (or the first category when the sheet has no Other).
+function qaGuess_(text, cats) {
+  var fallback = (!cats || !cats.length || cats.indexOf('Other') >= 0) ? 'Other' : cats[0];
+  var t = qaFold_(text);
+  var name = fallback;
+  if (t.trim()) {
+    var rules = qaKeywords_();
+    for (var i = 0; i < rules.length; i++) {
+      if (rules[i][0].test(t)) { name = rules[i][1]; break; }
+    }
+  }
+  if (name === 'Settlement' || (cats && cats.indexOf(name) < 0)) name = fallback;
+  return name;
+}
+
+// An amount as typed, or null when it is not one. Spaces are ignored; a trailing k means thousands.
+// A mark (dot or comma) is a thousands mark only when the group before it is 1 to 3 digits and not 0, and every
+// group after it is exactly 3 digits ("1.500", "85,000", "1.500.000"). Otherwise one mark is the decimal mark
+// ("1.5", "0.500", "12,30"). With both marks, the last one is the decimal mark and the other one a thousands mark
+// under the same rule ("1,234.50", "1.234,50"). EUR and USD keep at most 2 decimals ("0.500" is 0.5; "0.001" and
+// "1234.567" are no amount). IDR is whole rupiah, and under 1000 it means thousands, as with the bot: "85" is 85000
+// and "1.5" is 1500; a rupiah amount of 1000 or more with decimals ("1500.5") is no amount.
+function qaAmount_(text, currency) {
+  if (currency !== 'IDR' && currency !== 'EUR' && currency !== 'USD') return null;
+  var t = String(text === undefined || text === null ? '' : text).replace(/\s+/g, '');
+  var k = /k$/i.test(t);
+  if (k) t = t.slice(0, -1);
+  if (!/^\d[\d.,]*$/.test(t) || /[.,]$/.test(t)) return null;
+  // Groups joined by mark read as one whole number, or null when they are not thousands groups.
+  var thousands = function (str, mark) {
+    var g = str.split(mark);
+    if (g.length < 2 || !/^[1-9]\d{0,2}$/.test(g[0])) return null;
+    for (var i = 1; i < g.length; i++) if (!/^\d{3}$/.test(g[i])) return null;
+    return g.join('');
+  };
+  var marks = t.replace(/\d/g, '');
+  var n = null;
+  if (!marks) {
+    n = Number(t);
+  } else if (marks.split('').every(function (c) { return c === marks.charAt(0); })) {
+    var whole = thousands(t, marks.charAt(0));
+    if (whole !== null) n = Number(whole);
+    else if (marks.length === 1) n = Number(t.replace(/[.,]/, '.'));
+  } else {
+    var last = marks.charAt(marks.length - 1);
+    var inner = marks.slice(0, -1);
+    var at = t.lastIndexOf(last);
+    var head = inner.split('').every(function (c) { return c === inner.charAt(0); }) ? thousands(t.slice(0, at), inner.charAt(0)) : null;
+    if (head !== null) n = Number(head + '.' + t.slice(at + 1));
+  }
+  if (n === null || !isFinite(n)) return null;
+  if (k) n *= 1000;
+  else if (currency === 'IDR' && n < 1000) n *= 1000;
+  n = Math.round(n * 1e6) / 1e6; // drops float noise such as 0.29 * 1000
+  if (currency === 'IDR' ? Math.round(n) !== n : Math.round(n * 100) / 100 !== n) return null;
+  return n > 0 && n < 1e12 ? n : null;
+}
+
+// The line under the amount: what will be saved, then the same in the other currency at the month's rate (fx from
+// the payload). Without a rate only the amount. '' while there is no amount.
+function qaPreview_(amount, currency, fx) {
+  if (typeof amount !== 'number' || !(amount > 0)) return '';
+  var num = function (v) { return typeof v === 'number' && isFinite(v) && v > 0 ? v : 0; };
+  var rate = fx ? num(fx.idrPerEur) : 0;
+  var eurUsd = fx ? num(fx.eurUsd) : 0;
+  if (currency === 'IDR') return fmtIdr(amount) + (rate ? ' · ' + fmtEur(amount / rate) : '');
+  if (currency === 'EUR') return fmtEur(amount) + (rate ? ' · ' + fmtIdr(Math.round(amount * rate / 1000) * 1000) : '');
+  return 'USD ' + fixed2(amount) + (eurUsd ? ' · ' + fmtEur(amount / eurUsd) : '');
+}
+
+// The Money numbers to read the rate and the categories from: on show, else the kl.money snapshot.
+function qaData_() {
+  return DATA || moneyCacheData_(lsJson_(LS_MONEY));
+}
+
+// The categories the grid offers: the sheet's own list (Settlement never), else the bot's table plus Other.
+function qaCats_() {
+  var d = qaData_();
+  var out = [];
+  var take = function (c) { if (typeof c === 'string' && c && c !== 'Settlement' && out.indexOf(c) < 0) out.push(c); };
+  ((d && Array.isArray(d.categories)) ? d.categories : []).forEach(take);
+  if (out.length) return out;
+  qaKeywords_().forEach(function (r) { take(r[1]); });
+  take('Other');
+  return out;
+}
+
+function qaFresh_() {
+  return { amount: '', currency: 'IDR', item: '', category: '', hand: false, paidBy: 'Couple', paidFor: 'Couple', when: 'today', day: '' };
+}
+
+// ---- refused expenses (fix round 1): their own list, never the one QA_DRAFT slot, so nothing overwrites them.
+// Kept in kl.kept (read and written on every change, so another tab or a reload sees the same list), and only in
+// memory while writes to it fail. Each entry: {key, at, draft}; draft.id is the refused op's 'x:' id, used again
+// by the next Save of that draft, so an add that landed after all is answered existed and never doubled. An entry
+// leaves the list only when its draft is saved again. Lock-out keeps the list, as it keeps the queue.
+var QA_KEPT = [];
+var QA_KEPT_MEM = false; // the last kl.kept write failed: the list lives only in this page
+
+function qaKeptOk_(e) {
+  return !!e && typeof e === 'object' && typeof e.key === 'string' && !!e.draft && typeof e.draft === 'object';
+}
+
+function qaKept_() {
+  if (QA_KEPT_MEM) return QA_KEPT;
+  var v = lsJson_(LS_KEPT);
+  QA_KEPT = Array.isArray(v) ? v.filter(qaKeptOk_) : [];
+  return QA_KEPT;
+}
+
+function qaKeptChange_(change) {
+  var list = qaKept_().slice();
+  change(list);
+  QA_KEPT = list;
+  if (!list.length) {
+    lsDel_(LS_KEPT);
+    QA_KEPT_MEM = false;
+  } else {
+    QA_KEPT_MEM = !lsSet_(LS_KEPT, JSON.stringify(list));
+  }
+}
+
+// why: 'capped', 'invalid' or (A1 final fix 3) 'unsaved', for the line that says so.
+function qaKeptAdd_(key, draft, why) {
+  qaKeptChange_(function (list) { list.push({ key: key, at: Date.now(), draft: draft, why: why }); });
+}
+
+function qaKeptPut_(key, draft) {
+  qaKeptChange_(function (list) { list.forEach(function (e) { if (e.key === key) e.draft = draft; }); });
+}
+
+function qaKeptDrop_(key) {
+  qaKeptChange_(function (list) {
+    for (var i = list.length - 1; i >= 0; i--) if (list[i].key === key) list.splice(i, 1);
+  });
+}
+
+// The entry Add opens next: the oldest refused one, else (A1 final fix 3) the oldest one closed without Save.
+function qaKeptNext_() {
+  var list = qaKept_();
+  for (var i = 0; i < list.length; i++) if (list[i].why !== 'unsaved') return list[i];
+  return list[0] || null;
+}
+
+// The line that says an expense waits in Add, with Open; its words follow the entry Open opens.
+function qaKeptToast_() {
+  var next = qaKeptNext_();
+  if (!next) return;
+  qaToastSet_({ text: QA_KEPT_TEXT[next.why] || QA_KEPT_TEXT.invalid, action: 'open' });
+}
+var QA_KEPT_TEXT = {
+  capped: 'Not saved: the limit of 100 adds today is reached. It is kept in Add.',
+  invalid: 'Not saved. It is kept in Add to check.',
+  unsaved: 'Not saved yet. It is in Add.'
+};
+
+// A1 final fix 4: a kept draft keeps the day it was for. Today or Yesterday become that day, picked.
+function qaPin_(draft, day) {
+  if (draft.when !== 'pick' && todoValidDay_(day)) {
+    draft.when = 'pick';
+    draft.day = day;
+  }
+  return draft;
+}
+
+// A1 final fix 3: what an expense sheet closed without Save leaves behind. A kept entry takes the edits (an unsaved
+// one emptied of its amount leaves the list); a new draft with an amount joins kl.kept as 'unsaved', unless the
+// sheet closes for a lock-out or another sheet (then it stays in QA_DRAFT, as before).
+function qaKeepOnClose_(s, how) {
+  var typed = String(s.draft.amount || '').replace(/\s+/g, '') !== '';
+  if (s.kept) {
+    var entry = qaKept_().filter(function (e) { return e.key === s.kept; })[0];
+    if (entry && entry.why === 'unsaved' && !typed) {
+      qaKeptDrop_(s.kept);
+      QA_DRAFT = s.draft;
+      return;
+    }
+    qaKeptPut_(s.kept, qaPin_(s.draft, qaDate_(s)));
+    return;
+  }
+  if (typed && (how === 'close' || how === 'back' || how === 'nav' || how === 'hide')) {
+    qaKeptAdd_('k' + newId_().slice(1), qaPin_(JSON.parse(JSON.stringify(s.draft)), qaDate_(s)), 'unsaved');
+    return;
+  }
+  QA_DRAFT = s.draft;
+}
+
+// Today in Bali, from the phone's clock (Asia/Makassar).
+function qaToday_() {
+  var d = baliDay_(Date.now());
+  if (todoValidDay_(d)) return d;
+  return DATA && todoValidDay_(DATA.today) ? DATA.today : '';
+}
+
+// The category on show: the one picked by hand, else the guess from the words.
+function qaCategory_(s) {
+  if (s.draft.hand && s.cats.indexOf(s.draft.category) >= 0) return s.draft.category;
+  return qaGuess_(s.draft.item, s.cats);
+}
+
+function qaDate_(s) {
+  if (s.draft.when === 'yesterday') return isoAddDays_(s.today, -1);
+  if (s.draft.when === 'pick' && todoValidDay_(s.draft.day)) return s.draft.day;
+  return s.today;
+}
+
+function qaFocusAdd_() {
+  if (ADD_SLOT && !modalOpen_()) ADD_SLOT.focus({ preventScroll: true });
+}
+
+// carry: words from the segment switched away from, as the What.
+// A refused expense opens first (the oldest), unless words come along from a segment switch; then the draft
+// typed and not saved (QA_DRAFT), else a fresh one.
+function openExpenseSheet_(carry) {
+  whoShut_();
+  if (SHEET) closeItemSheet_('replace');
+  var words = sheetOneLine_(carry);
+  var keep = words ? null : qaKeptNext_();
+  var draft;
+  if (keep) {
+    draft = JSON.parse(JSON.stringify(keep.draft));
+    if (draft.when === 'pick' && draft.day && draft.day === qaToday_()) draft.when = 'today'; // final fix 4: same day
+  } else {
+    draft = QA_DRAFT ? JSON.parse(JSON.stringify(QA_DRAFT)) : qaFresh_();
+    QA_DRAFT = null;
+  }
+  if (words) draft.item = words.slice(0, 100);
+  var s = { list: 'expense', quick: true, draft: draft, kept: keep ? keep.key : '', cats: qaCats_(), today: qaToday_(), grid: false, done: false, els: {}, ctls: [], sync: [], focusEl: null, touch: null };
+  SHEET = s;
+  qaBuild_(s);
+  sheetInert_(true);
+  sheetHistory_();
+  s.focusEl = s.els.amount;
+  s.focusEl.focus({ preventScroll: true });
+  // Opened from a list tab before Money loaded: the numbers come quietly, for the rate and the categories.
+  if (!DATA && TOKEN && !LOADING) loadData(true);
+}
+
+// The segments on top of a quick add sheet. A tap on another one switches in place.
+function qaSegments_(p, s) {
+  var g = add(p, 'div', 'qa-seg');
+  g.setAttribute('role', 'group');
+  g.setAttribute('aria-label', 'Add');
+  QA_SEGMENTS.forEach(function (seg) {
+    var b = sheetCtl_(s, btn(g, 'qa-segbtn', null, function () { qaSwitch_(s, seg[0]); }));
+    b.setAttribute('aria-pressed', seg[0] === s.list ? 'true' : 'false');
+    b.appendChild(svgIcon_(tabIconPaths_(seg[0] === 'expense' ? 'money' : (seg[0] === 'todo' ? 'todo' : 'groceries'))));
+    add(b, 'span', '', seg[1]);
+  });
+}
+
+// Switching segments saves nothing and carries the words. An expense switched away from keeps its amount and
+// choices for the next Add (the words go along).
+function qaSwitch_(s, to) {
+  if (SHEET !== s || to === s.list) return;
+  var words = s.list === 'expense' ? s.draft.item : s.draft.text;
+  if (s.list === 'expense') {
+    if (s.kept) qaKeptPut_(s.kept, s.draft); // a refused one keeps everything, words too
+    else {
+      s.draft.item = '';
+      QA_DRAFT = s.draft;
+    }
+    s.done = true;
+  }
+  sheetShut_('replace');
+  if (to === 'expense') {
+    openExpenseSheet_(words);
+    return;
+  }
+  if (to === 'todo') TODO_FOCUS = 'add';
+  else GRO_FOCUS = 'add';
+  openItemSheet_(null, to, { text: sheetOneLine_(words) }, true);
+}
+
+// The expense sheet. Save sits in the header row, above the amount, so the phone keyboard never covers it.
+function qaBuild_(s) {
+  var p = sheetFrame_(s, 'New expense');
+  var head = add(p, 'div', 'qa-head');
+  add(head, 'h2', 'qa-title', 'New expense');
+  sheetCtl_(s, btn(head, 'qa-save btn-main', 'Save', function () { qaSave_(s); }));
+  qaSegments_(p, s);
+
+  var line = add(p, 'div', 'qa-amtline');
+  s.els.cur = sheetCtl_(s, btn(line, 'qa-cur', s.draft.currency, function () {
+    if (SHEET !== s) return;
+    var i = QA_CURRENCIES.indexOf(s.draft.currency);
+    s.draft.currency = QA_CURRENCIES[(i + 1) % QA_CURRENCIES.length];
+    qaSync_(s);
+  }));
+  var amount = sheetCtl_(s, add(line, 'input', 'qa-amount'));
+  amount.setAttribute('type', 'text');
+  amount.setAttribute('inputmode', 'decimal');
+  amount.setAttribute('autocomplete', 'off');
+  amount.setAttribute('maxlength', '20');
+  amount.setAttribute('aria-label', 'Amount');
+  amount.setAttribute('placeholder', '0');
+  amount.value = s.draft.amount;
+  amount.addEventListener('input', function () {
+    if (SHEET !== s) return;
+    s.draft.amount = amount.value;
+    s.els.status.textContent = '';
+    qaSync_(s);
+  });
+  s.els.amount = amount;
+  s.els.preview = add(p, 'p', 'qa-preview');
+  s.els.status = add(p, 'p', 'qa-status');
+  s.els.status.setAttribute('role', 'status');
+
+  var what = sheetCtl_(s, add(p, 'input', 'qa-what'));
+  what.setAttribute('type', 'text');
+  what.setAttribute('autocomplete', 'off');
+  what.setAttribute('maxlength', '100');
+  what.setAttribute('enterkeyhint', 'done');
+  what.setAttribute('aria-label', 'What');
+  what.setAttribute('placeholder', 'What was it?');
+  what.value = s.draft.item;
+  what.addEventListener('input', function () {
+    if (SHEET !== s) return;
+    s.draft.item = what.value;
+    qaSync_(s);
+  });
+  what.addEventListener('keydown', function (e) {
+    if (e && e.key === 'Enter' && !e.isComposing && SHEET === s) {
+      e.preventDefault();
+      qaSave_(s);
+    }
+  });
+  s.els.hint = add(p, 'p', 'qa-hint');
+
+  var row = function (id, label) {
+    var r = add(p, 'div', 'qa-row');
+    add(r, 'p', 'qa-label', label).setAttribute('id', id);
+    return r;
+  };
+  var typeRow = row('qa-type-label', 'Type');
+  s.els.type = sheetCtl_(s, btn(typeRow, 'qa-type', null, function () {
+    if (SHEET !== s) return;
+    s.grid = !s.grid;
+    qaSync_(s);
+  }));
+  var grid = add(p, 'div', 'qa-grid');
+  grid.setAttribute('role', 'group');
+  grid.setAttribute('aria-labelledby', 'qa-type-label');
+  s.cats.forEach(function (name) {
+    var b = sheetCtl_(s, btn(grid, 'qa-cat', null, function () {
+      if (SHEET !== s) return;
+      s.draft.category = name;
+      s.draft.hand = true;
+      s.grid = false;
+      qaSync_(s);
+      s.els.type.focus({ preventScroll: true });
+    }), function () { return s.grid; });
+    catAvatar_(b, name);
+    add(b, 'span', '', name);
+    s.sync.push(function () { b.setAttribute('aria-pressed', qaCategory_(s) === name ? 'true' : 'false'); });
+  });
+  s.sync.push(function () {
+    grid.hidden = !s.grid;
+    s.els.type.setAttribute('aria-expanded', s.grid ? 'true' : 'false');
+  });
+
+  var chips = function (cls, label, options, key) {
+    var r = row(cls + '-label', label);
+    var g = add(r, 'div', 'sheet-chips ' + cls);
+    g.setAttribute('role', 'group');
+    g.setAttribute('aria-labelledby', cls + '-label');
+    options.forEach(function (o) {
+      var value = typeof o === 'string' ? o : o[0];
+      var b = sheetCtl_(s, btn(g, 'schip', typeof o === 'string' ? o : o[1], function () {
+        if (SHEET !== s) return;
+        s.draft[key] = value;
+        if (key === 'when' && value === 'pick' && !todoValidDay_(s.draft.day)) s.draft.day = s.today;
+        qaSync_(s);
+      }));
+      s.sync.push(function () { b.setAttribute('aria-pressed', s.draft[key] === value ? 'true' : 'false'); });
+    });
+  };
+  chips('qa-by', 'Paid by', QA_WHO, 'paidBy');
+  chips('qa-for', 'For', QA_WHO, 'paidFor');
+  chips('qa-when', 'When', QA_WHEN, 'when');
+  var day = sheetCtl_(s, add(p, 'input', 'qa-day'), function () { return s.draft.when === 'pick'; });
+  day.setAttribute('type', 'date');
+  day.setAttribute('aria-label', 'Pick a day');
+  day.setAttribute('min', '2020-01-01');
+  if (s.today) day.setAttribute('max', s.today);
+  var takeDay = function (resync) {
+    if (SHEET !== s) return;
+    var v = day.value;
+    if (todoValidDay_(v) && v >= '2020-01-01' && (!s.today || v <= s.today)) s.draft.day = v;
+    if (resync) qaSync_(s);
+  };
+  day.addEventListener('input', function () { takeDay(false); });
+  day.addEventListener('change', function () { takeDay(true); });
+  s.sync.push(function () {
+    day.hidden = s.draft.when !== 'pick';
+    if (s.draft.when === 'pick') day.value = s.draft.day;
+  });
+  $('sheet').hidden = false;
+  qaSync_(s);
+}
+
+// Brings the sheet in line with its draft: the currency, the preview, the type chip, the hint, the chips.
+function qaSync_(s) {
+  if (!s || !s.els.amount) return;
+  var e = s.els;
+  e.cur.textContent = s.draft.currency;
+  e.cur.setAttribute('aria-label', 'Currency: ' + s.draft.currency + '. Change');
+  var d = qaData_();
+  e.preview.textContent = qaPreview_(qaAmount_(s.draft.amount, s.draft.currency), s.draft.currency, d ? d.fx : null);
+  var cat = qaCategory_(s);
+  e.type.textContent = '';
+  catAvatar_(e.type, cat);
+  add(e.type, 'span', '', cat);
+  add(e.type, 'span', 'chev').setAttribute('aria-hidden', 'true');
+  e.type.setAttribute('aria-label', 'Type: ' + cat + '. Change');
+  var guessed = !(s.draft.hand && s.cats.indexOf(s.draft.category) >= 0) && !!qaFold_(s.draft.item).trim();
+  e.hint.textContent = guessed ? 'Type guessed from the words.' : '';
+  sheetSync_(s);
+}
+
+// Save: an amount is needed (the sheet says so and stays). Otherwise the expense joins the queue, the sheet closes
+// and the toast offers Undo. A second tap finds the sheet closed and does nothing.
+function qaSave_(s) {
+  if (SHEET !== s || s.done) return;
+  var amount = qaAmount_(s.draft.amount, s.draft.currency);
+  if (amount === null) {
+    s.els.status.textContent = 'Needs an amount';
+    s.els.amount.focus({ preventScroll: true });
+    return;
+  }
+  var cat = qaCategory_(s);
+  var item = sheetOneLine_(s.draft.item).replace(/[\u0000-\u001f\u007f]/g, '').slice(0, 100).trim() || cat;
+  var op = expenseOp_({
+    amount: amount, currency: s.draft.currency, item: item, category: cat,
+    paidBy: s.draft.paidBy, paidFor: s.draft.paidFor, date: qaDate_(s)
+  }, s.draft);
+  s.done = true;
+  if (s.kept) qaKeptDrop_(s.kept);
+  else QA_DRAFT = null;
+  sheetShut_('close');
+  qaToastSet_({ text: 'Added ' + qaPreview_(amount, op.fields.currency, null) + ' · ' + cat + qaWhoText_(op.fields) + '.', action: 'undo', uid: op.uid });
+  expenseEnqueue_(op);
+  moneyRepaint_();
+  qaFocusAdd_(); // after the repaint, which draws a new Add slot
+}
+
+// A1 final fix 5: who paid and who it was for, named in the Added line when not Couple: ", paid by Kev for Lili".
+function qaWhoText_(f) {
+  var parts = [];
+  if (f.paidBy && f.paidBy !== 'Couple') parts.push('paid by ' + f.paidBy);
+  if (f.paidFor && f.paidFor !== 'Couple') parts.push('for ' + f.paidFor);
+  return parts.length ? ', ' + parts.join(' ') : '';
+}
+
+// The queue op: the fields addExpense takes, its 'x:' id, from (only ever Kev or Lili, else left out), and the
+// draft as typed (never sent), so a refused add can be put back in the sheet.
+// fix round 1: a draft the server gave back carries its first id (draft.id), and saving it again uses that id.
+function expenseOp_(fields, draft) {
+  var again = typeof draft.id === 'string' && /^x:[0-9a-f-]{36}$/.test(draft.id);
+  var op = { op: 'expense', at: Date.now(), id: again ? draft.id : 'x' + newId_().slice(1), fields: fields, draft: JSON.parse(JSON.stringify(draft)) };
+  if (again) op.again = true;
+  op.uid = 'u' + newId_().slice(1);
+  var me = whoAmI_();
+  if (me === 'Kev' || me === 'Lili') op.from = me;
+  return op;
+}
+
+function expenseEnqueue_(op) {
+  listsQueueChange_(function (arr) { arr.push(op); });
+  setTimeout(listsNoteUpdate_, 10000);
+  listsFlush_();
+}
+
+// Sends the queue head when it is an expense: alone, through addExpense, never inside a listOp. tried marks an op
+// that went out at least once, so Undo knows the row may exist.
+function expenseSend_(op) {
+  if (HEAD_FAIL_UID !== op.uid) { HEAD_FAIL_UID = op.uid; HEAD_FAIL_N = 0; }
+  if (!op.tried) {
+    listsQueueChange_(function (arr) { arr.forEach(function (q) { if (q.uid === op.uid) q.tried = true; }); });
+  }
+  var sent = JSON.parse(JSON.stringify(op));
+  var body = { id: sent.id, fields: sent.fields };
+  if (sent.from === 'Kev' || sent.from === 'Lili') body.from = sent.from;
+  INFLIGHT = op.uid;
+  var session = SESSION;
+  listsCall_('addExpense', body).then(function (res) {
+    INFLIGHT = '';
+    if (session !== SESSION) { listsFlush_(); return; }
+    expenseReply_(sent, res);
+  }, function (err) {
+    INFLIGHT = '';
+    if (session !== SESSION) { listsFlush_(); return; }
+    var code = err ? err.code : '';
+    if (code === 'NO_SESSION') { lockOut(); return; }
+    if (code === 'BAD_REQUEST') { expenseRefused_(sent, 'invalid'); return; }
+    if (code === 'SERVER' && HEAD_FAIL_UID === sent.uid && ++HEAD_FAIL_N >= HEAD_FAIL_MAX) { expenseRefused_(sent, 'invalid'); return; }
+    expenseRetry_(); // TIMEOUT, UNREACHED, SERVER, NOT_CONFIGURED: the id makes another send safe
+  });
+}
+
+function expenseRetry_() {
+  listsRetryLater_();
+  moneyRepaint_();
+}
+
+// {rowNumber, fingerprint} from a reply, or null.
+function qaRow_(r) {
+  if (!r || typeof r !== 'object' || typeof r.rowNumber !== 'number' || !(r.rowNumber >= 2) || typeof r.fingerprint !== 'string' || !r.fingerprint) return null;
+  return { rowNumber: r.rowNumber, fingerprint: r.fingerprint };
+}
+
+// The op asked for Undo (the toast's Undo came while it was out, or before a reload).
+function expenseUndoWanted_(op) {
+  var cur = listsByUid_(op.uid);
+  return !!((cur && cur.undo) || op.undo);
+}
+
+function expenseReply_(op, res) {
+  if (!res || typeof res !== 'object') { expenseRetry_(); return; }
+  if (res.ok === true) {
+    // Saved now, or saved before (existed: a replay): the same success, and the toast already on show stays.
+    var undo = expenseUndoWanted_(op);
+    var row = qaRow_(res.row);
+    expenseDone_(op);
+    if (op.settle && op.fields) SETTLE_ANIM = { from: op.fields.amount, at: Date.now(), running: false };
+    if (res.data && typeof res.data === 'object' && Array.isArray(res.data.months)) moneySet_(res.data);
+    else if (DATA) {
+      MONEY_LIVE = false; // A1 final fix 2: the figures on show lack this row until the refresh answers
+      loadData(true);
+    }
+    if (undo) qaDeleteRow_(row);
+    else if (QA_TOAST && QA_TOAST.uid === op.uid) {
+      QA_TOAST.row = row;
+      QA_TOAST.answered = true;
+      // A returned draft saved again whose first try had landed after all: the row from then stands.
+      if (res.existed && op.again) qaToastSet_({ text: 'It was saved already. Check it in the month.', action: 'undo', uid: op.uid, row: row, answered: true });
+    }
+    moneyRepaint_();
+    return;
+  }
+  if (res.invalid || res.capped) { expenseRefused_(op, res.capped ? 'capped' : 'invalid'); return; }
+  // retry (the sheet was busy), historyFailed, failed: nothing was added. A server that never takes it lets it go.
+  if (HEAD_FAIL_UID === op.uid && ++HEAD_FAIL_N >= HEAD_FAIL_MAX) { expenseRefused_(op, 'invalid'); return; }
+  expenseRetry_();
+}
+
+// The op is answered: off the queue (its own uid only), the next one sent.
+function expenseDone_(op) {
+  listsQueueRemove_(op.uid);
+  RETRY_N = 0;
+  HEAD_FAIL_UID = '';
+  HEAD_FAIL_N = 0;
+  listsNoteUpdate_();
+  listsFlush_();
+}
+
+// The server will not take it: nothing was saved. What was typed goes back into Add, and one calm line says so.
+function expenseRefused_(op, why) {
+  if (op.settle) { // A1-T6: nothing was saved, the balance is as it was; nothing goes back into Add
+    expenseDone_(op);
+    moneyRepaint_();
+    qaToastSet_({ text: 'Not settled. The balance is as it was.' });
+    if (DATA && TOKEN) loadData(true); // A1 final fix 2: the server may know a newer balance (balanceChanged)
+    return;
+  }
+  var undo = expenseUndoWanted_(op);
+  expenseDone_(op);
+  moneyRepaint_();
+  if (undo) { qaToastSet_({ text: 'Removed.' }); return; }
+  var d = op.draft && typeof op.draft === 'object' ? JSON.parse(JSON.stringify(op.draft)) : null;
+  if (!d) {
+    var f = op.fields || {};
+    d = qaFresh_();
+    d.amount = String(f.amount || '');
+    d.currency = QA_CURRENCIES.indexOf(f.currency) >= 0 ? f.currency : 'IDR';
+    d.item = String(f.item || '');
+  }
+  d.id = op.id; // saved again with this id, so a row that landed after all is never added twice
+  qaPin_(d, op.fields && op.fields.date); // A1 final fix 4: never re-dated to a later day
+  qaKeptAdd_(op.uid, d, why === 'capped' ? 'capped' : 'invalid');
+  qaToastSet_({ text: QA_KEPT_TEXT[why === 'capped' ? 'capped' : 'invalid'], action: 'open' });
+}
+
+// Undo from the toast. Never sent: the op is simply dropped. Sent at least once (or on its way): the row may exist,
+// so the op is marked, and its reply is followed by the delete. Answered: the delete of the row the reply named.
+function qaUndo_() {
+  var t = QA_TOAST;
+  if (!t || !t.uid) return;
+  var q = listsByUid_(t.uid);
+  if (q && !q.tried && INFLIGHT !== q.uid) {
+    listsQueueRemove_(q.uid);
+    listsNoteUpdate_();
+    qaToastSet_({ text: 'Removed.' });
+    moneyRepaint_();
+    return;
+  }
+  if (q) {
+    listsQueueChange_(function (arr) { arr.forEach(function (o) { if (o.uid === q.uid) o.undo = true; }); });
+    qaToastSet_({ text: 'Undoing...' });
+    return;
+  }
+  qaDeleteRow_(t.answered ? t.row : null);
+}
+
+// The delete of an added row (deleteExpense with the reply's row and fingerprint). No row, or a delete that does
+// not go through: one calm line; the expense stays and can be deleted from its month.
+function qaDeleteRow_(row) {
+  if (!row || !TOKEN) { qaToastSet_({ text: QA_UNDO_FAIL }); return; }
+  qaToastSet_({ text: 'Undoing...' });
+  var session = SESSION;
+  call_('deleteExpense', { token: TOKEN, rowNumber: row.rowNumber, fingerprint: row.fingerprint }).then(function (res) {
+    if (session !== SESSION) return;
+    if (res && res.ok) {
+      if (res.data && typeof res.data === 'object' && Array.isArray(res.data.months)) moneySet_(res.data);
+      else if (DATA) loadData(true);
+      qaToastSet_({ text: 'Removed.' });
+      moneyRepaint_();
+      return;
+    }
+    qaToastSet_({ text: QA_UNDO_FAIL });
+  }, function (err) {
+    if (session !== SESSION) return;
+    if (err && err.code === 'NO_SESSION') { lockOut(); return; }
+    qaToastSet_({ text: QA_UNDO_FAIL });
+    if (unreached(err) && DATA) loadData(true); // it may have gone through: the numbers say
+  });
+}
+
+// The toast: one line above the bar on every tab, for 6 s. null takes it away.
+function qaToastSet_(t) {
+  if (QA_TOAST_TIMER !== null) clearTimeout(QA_TOAST_TIMER);
+  QA_TOAST_TIMER = null;
+  QA_TOAST = t;
+  if (t) {
+    QA_TOAST_TIMER = setTimeout(function () {
+      QA_TOAST_TIMER = null;
+      if (QA_TOAST === t) { QA_TOAST = null; qaToastPaint_(); }
+    }, 6000);
+  }
+  qaToastPaint_();
+}
+
+function qaToastPaint_() {
+  var root = $('qa-toast');
+  root.textContent = '';
+  var t = QA_TOAST;
+  root.hidden = !t;
+  if (!t) return;
+  add(root, 'span', '', t.text);
+  if (t.action === 'undo') btn(root, '', 'Undo', qaUndo_);
+  else if (t.action === 'open') {
+    btn(root, '', 'Open', function () {
+      qaToastSet_(null);
+      openExpenseSheet_();
+    });
+  }
+}
+
+// Money on show is drawn again (a new expense in its numbers, or the waiting line).
+function moneyRepaint_() {
+  if (APP_ON && DATA && tabOf_(VIEW.screen) === 'money') render(true);
 }
 
 // ---- Groceries screen (Task 8) -----------------------------------------------------------------
@@ -4659,6 +6269,8 @@ function groClear_() {
   if (GRO && VIEW.screen === 'groceries' && TOKEN) {
     GRO.head.textContent = '';
     GRO.rest.textContent = '';
+    if (GRO.toasts) GRO.toasts.textContent = ''; // A1-T7: the dock keeps the field; its two slots are refilled
+    if (GRO.recent) GRO.recent.textContent = '';
     return;
   }
   $('groceries').textContent = '';
@@ -4775,9 +6387,19 @@ function groVisibility_() {
 }
 
 // ---- drawing
+// A1-T7: the dock above the tab bar, near the thumb: the lists' lines (Undo, Not saved yet), the Bought recently
+// chips, then the add field and its line. It is built once per visit like the field, so a repaint never takes the
+// focus or the keyboard away; only the toasts and chips slots are refilled. With the keyboard up it rides on top
+// of the keyboard (groDockPlace_).
 function groAddBox_(root) {
-  var box = add(root, 'div', 'gro-add');
-  var w = add(box, 'div', 'wrap');
+  var box = add(root, 'div', 'gro-dock');
+  var toasts = add(box, 'div', 'gro-dock-slot');
+  var recent = add(box, 'div', 'gro-dock-slot');
+  // A label: a tap anywhere on the pill (the plus too) puts the cursor in the field.
+  var w = add(box, 'label', 'gro-add');
+  var plus = add(w, 'span', 'gro-add-plus');
+  plus.setAttribute('aria-hidden', 'true');
+  plus.appendChild(svgIcon_(['M12 6v12', 'M6 12h12']));
   var f = add(w, 'input', '');
   f.setAttribute('type', 'text');
   f.setAttribute('aria-label', 'Add an item');
@@ -4787,7 +6409,7 @@ function groAddBox_(root) {
   f.setAttribute('autocomplete', 'off');
   f.setAttribute('data-focus', 'field');
   f.value = GRO_DRAFT;
-  var note = add(w, 'p', 'gro-note', GRO_NOTE);
+  var note = add(box, 'p', 'gro-note', GRO_NOTE);
   note.setAttribute('role', 'status');
   f.addEventListener('input', function () {
     GRO_DRAFT = f.value;
@@ -4803,7 +6425,24 @@ function groAddBox_(root) {
     GRO_DRAFT = '';
     groAdd_(v);
   });
-  return { box: box, field: f, note: note };
+  return { box: box, field: f, note: note, toasts: toasts, recent: recent };
+}
+
+// A1-T7: how much of the layout viewport the phone keyboard covers now, from the visual viewport (0: no keyboard).
+// Under 120 px is the browser's own bar moving, never a keyboard. Older browsers without it: always 0.
+var GRO_KB = 0;
+function groDockPlace_() {
+  var vv = window.visualViewport;
+  var ih = Number(window.innerHeight) || 0;
+  var cover = vv && ih > 0 ? Math.round(ih - (Number(vv.height) || 0) - (Number(vv.offsetTop) || 0)) : 0;
+  GRO_KB = cover > 120 ? cover : 0;
+  if (!GRO || !GRO.box) return;
+  GRO.box.style.bottom = GRO_KB ? GRO_KB + 'px' : ''; // right on the keyboard; '' is the CSS place above the bar
+  GRO.box.className = 'gro-dock' + (GRO_KB ? ' is-kb' : '');
+  // The dock's height, so the end of the list and the quick add toast clear it.
+  var h = Number(GRO.box.offsetHeight) || 0;
+  var rootStyle = document.documentElement && document.documentElement.style;
+  if (h > 0 && rootStyle && typeof rootStyle.setProperty === 'function') rootStyle.setProperty('--gro-dock-h', h + 'px');
 }
 
 function renderGroceries_(data, shopFilter) {
@@ -4814,32 +6453,35 @@ function renderGroceries_(data, shopFilter) {
   if (GRO && lists && !GRO.field) { root.textContent = ''; GRO = null; } // the lists arrived: build the field
   if (!GRO) {
     root.textContent = '';
-    GRO = { head: add(root, 'div', ''), box: null, field: null, note: null, rest: null };
-    if (lists) {
+    GRO = { head: add(root, 'div', ''), box: null, field: null, note: null, rest: null, toasts: null, recent: null };
+    GRO.rest = add(root, 'div', '');
+    if (lists) { // A1-T7: the dock comes after the list, where it shows (at the bottom)
       var a = groAddBox_(root);
       GRO.box = a.box;
       GRO.field = a.field;
       GRO.note = a.note;
+      GRO.toasts = a.toasts;
+      GRO.recent = a.recent;
     }
-    GRO.rest = add(root, 'div', '');
   }
   var title = listsPanel_(GRO.head, 'Groceries');
   var top = add(GRO.head, 'div', 'wrap');
   listsProblems_(top, lists);
-  if (!whoAmI_()) renderWhoCard_(top);
   var body = add(GRO.rest, 'div', 'wrap');
   var main = add(body, 'div', 'lists-main gro-main');
   if (!lists) listsWaiting_(main);
-  else groMain_(main, lists, shopFilter);
-  add(body, 'div', 'list-end');
-  listsDock_(GRO.rest);
+  else groMain_(main, lists, shopFilter, GRO.recent);
+  add(body, 'div', GRO.box ? 'list-end gro-end' : 'list-end');
+  listsDock_(GRO.toasts || GRO.rest);
+  groDockPlace_();
+  if (!GRO_FOCUS_EL && GRO_FOCUS === 'add' && ADD_SLOT) GRO_FOCUS_EL = ADD_SLOT; // A1-T5: back to the Add slot
   // The add field is never rebuilt, so it is never focused from here (that would raise the keyboard).
-  if (GRO_FOCUS_EL && !SHEET) GRO_FOCUS_EL.focus({ preventScroll: true });
+  if (GRO_FOCUS_EL && !modalOpen_()) GRO_FOCUS_EL.focus({ preventScroll: true });
   groTimerEnsure_();
   return title;
 }
 
-function groMain_(main, lists, shop) {
+function groMain_(main, lists, shop, recentSlot) {
   var open = Array.isArray(lists.groceries) ? lists.groceries : [];
   var known = groKnownShops_(lists);
   if (shop) shop = groShopCanon_(shop, known);
@@ -4857,7 +6499,7 @@ function groMain_(main, lists, shop) {
     }
   });
   if (recent.length) {
-    var r = add(main, 'div', 'gro-recent');
+    var r = add(recentSlot || main, 'div', 'gro-recent'); // A1-T7: in the dock, above the add field
     add(r, 'p', 'gro-label', 'Bought recently').setAttribute('id', 'gro-recent-label');
     var row = add(r, 'div', 'gro-chips');
     row.setAttribute('role', 'group');
@@ -4882,15 +6524,21 @@ function groMain_(main, lists, shop) {
     sb.setAttribute('aria-expanded', GRO_MENU ? 'true' : 'false');
     if (GRO_MENU) groMenu_(main, open, known, shop);
   }
-  if (!all.length) add(main, 'p', 'gro-empty', 'Nothing on the list.');
+  if (!all.length) emptyState_(main, 'All clear', 'Nothing on the list.'); // A1-T7: the calm empty state
+  // A1-T7: each run of rows is one white card: the list, or the shop's items, Any shop, the rest elsewhere.
+  var cardRows = function (items) {
+    if (!items.length) return;
+    var c = listCard_(main);
+    items.forEach(function (it) { groRow_(c, it, !!GRO_STRUCK[it.id]); });
+  };
   if (!shop) {
-    all.forEach(function (it) { groRow_(main, it, !!GRO_STRUCK[it.id]); });
+    cardRows(all);
   } else {
     var sp = groSplit_(all, shop);
-    sp.here.forEach(function (it) { groRow_(main, it, !!GRO_STRUCK[it.id]); });
+    cardRows(sp.here);
     if (sp.any.length) {
       add(main, 'h2', 'gro-head', 'Any shop');
-      sp.any.forEach(function (it) { groRow_(main, it, !!GRO_STRUCK[it.id]); });
+      cardRows(sp.any);
     }
     if (sp.elsewhere.length) {
       // M1: the count is of open items, as in the menu; struck ones stay shown, and the line stays without a 0.
@@ -4901,7 +6549,7 @@ function groMain_(main, lists, shop) {
         render(true);
       }), 'elsewhere');
       more.setAttribute('aria-expanded', GRO_ELSEWHERE ? 'true' : 'false');
-      if (GRO_ELSEWHERE) sp.elsewhere.forEach(function (it) { groRow_(main, it, !!GRO_STRUCK[it.id]); });
+      if (GRO_ELSEWHERE) cardRows(sp.elsewhere);
     }
   }
   var done = (Array.isArray(lists.doneToday) ? lists.doneToday : []).filter(function (it) {
@@ -4916,7 +6564,10 @@ function groMain_(main, lists, shop) {
       render(true);
     }), 'fold:done');
     fold.setAttribute('aria-expanded', GRO_DONE_OPEN ? 'true' : 'false');
-    if (GRO_DONE_OPEN) done.forEach(function (it) { groRow_(d, it, true); });
+    if (GRO_DONE_OPEN) {
+      var dc = listCard_(d);
+      done.forEach(function (it) { groRow_(dc, it, true); });
+    }
   }
 }
 
@@ -4946,6 +6597,11 @@ function groMenu_(main, open, known, shop) {
 // One row: the tick zone, then the text (2 lines at most). No shop name.
 function groRow_(parent, it, done) {
   var row = add(parent, 'div', 'gro-row' + (done ? ' is-done' : ''));
+  listsSwipe_(row, function () {
+    GRO_FOCUS = 'tick:' + it.id;
+    if (done) groUntick_(it);
+    else groTick_(it);
+  }, done ? null : function () { listsDelete_('grocery', it); });
   var tick = groKey_(btn(row, 'tick-zone', null, function () {
     GRO_FOCUS = 'tick:' + it.id;
     if (done) groUntick_(it);
@@ -5049,7 +6705,13 @@ $('groceries').addEventListener('focusin', function (e) {
   GRO_FOCUS = (t && t.getAttribute && t.getAttribute('data-focus')) || '';
 });
 if (typeof document.addEventListener === 'function') document.addEventListener('visibilitychange', groVisibility_);
+// A1-T7: the Groceries dock follows the phone keyboard (the visual viewport shrinks or scrolls while it is up).
+if (window.visualViewport && typeof window.visualViewport.addEventListener === 'function') {
+  window.visualViewport.addEventListener('resize', groDockPlace_);
+  window.visualViewport.addEventListener('scroll', groDockPlace_);
+}
 $('sheet').addEventListener('keydown', sheetKey_);
+$('who').addEventListener('keydown', whoKey_);
 $('sheet').addEventListener('focusin', function (e) { if (SHEET && e && e.target) SHEET.focusEl = e.target; });
 window.addEventListener('popstate', sheetPopState_);
 // R58: the page goes away (tab closed, put in the background cache) with the sheet open: save it.
