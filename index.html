@@ -690,7 +690,7 @@
     pointer-events: none;
   }
   .list-card > .todo-day + .todo-row::before, .list-card > .todo-note + .todo-row::before { display: none; }
-  .todo-fold-h + .list-card, .gro-more + .list-card { margin-top: 8px; }
+  .todo-fold-h + .list-card { margin-top: 8px; }
   #app:has(#groceries:not([hidden])) .qa-toast { bottom: calc(var(--bar-h) + 12px + env(safe-area-inset-bottom) + var(--gro-dock-h, 150px)); }
   /* A1-T7 end */
 
@@ -958,7 +958,7 @@
     display: block;
     width: 100%;
     min-height: 44px;
-    margin-bottom: 10px;
+    margin-top: 10px;
     padding: 8px 12px;
     font: inherit;
     font-size: 16px;
@@ -1046,38 +1046,6 @@
     background: var(--card);
     box-shadow: 0 0 0 1px rgba(58, 34, 19, 0.06), 0 1px 2px rgba(58, 34, 19, 0.08);
   }
-  .gro-tools { display: flex; justify-content: flex-end; padding-top: 4px; }
-  .gro-shop { min-height: 44px; padding: 0 16px; border-radius: 22px; font-size: 15px; font-weight: 600; color: var(--muted); background: #f6ece2; }
-  .gro-shop[aria-expanded="true"] { color: #9c4615; background: #fde3cc; box-shadow: inset 0 0 0 1.5px #dc966a; }
-  .gro-menu { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 6px; padding: 10px 0 6px; }
-  .gro-menu .schip { min-height: 44px; }
-  .gro-head { margin: 0; padding: 20px 4px 8px; font-size: 15px; font-weight: 700; color: var(--ink); }
-  .gro-more {
-    display: flex;
-    width: 100%;
-    justify-content: space-between;
-    align-items: center;
-    gap: 12px;
-    min-height: 48px;
-    margin-top: 12px;
-    padding: 0 14px;
-    border-radius: 14px;
-    font-size: 15px;
-    font-weight: 700;
-    color: var(--muted);
-    background: rgba(246, 236, 226, 0.7);
-  }
-  .gro-more::after {
-    content: "";
-    flex: none;
-    width: 8px;
-    height: 8px;
-    margin-right: 6px;
-    border-right: 2px solid var(--muted);
-    border-bottom: 2px solid var(--muted);
-    transform: rotate(45deg);
-  }
-  .gro-more[aria-expanded="true"]::after { transform: rotate(-135deg); }
   .gro-row { position: relative; display: flex; align-items: center; min-height: 56px; background: var(--card); }
   .gro-open {
     display: flex;
@@ -1101,6 +1069,52 @@
   }
   .is-done .gro-text { text-decoration: line-through; text-decoration-thickness: 1px; text-decoration-color: #d9b89c; color: var(--muted); }
   .gro-done { padding-top: 16px; }
+
+  /* A2-T3 groceries by shop: a section per shop, its header sticks while the section scrolls under it (opaque page
+     colour, a hairline below); a shop header is one 48 px button that opens In the shop. Any shop is a plain heading. */
+  .gro-sec + .gro-sec { margin-top: 14px; }
+  .gro-head {
+    position: sticky;
+    top: env(safe-area-inset-top, 0px);
+    z-index: 2;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-height: 48px;
+    margin: 0 -4px 4px;
+    padding: 0 4px;
+    background: var(--page);
+    box-shadow: 0 0.5px 0 rgba(58, 34, 19, 0.1);
+  }
+  .gro-sec-btn { display: flex; flex: 1; align-items: center; gap: 10px; min-width: 0; min-height: 48px; color: var(--ink); text-align: left; }
+  .gro-sec-av { flex: none; display: flex; align-items: center; justify-content: center; width: 28px; height: 28px; border-radius: 9px; color: #b4541d; background: #fde3cc; }
+  .gro-sec-av.any { color: #8a7a6d; background: #efe6dc; }
+  .gro-sec-av .icon { width: 16px; height: 16px; color: currentColor; }
+  .gro-sec-name { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 17px; font-weight: 700; letter-spacing: -0.01em; color: var(--ink); }
+  .gro-sec-n { flex: none; padding: 1px 8px; border-radius: 999px; font-size: 13px; font-weight: 700; line-height: 18px; color: #9c4615; background: #f6e7d9; }
+  .gro-sec-n.any { color: var(--muted); background: #efe6dc; }
+  .gro-sec-go { flex: none; margin-left: auto; padding-right: 4px; font-size: 13px; font-weight: 600; color: #9c4615; }
+  .gro-sec-go::after { content: ""; display: inline-block; width: 6px; height: 6px; margin-left: 6px; border-right: 2px solid currentColor; border-top: 2px solid currentColor; transform: translateY(-1px) rotate(45deg); }
+  /* In the shop: Back to all shops above the shop's name; All clear and a second Back below the rows. */
+  .gro-back-row { padding-top: 4px; }
+  /* A2 final: In the shop, the Any shop items follow under a small heading. */
+  .gro-here-any { margin: 16px 0 6px 4px; font-size: 13px; font-weight: 700; color: var(--muted); }
+  .gro-clear { display: flex; flex-direction: column; align-items: center; padding-bottom: 8px; }
+  .gro-clear .empty { padding-top: 28px; }
+  .gro-back-all { min-width: 200px; margin-top: 12px; }
+  /* The item sheet's small New shop: a quiet outlined chip; its field shows only once tapped. */
+  .sheet-newshop {
+    min-height: 44px;
+    padding: 0 14px;
+    border-radius: 22px;
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--muted);
+    background: transparent;
+    box-shadow: inset 0 0 0 1.5px #dccbbb;
+  }
+  .sheet-newshop[aria-expanded="true"] { color: #9c4615; box-shadow: inset 0 0 0 2px #b4541d; }
+  /* A2-T3 end */
 
   /* A1-T5 quick add */
   .qa-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 12px; }
@@ -3512,6 +3526,7 @@ function renderTabs_() {
     var isAdd = t[0] === 'add';
     var b = btn(bar, isAdd ? 'tab tab-add' : 'tab', null, function () {
       if (isAdd) openQuickAdd_(segment);
+      else if (t[0] === 'groceries' && VIEW.screen === 'groceries' && !SHEET && groHere_()) groLeaveHere_(groHere_()); // A2-T3 fix 1
       else go(t[0] === 'money' ? { screen: 'home', key: null } : { screen: t[0], key: null });
     });
     if (t[0] === cur) b.setAttribute('aria-current', 'page');
@@ -3524,6 +3539,12 @@ function renderTabs_() {
 // A1-T5: the quick add. To-do and Grocery are the item sheet for a new item (the existing add, unchanged) with the
 // segments on top; Expense is its own sheet. Closing either gives focus back to the Add slot.
 function openQuickAdd_(segment) {
+  // A2-T3: on Groceries, Add is the docked field: the cursor goes there (the keyboard comes up), no sheet.
+  if (segment === 'grocery' && VIEW.screen === 'groceries' && GRO && GRO.field && !SHEET) {
+    whoShut_();
+    GRO.field.focus();
+    return;
+  }
   if (segment === 'todo' || segment === 'grocery') {
     if (segment === 'todo') TODO_FOCUS = 'add';
     else GRO_FOCUS = 'add';
@@ -3617,12 +3638,37 @@ function listsApplyOp_(lists, op) {
     if (i < 0) {
       arr.push({
         id: op.id, list: op.list, text: f.text || '', who: isTodo ? (f.who || 'Either') : '', due: isTodo ? (f.due || '') : '',
-        time: isTodo ? (f.time || '') : '', shop: isTodo ? '' : (f.shop || ''), added: lists.today || '', ageDays: 0,
+        time: isTodo ? (f.time || '') : '', shop: isTodo ? '' : (f.shop || ''), shopFrom: (!isTodo && f.shop) ? 'hand' : '',
+        added: lists.today || '', ageDays: 0,
         kind: '', minutes: '', firstStep: '', fp: ''
       });
     }
   } else if (op.op === 'edit') {
     if (i >= 0) {
+      // A2-T3: a shop set in the sheet is a hand shop. A rename drops a learned or guessed shop: it was for the old
+      // text (the screen places the new text from shopMap, as the server will).
+      var had = arr[i];
+      var fold = function (v) {
+        var t = String(v === undefined || v === null ? '' : v);
+        if (typeof t.normalize === 'function') t = t.normalize('NFD');
+        return t.replace(/[\u0300-\u036f]/g, '').replace(/[\u2018\u2019]/g, '\u0027').toLowerCase().replace(/\s+/g, ' ').trim();
+      };
+      if (!isTodo && Object.prototype.hasOwnProperty.call(f, 'shop')) {
+        // A2 final: No shop on a hand-shop item drops shopMap's entry for that very item when it names the shop
+        // being cleared (it came from this row), so the placement does not put it straight back; the next read
+        // brings the server's own map.
+        var map = lists.shopMap;
+        var mk = fold(had.text);
+        if (!f.shop && had.shopFrom === 'hand' && fold(had.shop) !== '' && map && typeof map === 'object' &&
+          Object.prototype.hasOwnProperty.call(map, mk) && typeof map[mk] === 'string' && fold(map[mk]) === fold(had.shop)) {
+          delete map[mk];
+        }
+        had.shopFrom = f.shop ? 'hand' : '';
+      } else if (!isTodo && Object.prototype.hasOwnProperty.call(f, 'text') && (had.shopFrom === 'learned' || had.shopFrom === 'guess') &&
+        fold(f.text) !== fold(had.text)) {
+        had.shop = '';
+        had.shopFrom = '';
+      }
       for (var k in f) if (Object.prototype.hasOwnProperty.call(f, k)) arr[i][k] = f[k];
     }
   } else if (op.op === 'tick' || op.op === 'delete') {
@@ -3686,6 +3732,7 @@ var WAITING_READ = false; // the head waits for a read: a failed read then retri
 function listsShape_(r) {
   if (!r || typeof r !== 'object' || !Array.isArray(r.todo) || !Array.isArray(r.groceries)) return null;
   ['doneToday', 'boughtRecently', 'shops', 'problems'].forEach(function (k) { if (!Array.isArray(r[k])) r[k] = []; });
+  if (!r.shopMap || typeof r.shopMap !== 'object' || Array.isArray(r.shopMap)) r.shopMap = {}; // A2-T3: folded item -> shop
   if (!r.prefs || typeof r.prefs !== 'object') r.prefs = { Kev: { pausedUntil: '' }, Lili: { pausedUntil: '' } };
   return r;
 }
@@ -3694,6 +3741,7 @@ function listsRebuild_() {
   if (!LISTS_BASE) { LISTS = null; return; }
   var view = JSON.parse(JSON.stringify(LISTS_BASE));
   QUEUE.forEach(function (op) { listsApplyOp_(view, op); });
+  groPlace_(view); // A2-T3: an item with no shop yet (added here, renamed) is placed from shopMap
   LISTS = view;
 }
 
@@ -3950,6 +3998,8 @@ function listsBody_(op) {
   }
   if (op.op === 'edit' || op.op === 'tick' || op.op === 'delete') b.fp = op.fp;
   if (op.op === 'add' || op.op === 'edit' || op.op === 'pause') b.fields = op.fields || {};
+  // A2-T3: a grocery tick says the shop the item was shown under, so the Done row learns it (older servers ignore it).
+  if (op.op === 'tick' && op.fields && typeof op.fields.shop === 'string' && op.fields.shop) b.fields = { shop: op.fields.shop };
   return b;
 }
 
@@ -4131,8 +4181,22 @@ function listsUpsert_(base, list, item, oldId) {
   var i = -1;
   for (var j = 0; j < arr.length && i < 0; j++) if (arr[j].id === oldId) i = j;
   for (var k = 0; k < arr.length && i < 0; k++) if (arr[k].id === item.id) i = k;
+  if (i >= 0 && list === 'grocery') item = groKeepShop_(arr[i], item);
   if (i >= 0) arr[i] = item;
   else arr.push(item);
+}
+
+// A2-T3: a write reply carries only the hand shop. When it has none, the learned or guessed shop the item had stays,
+// as long as the text is the same item (a rename has dropped it already), so a row never jumps to Any shop.
+function groKeepShop_(had, item) {
+  if (!had || !item || sheetOneLine_(item.shop) || !sheetOneLine_(had.shop)) return item;
+  if (had.shopFrom !== 'learned' && had.shopFrom !== 'guess') return item;
+  if (foldKey_(had.text) !== foldKey_(item.text)) return item;
+  var out = {};
+  for (var k in item) if (Object.prototype.hasOwnProperty.call(item, k)) out[k] = item[k];
+  out.shop = had.shop;
+  out.shopFrom = had.shopFrom;
+  return out;
 }
 
 function listsRemove_(base, list, id) {
@@ -5316,6 +5380,7 @@ function sheetBuild_(s) {
   ta.setAttribute('maxlength', '500');
   ta.setAttribute('rows', '1');
   ta.setAttribute('enterkeyhint', 'done');
+  if (s.list === 'grocery' && !s.orig) ta.setAttribute('placeholder', 'Add an item');
   ta.value = s.draft.text;
   ta.addEventListener('input', function () {
     if (SHEET !== s) return;
@@ -5331,7 +5396,7 @@ function sheetBuild_(s) {
   });
   s.els.text = ta;
   if (s.list === 'todo') sheetTodoFields_(p, s);
-  else {
+  else if (s.orig) { // A2-T3: a new grocery item has no shop to pick; it is placed by itself
     s.els.shop = add(p, 'div', 'sheet-shop');
     if (typeof sheetShop_ === 'function') sheetShop_(s.els.shop, s); // Task 8
   }
@@ -6161,10 +6226,11 @@ function moneyRepaint_() {
   if (APP_ON && DATA && tabOf_(VIEW.screen) === 'money') render(true);
 }
 
-// ---- Groceries screen (Task 8) -----------------------------------------------------------------
-// A plain list: no shop names unless a shop is picked. The pinned "Add an item" field is built once per visit
-// and kept through every repaint (only the parts above and below it are rebuilt), so a reply or the 60 s
-// refresh never takes the phone keyboard away while someone types the next item.
+// ---- Groceries screen (Task 8; A2-T3 by shop) -------------------------------------------------------------------
+// A2-T3: one section per shop that has items, in the known shops order, Any shop last, each under a sticky header with
+// the shop name and its count. A shop header opens "In the shop": that shop alone, until Back, leaving the tab or
+// 3 hours. The pinned "Add an item" field is built once per visit and kept through every repaint (only the parts
+// above and below it are rebuilt), so a reply or the 60 s refresh never takes the phone keyboard away.
 
 // The compare key for item and shop names: lowercase, accents removed, the typographic apostrophe as a
 // plain one, ends trimmed, inner spaces collapsed ("Pépito " is "pepito").
@@ -6192,25 +6258,70 @@ function groKnownShops_(lists) {
   return out;
 }
 
-// How many open items each shop has, in the order of shops.
-function groShopCounts_(items, shops) {
-  return shops.map(function (shop) {
-    var k = foldKey_(shop);
-    return { shop: shop, n: items.filter(function (it) { return !!k && foldKey_(it.shop) === k; }).length };
+// A2-T3: the sections, as [{shop, items}]: one per shop that has items, in the order of shops (a shop missing from
+// it comes after, in the order first seen), then {shop: ''} for Any shop. Item order is kept in each section.
+function groSections_(items, shops) {
+  var order = [];                 // the sections in screen order (known shops first, then new ones as first seen)
+  var byKey = Object.create(null); // folded shop -> its section (no prototype: any shop name is a plain key)
+  var any = { shop: '', items: [] };
+  var take = function (k, name) {
+    if (!byKey[k]) {
+      byKey[k] = { shop: name, items: [] };
+      order.push(byKey[k]);
+    }
+    return byKey[k];
+  };
+  shops.forEach(function (name) {
+    var k = foldKey_(name);
+    if (k) take(k, String(name));
   });
+  items.forEach(function (it) {
+    var k = foldKey_(it.shop);
+    if (!k) any.items.push(it);
+    else take(k, sheetOneLine_(it.shop).slice(0, 40)).items.push(it);
+  });
+  var out = order.filter(function (sec) { return sec.items.length; });
+  if (any.items.length) out.push(any);
+  return out;
 }
 
-// The filtered view: that shop's items, then items with no shop, then the rest. Order is kept in each part.
-function groSplit_(items, shop) {
-  var k = foldKey_(shop);
-  var out = { here: [], any: [], elsewhere: [] };
-  items.forEach(function (it) {
-    var s = foldKey_(it.shop);
-    if (!s) out.any.push(it);
-    else if (s === k) out.here.push(it);
-    else out.elsewhere.push(it);
+// A2 final: the known shops in the order this visit first showed them, so a tick (its Done row makes that shop the
+// newest) never reorders the sections; a shop not seen yet on this visit comes after the others. The spelling is the
+// current one. GRO_SEC is cleared on leaving the tab.
+function groSecOrder_(shops) {
+  var name = Object.create(null);
+  shops.forEach(function (n) {
+    var k = foldKey_(n);
+    if (k && !(k in name)) name[k] = n;
   });
-  return out;
+  var had = Object.create(null);
+  GRO_SEC.forEach(function (k) { had[k] = true; });
+  shops.forEach(function (n) {
+    var k = foldKey_(n);
+    if (k && !had[k]) {
+      had[k] = true;
+      GRO_SEC.push(k);
+    }
+  });
+  return GRO_SEC.filter(function (k) { return k in name; }).map(function (k) { return name[k]; });
+}
+
+// A2-T3: an open grocery item with no shop is placed from shopMap (its folded text), as the server would place it
+// once a Done row has taught it. Used on the lists the screens show, so an add made here, offline too, sits under
+// its shop at once.
+function groPlace_(lists) {
+  var map = lists && lists.shopMap;
+  if (!map || typeof map !== 'object' || !Array.isArray(lists.groceries)) return lists;
+  lists.groceries.forEach(function (it) {
+    if (!it || sheetOneLine_(it.shop)) return;
+    var k = foldKey_(it.text);
+    var v = Object.prototype.hasOwnProperty.call(map, k) ? map[k] : '';
+    var shop = typeof v === 'string' ? sheetOneLine_(v).slice(0, 40) : '';
+    if (!shop) return;
+    it.shop = shop;
+    it.shopFrom = 'learned';
+  });
+  return lists;
 }
 
 // The shop in a stored kl.shop value ({shop, at}), or '' when there is none, it is malformed, or it was set
@@ -6236,31 +6347,30 @@ function groShopCanon_(v, shops) {
   return t;
 }
 
-var LS_SHOP = 'kl.shop';  // the shop filter, as {shop, at}; ignored 3 hours after it was set
-var GRO_SHOP_RAW = null;  // memory copy of kl.shop, so the filter holds for this visit even without storage
+var LS_SHOP = 'kl.shop';  // A2-T3: "In the shop", as {shop, at}; ends 3 hours after it began
+var GRO_SHOP_RAW = null;  // memory copy of kl.shop, so the mode holds for this visit even without storage
 var GRO = null;           // the screen's kept parts on show now: {head, box, field, note, rest}
 var GRO_DRAFT = '';       // what is typed in the add field, kept in memory across visits (never stored)
 var GRO_NOTE = '';        // the line under the add field ("Already on the list")
 var GRO_STRUCK = {};      // id -> {item}: ticked here, struck in place until the screen is left
 var GRO_POS = {};         // id -> place on this visit, so an item ticked and unticked comes back in its place
 var GRO_SEQ = 0;
-var GRO_MENU = false;     // the Shop menu is open
-var GRO_ELSEWHERE = false; // the "N more elsewhere" items are shown
+var GRO_SEC = [];         // A2 final: folded shop names in section order on this visit (new ones append at the end)
 var GRO_DONE_OPEN = false; // the collapsed Bought today section is open
 var GRO_FOCUS = '';       // the keyed control that had focus, given back after a repaint
 var GRO_FOCUS_EL = null;
 var GRO_TIMER = null;     // the 60 s refresh while Groceries is on show and the page is visible
 
-// Leaving Groceries: struck items go to Bought today, the menu and folds close, the refresh stops.
+// Leaving Groceries: struck items go to Bought today, the fold closes, "In the shop" ends, the refresh stops.
 function groLeave_() {
   GRO_STRUCK = {};
   GRO_POS = {};
   GRO_SEQ = 0;
-  GRO_MENU = false;
-  GRO_ELSEWHERE = false;
+  GRO_SEC = [];
   GRO_DONE_OPEN = false;
   GRO_FOCUS = '';
   GRO_NOTE = '';
+  groSetHere_('');
   groTimerStop_();
 }
 
@@ -6283,26 +6393,43 @@ function groKey_(e, key) {
   return e;
 }
 
-function groShop_() {
+// A2-T3: the shop "In the shop" shows, or '' for all shops. Forgotten once it is 3 hours old.
+function groHere_() {
   if (GRO_SHOP_RAW === null) GRO_SHOP_RAW = lsGet_(LS_SHOP) || '';
   var shop = groShopFrom_(GRO_SHOP_RAW, Date.now());
   if (!shop && GRO_SHOP_RAW) {
     GRO_SHOP_RAW = '';
-    GRO_ELSEWHERE = false;
     lsDel_(LS_SHOP);
   }
   return shop;
 }
 
-function groSetShop_(shop) {
-  GRO_ELSEWHERE = false;
+function groSetHere_(shop) {
   if (shop) {
     GRO_SHOP_RAW = JSON.stringify({ shop: shop, at: Date.now() });
     lsSet_(LS_SHOP, GRO_SHOP_RAW);
   } else {
+    if (GRO_SHOP_RAW === null) GRO_SHOP_RAW = lsGet_(LS_SHOP) || '';
+    if (GRO_SHOP_RAW) lsDel_(LS_SHOP); // only when one was set: leaving the tab touches no storage otherwise
     GRO_SHOP_RAW = '';
-    lsDel_(LS_SHOP);
   }
+}
+
+// Into "In the shop" (a header tap) and back out (Back): the top of the screen, focus on Back or on that header.
+function groEnterHere_(shop) {
+  groSetHere_(shop);
+  GRO_FOCUS = 'back';
+  render(true);
+  window.scrollTo(0, 0);
+}
+
+function groLeaveHere_(shop) {
+  groSetHere_('');
+  GRO_FOCUS = 'sec:' + foldKey_(shop);
+  render(true); // fix 1: the repaint focuses that header (without scrolling); then it is brought into view
+  var head = GRO_FOCUS_EL;
+  if (head && typeof head.scrollIntoView === 'function') head.scrollIntoView({ block: 'center' });
+  else window.scrollTo(0, 0);
 }
 
 function groSay_(t) {
@@ -6310,7 +6437,7 @@ function groSay_(t) {
   if (GRO && GRO.note) GRO.note.textContent = t;
 }
 
-// One add, unless that text (without case or accents) is already on the list.
+// One add, unless that text (without case or accents) is already on the list. No shop: it is placed by itself.
 function groAdd_(raw) {
   var text = sheetOneLine_(raw).slice(0, 500).trim();
   if (!text) return false;
@@ -6321,13 +6448,22 @@ function groAdd_(raw) {
     return false;
   }
   groSay_('');
-  listsQueue_({ op: 'add', list: 'grocery', fields: { text: text } });
+  var op = listsQueue_({ op: 'add', list: 'grocery', fields: { text: text } });
+  // A2-T3: in the shop, an item that lands under another shop is out of sight; the line says where it went.
+  // A2 final: one under Any shop shows here too, so it needs no line.
+  var here = groHere_();
+  var it = op && listsItem_('grocery', op.id);
+  if (here && it && foldKey_(it.shop) && foldKey_(it.shop) !== foldKey_(here)) groSay_('Added under ' + sheetOneLine_(it.shop));
   return true;
 }
 
+// A2-T3: the tick says the shop the item is shown under (hand, learned or guess), so the Done row learns it.
 function groTick_(it) {
   GRO_STRUCK[it.id] = { item: todoCopy_(it) };
-  listsQueue_({ op: 'tick', list: 'grocery', id: it.id });
+  var shop = sheetOneLine_(it.shop).slice(0, 40);
+  var op = { op: 'tick', list: 'grocery', id: it.id };
+  if (shop) op.fields = { shop: shop };
+  listsQueue_(op);
 }
 
 function groUntick_(it) {
@@ -6390,7 +6526,7 @@ function groVisibility_() {
 // A1-T7: the dock above the tab bar, near the thumb: the lists' lines (Undo, Not saved yet), the Bought recently
 // chips, then the add field and its line. It is built once per visit like the field, so a repaint never takes the
 // focus or the keyboard away; only the toasts and chips slots are refilled. With the keyboard up it rides on top
-// of the keyboard (groDockPlace_).
+// of the keyboard (groDockPlace_). A2-T3: the tab bar Add on Groceries puts the cursor here.
 function groAddBox_(root) {
   var box = add(root, 'div', 'gro-dock');
   var toasts = add(box, 'div', 'gro-dock-slot');
@@ -6445,10 +6581,11 @@ function groDockPlace_() {
   if (h > 0 && rootStyle && typeof rootStyle.setProperty === 'function') rootStyle.setProperty('--gro-dock-h', h + 'px');
 }
 
-function renderGroceries_(data, shopFilter) {
+function renderGroceries_(data) {
   var root = $('groceries');
   var lists = data === undefined ? LISTS : data;
-  if (shopFilter === undefined) shopFilter = groShop_();
+  var here = lists ? groHere_() : '';
+  if (here) here = groShopCanon_(here, groKnownShops_(lists));
   GRO_FOCUS_EL = null;
   if (GRO && lists && !GRO.field) { root.textContent = ''; GRO = null; } // the lists arrived: build the field
   if (!GRO) {
@@ -6464,13 +6601,18 @@ function renderGroceries_(data, shopFilter) {
       GRO.recent = a.recent;
     }
   }
-  var title = listsPanel_(GRO.head, 'Groceries');
+  if (here) { // A2-T3: In the shop: Back to all shops above the shop's name
+    var bw = add(GRO.head, 'div', 'wrap gro-back-row');
+    groKey_(btn(bw, 'back', 'Back to all shops', function () { groLeaveHere_(here); }), 'back');
+  }
+  var title = here ? listsPanel_(GRO.head, here, 'In the shop') : listsPanel_(GRO.head, 'Groceries');
   var top = add(GRO.head, 'div', 'wrap');
   listsProblems_(top, lists);
   var body = add(GRO.rest, 'div', 'wrap');
   var main = add(body, 'div', 'lists-main gro-main');
   if (!lists) listsWaiting_(main);
-  else groMain_(main, lists, shopFilter, GRO.recent);
+  else if (here) groHereMain_(main, lists, here, GRO.recent);
+  else groMain_(main, lists, GRO.recent);
   add(body, 'div', GRO.box ? 'list-end gro-end' : 'list-end');
   listsDock_(GRO.toasts || GRO.rest);
   groDockPlace_();
@@ -6481,13 +6623,8 @@ function renderGroceries_(data, shopFilter) {
   return title;
 }
 
-function groMain_(main, lists, shop, recentSlot) {
-  var open = Array.isArray(lists.groceries) ? lists.groceries : [];
-  var known = groKnownShops_(lists);
-  if (shop) shop = groShopCanon_(shop, known);
-  // Open items plus the ones struck in place on this visit: what decides the layout, so a tick moves nothing.
-  var all = groItems_(lists);
-  // Bought recently: one tap adds; what is on the list, or was ticked on this visit (M2), gets no chip.
+// Bought recently: one tap adds; what is on the list, or was ticked on this visit (M2), gets no chip.
+function groRecent_(slot, lists, all) {
   var onList = {};
   all.forEach(function (it) { onList[foldKey_(it.text)] = true; });
   var recent = [];
@@ -6498,59 +6635,68 @@ function groMain_(main, lists, shop, recentSlot) {
       recent.push(v);
     }
   });
-  if (recent.length) {
-    var r = add(recentSlot || main, 'div', 'gro-recent'); // A1-T7: in the dock, above the add field
-    add(r, 'p', 'gro-label', 'Bought recently').setAttribute('id', 'gro-recent-label');
-    var row = add(r, 'div', 'gro-chips');
-    row.setAttribute('role', 'group');
-    row.setAttribute('aria-labelledby', 'gro-recent-label');
-    recent.forEach(function (t, i) {
-      groKey_(btn(row, 'gchip', t, function () {
-        var next = recent[i + 1] || recent[i - 1];
-        GRO_FOCUS = next ? 'recent:' + foldKey_(next) : '';
-        groAdd_(t);
-      }), 'recent:' + foldKey_(t));
-    });
+  if (!recent.length || !slot) return;
+  var r = add(slot, 'div', 'gro-recent'); // A1-T7: in the dock, above the add field
+  add(r, 'p', 'gro-label', 'Bought recently').setAttribute('id', 'gro-recent-label');
+  var row = add(r, 'div', 'gro-chips');
+  row.setAttribute('role', 'group');
+  row.setAttribute('aria-labelledby', 'gro-recent-label');
+  recent.forEach(function (t, i) {
+    groKey_(btn(row, 'gchip', t, function () {
+      var next = recent[i + 1] || recent[i - 1];
+      GRO_FOCUS = next ? 'recent:' + foldKey_(next) : '';
+      groAdd_(t);
+    }), 'recent:' + foldKey_(t));
+  });
+}
+
+// A1-T7: a run of rows is one white card.
+function groCardRows_(main, items) {
+  if (!items.length) return null;
+  var c = listCard_(main);
+  items.forEach(function (it) { groRow_(c, it, !!GRO_STRUCK[it.id]); });
+  return c;
+}
+
+var GRO_STORE_PATHS = ['M4 10h16', 'M5.5 10l1.2-5h10.6l1.2 5', 'M6 10v9h12v-9', 'M10 19v-5h4v5'];
+
+// A2-T3: a section header: an icon, the shop name and the count of its open items (struck ones do not count; no 0).
+// A shop's header is one button that opens In the shop; Any shop's is a plain heading. It sticks while its section
+// scrolls under it.
+function groHead_(sec, shop, n) {
+  var h = add(sec, 'h2', 'gro-head');
+  var box = h;
+  if (shop) {
+    box = groKey_(btn(h, 'gro-sec-btn', null, function () { groEnterHere_(shop); }), 'sec:' + foldKey_(shop));
+    box.setAttribute('aria-label', shop + ', ' + n + (n === 1 ? ' item' : ' items') + '. Shop here');
   }
-  // The Shop filter, only once some item on screen has a shop (or a filter is on). I1: struck items count, so
-  // ticking the last item with a shop does not remove the button and move every row under the finger.
-  if (shop || all.some(function (it) { return !!foldKey_(it.shop); })) {
-    var tools = add(main, 'div', 'gro-tools');
-    var sb = groKey_(btn(tools, 'gro-shop', 'Shop: ' + (shop || 'all'), function () {
-      GRO_FOCUS = 'shop';
-      GRO_MENU = !GRO_MENU;
-      render(true);
-    }), 'shop');
-    sb.setAttribute('aria-expanded', GRO_MENU ? 'true' : 'false');
-    if (GRO_MENU) groMenu_(main, open, known, shop);
+  var av = add(box, 'span', shop ? 'gro-sec-av' : 'gro-sec-av any');
+  av.setAttribute('aria-hidden', 'true');
+  av.appendChild(svgIcon_(shop ? GRO_STORE_PATHS : tabIconPaths_('groceries')));
+  add(box, 'span', 'gro-sec-name', shop || 'Any shop');
+  var count = add(box, 'span', shop ? 'gro-sec-n' : 'gro-sec-n any', n ? String(n) : '');
+  count.hidden = !n;
+  if (shop) {
+    var go = add(box, 'span', 'gro-sec-go', 'Shop here');
+    go.setAttribute('aria-hidden', 'true');
   }
+}
+
+function groMain_(main, lists, recentSlot) {
+  // Open items plus the ones struck in place on this visit: what decides the layout, so a tick moves nothing.
+  var all = groItems_(lists);
+  groRecent_(recentSlot, lists, all);
   if (!all.length) emptyState_(main, 'All clear', 'Nothing on the list.'); // A1-T7: the calm empty state
-  // A1-T7: each run of rows is one white card: the list, or the shop's items, Any shop, the rest elsewhere.
-  var cardRows = function (items) {
-    if (!items.length) return;
-    var c = listCard_(main);
-    items.forEach(function (it) { groRow_(c, it, !!GRO_STRUCK[it.id]); });
-  };
-  if (!shop) {
-    cardRows(all);
+  var shops = groSecOrder_(groKnownShops_({ shops: lists.shops, groceries: all }));
+  var secs = groSections_(all, shops);
+  if (secs.length === 1 && !secs[0].shop) {
+    groCardRows_(main, all); // no shop at all: one plain card, no lone Any shop header
   } else {
-    var sp = groSplit_(all, shop);
-    cardRows(sp.here);
-    if (sp.any.length) {
-      add(main, 'h2', 'gro-head', 'Any shop');
-      cardRows(sp.any);
-    }
-    if (sp.elsewhere.length) {
-      // M1: the count is of open items, as in the menu; struck ones stay shown, and the line stays without a 0.
-      var n = sp.elsewhere.filter(function (it) { return !GRO_STRUCK[it.id]; }).length;
-      var more = groKey_(btn(main, 'gro-more', n ? n + ' more elsewhere' : 'More elsewhere', function () {
-        GRO_FOCUS = 'elsewhere';
-        GRO_ELSEWHERE = !GRO_ELSEWHERE;
-        render(true);
-      }), 'elsewhere');
-      more.setAttribute('aria-expanded', GRO_ELSEWHERE ? 'true' : 'false');
-      if (GRO_ELSEWHERE) cardRows(sp.elsewhere);
-    }
+    secs.forEach(function (sec) {
+      var box = add(main, 'div', 'gro-sec');
+      groHead_(box, sec.shop, sec.items.filter(function (it) { return !GRO_STRUCK[it.id]; }).length);
+      groCardRows_(box, sec.items);
+    });
   }
   var done = (Array.isArray(lists.doneToday) ? lists.doneToday : []).filter(function (it) {
     return it && it.list === 'grocery' && !GRO_STRUCK[it.id];
@@ -6571,30 +6717,28 @@ function groMain_(main, lists, shop, recentSlot) {
   }
 }
 
-// The Shop menu: All, then each shop with open items and how many (R60), plus the current filter.
-function groMenu_(main, open, known, shop) {
-  var menu = add(main, 'div', 'gro-menu');
-  menu.setAttribute('role', 'group');
-  menu.setAttribute('aria-label', 'Shop');
-  var cur = foldKey_(shop);
-  if (cur && !known.some(function (k) { return foldKey_(k) === cur; })) known = known.concat([shop]);
-  var pick = function (name) {
-    GRO_MENU = false;
-    GRO_FOCUS = 'shop';
-    groSetShop_(name);
-    render(true);
-  };
-  var all = groKey_(btn(menu, 'schip', 'All', function () { pick(''); }), 'shopopt:');
-  all.setAttribute('aria-pressed', cur ? 'false' : 'true');
-  groShopCounts_(open, known).forEach(function (c) {
-    var k = foldKey_(c.shop);
-    if (!c.n && k !== cur) return; // R60: only shops with open items, plus the current filter
-    var b = groKey_(btn(menu, 'schip', c.n ? c.shop + ' · ' + c.n : c.shop, function () { pick(c.shop); }), 'shopopt:' + k);
-    b.setAttribute('aria-pressed', k === cur ? 'true' : 'false');
-  });
+// A2-T3: In the shop: that shop's items, in one card; A2 final: then the Any shop items (they can be bought anywhere)
+// under a small Any shop heading, in a second card. Once none of either is left open: a calm All clear with Back,
+// below the struck rows, so nothing moves under the finger and a mistaken tick can still be undone.
+function groHereMain_(main, lists, here, recentSlot) {
+  var all = groItems_(lists);
+  groRecent_(recentSlot, lists, all);
+  var k = foldKey_(here);
+  var mine = all.filter(function (it) { return foldKey_(it.shop) === k; });
+  var any = all.filter(function (it) { return !foldKey_(it.shop); });
+  groCardRows_(main, mine);
+  if (any.length) {
+    var anyBox = add(main, 'div', 'gro-here-any-sec');
+    add(anyBox, 'h2', 'gro-here-any', 'Any shop');
+    groCardRows_(anyBox, any);
+  }
+  if (mine.concat(any).some(function (it) { return !GRO_STRUCK[it.id]; })) return;
+  var box = add(main, 'div', 'gro-clear');
+  emptyState_(box, 'All clear', 'Nothing left to buy here.');
+  groKey_(btn(box, 'btn-plain gro-back-all', 'Back to all shops', function () { groLeaveHere_(here); }), 'back2');
 }
 
-// One row: the tick zone, then the text (2 lines at most). No shop name.
+// One row: the tick zone, then the text (2 lines at most). The section says the shop; the row never does.
 function groRow_(parent, it, done) {
   var row = add(parent, 'div', 'gro-row' + (done ? ' is-done' : ''));
   listsSwipe_(row, function () {
@@ -6617,24 +6761,57 @@ function groRow_(parent, it, done) {
   add(main, 'span', 'gro-text', it.text);
 }
 
-// The edit sheet's Shop field (called by sheetBuild_): a text field, then No shop and a chip for each of the
-// 12 newest shops the server knows.
-// Matching ignores case and accents; a typed known shop is saved with its known spelling; the same shop
-// typed differently is no change.
+// The edit sheet's Shop part (called by sheetBuild_, for an item on the list): a chip for each of the 12 newest
+// shops the server knows (plus the item's own shop when it is not among them), No shop, then a small New shop that
+// shows a text field only when tapped. The shop the item is shown under is pressed; picking another sends it as
+// the item's own (hand) shop. Matching ignores case and accents; a typed known shop is saved with its known
+// spelling; the same shop typed differently is no change.
 function sheetShop_(slot, s) {
   if (!s.sync) s.sync = [];
   var shops = groKnownShops_({ shops: LISTS && LISTS.shops }).slice(0, 12); // R60: the 12 newest from the server list
+  var own = sheetOneLine_(s.draft.shop).slice(0, 40);
+  if (own && !shops.some(function (n) { return foldKey_(n) === foldKey_(own); })) shops.push(own);
+  s.newShop = false;
   add(slot, 'p', 'sheet-label', 'Shop').setAttribute('id', 'sheet-shop-label');
-  var input = sheetCtl_(s, add(slot, 'input', 'sheet-shop-input'));
+  var g = add(slot, 'div', 'sheet-chips');
+  g.setAttribute('role', 'group');
+  g.setAttribute('aria-labelledby', 'sheet-shop-label');
+  var input = null;
+  var chip = function (label, value) {
+    var b = sheetCtl_(s, btn(g, 'schip', label, function () {
+      if (SHEET !== s) return;
+      s.draft.shop = value;
+      s.newShop = false;
+      input.value = '';
+      sheetSync_(s);
+    }));
+    s.sync.push(function () {
+      var k = foldKey_(s.draft.shop);
+      b.setAttribute('aria-pressed', (value ? k === foldKey_(value) : !k) ? 'true' : 'false');
+    });
+  };
+  shops.forEach(function (n) { chip(n, n); });
+  // Fix 1 (ruling): a learned or guessed shop cannot be cleared by hand (the next read would place it again), so
+  // such an item offers no No shop; picking another shop makes it a hand shop.
+  var placed = s.orig && (s.orig.shopFrom === 'learned' || s.orig.shopFrom === 'guess') && !!own;
+  if (!placed) chip('No shop', '');
+  var more = sheetCtl_(s, btn(g, 'sheet-newshop', 'New shop', function () {
+    if (SHEET !== s) return;
+    if (!s.newShop) s.shopKeep = s.draft.shop; // fix 1: an emptied field gives this back
+    s.newShop = true;
+    sheetSync_(s);
+    input.focus();
+  }));
+  input = sheetCtl_(s, add(slot, 'input', 'sheet-shop-input'), function () { return s.newShop; });
   input.setAttribute('type', 'text');
-  input.setAttribute('aria-labelledby', 'sheet-shop-label');
+  input.setAttribute('aria-label', 'New shop');
+  input.setAttribute('placeholder', 'Shop name');
   input.setAttribute('maxlength', '40');
   input.setAttribute('autocomplete', 'off');
   input.setAttribute('enterkeyhint', 'done');
-  input.value = s.draft.shop;
   input.addEventListener('input', function () {
     if (SHEET !== s) return;
-    s.draft.shop = input.value;
+    s.draft.shop = sheetOneLine_(input.value) ? input.value : (s.shopKeep || ''); // fix 1: empty never clears; No shop does
     sheetSync_(s);
   });
   input.addEventListener('keydown', function (e) {
@@ -6643,23 +6820,10 @@ function sheetShop_(slot, s) {
       closeItemSheet_('close');
     }
   });
-  var g = add(slot, 'div', 'sheet-chips');
-  g.setAttribute('role', 'group');
-  g.setAttribute('aria-labelledby', 'sheet-shop-label');
-  var chip = function (label, value) {
-    var b = sheetCtl_(s, btn(g, 'schip', label, function () {
-      if (SHEET !== s) return;
-      s.draft.shop = value;
-      input.value = value;
-      sheetSync_(s);
-    }));
-    s.sync.push(function () {
-      var k = foldKey_(s.draft.shop);
-      b.setAttribute('aria-pressed', (value ? k === foldKey_(value) : !k) ? 'true' : 'false');
-    });
-  };
-  chip('No shop', '');
-  shops.forEach(function (n) { chip(n, n); });
+  s.sync.push(function () {
+    more.setAttribute('aria-expanded', s.newShop ? 'true' : 'false');
+    input.hidden = !s.newShop;
+  });
   s.finish = function () {
     var was = s.orig ? sheetOneLine_(s.orig.shop) : '';
     if (sheetOneLine_(s.draft.shop) === was) return;
