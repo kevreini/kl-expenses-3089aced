@@ -217,6 +217,8 @@
   .why-amt { white-space: nowrap; flex: none; }
   .why-total { font-weight: 600; border-bottom: 0; }
   .why-end { margin-top: 12px; font-weight: 500; }
+  .bal-act { display: flex; flex-direction: row-reverse; justify-content: flex-end; align-items: center; flex-wrap: wrap; gap: 8px 12px; margin-top: 10px; }
+  .bal-act-note { display: block; flex: 1 1 160px; }
 
   /* Monthly bars */
   .barsin { display: flex; position: relative; min-width: 100%; width: max-content; }
@@ -271,8 +273,8 @@
   .pace { position: relative; height: 8px; margin: 14px 0 10px; border-radius: 4px; background: rgba(110, 74, 51, 0.16); }
   .pace-fill { position: absolute; left: 0; top: 0; bottom: 0; border-radius: 4px; background: var(--action); }
   .pace-day { position: absolute; top: -3px; bottom: -3px; width: 2px; margin-left: -1px; border-radius: 1px; background: var(--on-cover); opacity: 0.5; }
-  .hero-foot { display: flex; justify-content: space-between; gap: 12px; font-size: 13px; font-weight: 500; color: var(--on-cover-muted); }
-  .hero-pct { color: var(--on-cover); font-weight: 600; }
+  .hero-foot { display: flex; flex-direction: column; gap: 2px; font-size: 13px; font-weight: 500; color: var(--on-cover-muted); }
+  .hero-pct { color: var(--on-cover); font-size: 15px; font-weight: 600; }
 
   /* The cards below the hero */
   .card { background: var(--card); border-radius: var(--radius); box-shadow: 0 1px 2px rgba(58, 34, 19, 0.06), 0 0 0 1px rgba(58, 34, 19, 0.04); }
@@ -289,6 +291,7 @@
   .bal-big { font: var(--type-card-title); font-weight: 700; letter-spacing: -0.015em; white-space: nowrap; }
   .bal-small { font-size: 13px; color: var(--muted); white-space: nowrap; }
   .bal-note { font-size: 13px; color: var(--muted); }
+  .bal-settle:disabled { opacity: 0.55; cursor: default; }
   .bal-settle {
     flex: none;
     min-height: 44px;
@@ -361,8 +364,6 @@
   .rows-card .row-main { font-weight: 600; }
   .rows-card .row-sub { font-size: 13px; }
   .rows-card .receipt { margin-left: 44px; }
-  .rows-card .editor { padding: 4px 0 16px; }
-  .rows-card .editor input, .rows-card select { background: var(--page); border-color: var(--rule); border-radius: 12px; }
   /* A1-T4 end */
 
   /* Donut */
@@ -426,52 +427,10 @@
   .row-main { font-weight: 500; white-space: nowrap; }
   .row-sub { font-size: 14px; color: var(--muted); white-space: nowrap; }
 
-  /* Fixing an expense */
-  .editor { padding: 6px 0 16px; }
-  .editor label { display: block; font-size: 14px; color: var(--muted); margin: 10px 0 4px; }
-  .select-line { display: flex; align-items: center; gap: 10px; }
-  .type-icon { flex: none; width: 20px; height: 20px; }
-  select {
-    display: block;
-    width: 100%;
-    min-width: 0;
-    min-height: 44px;
-    padding: 8px 10px;
-    font: inherit;
-    color: var(--ink);
-    background: var(--paper);
-    border: 1px solid var(--muted);
-    border-radius: 8px;
-  }
-  select:disabled { opacity: 0.55; }
-  .editor input {
-    display: block;
-    width: 100%;
-    min-width: 0;
-    min-height: 44px;
-    padding: 8px 10px;
-    font: inherit;
-    font-size: 16px;
-    color: var(--ink);
-    background: var(--paper);
-    border: 1px solid var(--muted);
-    border-radius: 8px;
-  }
-  .editor input:disabled { opacity: 0.55; }
-  .editor-delete {
-    display: block;
-    min-height: 44px;
-    margin-top: 10px;
-    padding: 0 4px;
-    font-size: 14px;
-    color: var(--accent);
-    text-decoration: underline;
-    text-underline-offset: 3px;
-  }
-  .editor-delete:disabled { opacity: 0.55; cursor: default; }
+  /* Fixing an expense: A3-T2B M7, the Edit expense sheet (it reuses the quick add and sheet styles) */
   .editor-note { margin-top: 12px; font-size: 14px; color: var(--muted); }
   .editor-error { margin-top: 10px; font-size: 15px; font-weight: 500; color: var(--accent); }
-  .editor-actions { display: flex; gap: 8px; margin-top: 14px; }
+  .sheet .schip:disabled, .qa-cat:disabled, .qa-type:disabled, .sheet input:disabled, .sheet-delete:disabled { opacity: 0.55; cursor: default; }
   .btn-main, .btn-plain {
     flex: 1;
     min-height: 44px;
@@ -497,22 +456,24 @@
     width: calc(100% - 32px);
     max-width: 520px;
     min-height: 52px;
-    padding: 4px 16px;
-    border-radius: 10px;
-    color: var(--on-cover);
-    background: var(--cover);
-    border: 1px solid var(--on-cover-line);
+    padding: 4px 6px 4px 16px;
+    border-radius: 14px;
+    font-size: 15px;
+    font-weight: 500;
+    color: #fbeee2;
+    background: var(--ink);
   }
+  /* A3-T2B p3: one toast style everywhere, the dark one (as .qa-toast) */
   .toast button {
+    flex: none;
     min-height: 44px;
     min-width: 44px;
-    padding: 0 6px;
-    font-weight: 600;
-    text-decoration: underline;
-    text-underline-offset: 3px;
+    padding: 0 10px;
+    font-weight: 700;
+    color: #fbcda4;
   }
   .toast button:disabled { opacity: 0.55; cursor: default; }
-  .toast :focus-visible { outline-color: var(--on-cover); }
+  .toast :focus-visible { outline-color: #fbcda4; }
   .list-end { height: 84px; }
   .flag {
     display: inline-block;
@@ -574,6 +535,18 @@
     padding-bottom: calc(var(--bar-h) + env(safe-area-inset-bottom));
     padding-left: env(safe-area-inset-left);
   }
+  /* A3-T2B p13: a page-coloured band behind the status bar, so rows never show above the sticky shop headers */
+  #app::before {
+    content: "";
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 4;
+    height: env(safe-area-inset-top, 0px);
+    background: var(--page);
+    pointer-events: none;
+  }
   .tabbar {
     position: fixed;
     left: 0;
@@ -608,6 +581,9 @@
   .tab-add .tab-pill { width: 50px; border-radius: 12px; color: var(--on-action); background: var(--action); box-shadow: 0 5px 12px -3px rgba(166, 74, 24, 0.5); }
   .tab-add .icon { width: 22px; height: 22px; stroke-width: 2.5; }
   .tab-add:active .tab-pill { opacity: 0.85; }
+  /* A3-T2B m9: an expense waits in Add */
+  .tab-add .tab-pill { position: relative; }
+  .tab-dot { position: absolute; top: -3px; right: -3px; width: 10px; height: 10px; border-radius: 50%; background: var(--ink); box-shadow: 0 0 0 2px var(--page); }
 
   /* Screens: a short fade when one comes on show. Browsers with View Transitions cross-fade instead. */
   .screen { animation: screen-in 180ms ease-out; }
@@ -643,7 +619,10 @@
   }
   .avatar-kev > span, .avatar-dot.avatar-kev { color: #46664c; background: #e1eae0; }
   .avatar-lili > span, .avatar-dot.avatar-lili { color: #9c4615; background: #fde0c8; }
-  .avatar-q > span { color: #6b5a4e; background: #efe6dc; }
+  /* A3-T2B m3: before the who choice, a person icon labelled "Who?" in a soft pill */
+  .avatar.avatar-who { width: auto; min-height: 44px; height: 44px; gap: 4px; padding: 0 12px 0 9px; margin-right: 0; border-radius: 22px; color: var(--muted); background: #efe6dc; }
+  .avatar.avatar-who > span { width: auto; height: auto; font-size: 15px; font-weight: 600; background: none; color: inherit; }
+  .avatar-who .icon { width: 20px; height: 20px; color: currentColor; }
   .who-title { font: var(--type-card-title); margin: 4px 0 6px; }
   .who-line { font: var(--type-secondary); color: var(--muted); margin-bottom: 14px; }
   .who-choices { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
@@ -677,7 +656,7 @@
   /* A1-T7 list cards: a label on the page, then one white card per section; 56 px rows, a hairline between rows
      that starts after the tick, the 28 px tick circle in a 56 px target. Rows slide inside their card. */
   .list-lab { margin: 22px 4px 8px; font-size: 15px; font-weight: 700; line-height: 1.3; color: var(--ink); }
-  .lists-main > .list-lab:first-child, .todo-top + .list-lab { margin-top: 8px; }
+  .lists-main > .list-lab:first-child { margin-top: 8px; }
   .list-card { padding: 0 14px 0 0; overflow: hidden; }
   .list-card :focus-visible { outline-offset: -2px; }
   .list-card > * + .todo-row::before, .list-card > * + .gro-row::before {
@@ -722,17 +701,18 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: 16px;
+    gap: 12px;
     min-height: 52px;
-    padding: 4px 16px;
-    border-radius: 10px;
-    color: var(--on-cover);
-    background: var(--cover);
-    border: 1px solid var(--on-cover-line);
+    padding: 4px 6px 4px 16px;
+    border-radius: 14px;
+    font-size: 15px;
+    font-weight: 500;
+    color: #fbeee2;
+    background: var(--ink);
   }
 
   /* To do: sections, rows with a wide tick zone, chips, the calm note, the settings lines */
-  .todo-top { display: flex; justify-content: flex-end; margin-bottom: 4px; }
+  .large-title .mine { margin-left: auto; } /* A3-T2B m4: Mine on the title row, beside the avatar */
   .mine {
     min-height: 44px;
     padding: 0 18px;
@@ -789,17 +769,20 @@
   .tick-zone[aria-pressed="true"] .icon { background: var(--action); border-color: var(--action); }
   .tick-zone:active .icon { background: var(--tint); }
   .tick-zone[aria-pressed="true"]:active .icon { background: var(--action); }
+  /* A3-T2B: the text button and, under it, the chips (outside the button, so the First step chip is its own button) */
+  .todo-main { display: flex; flex-direction: column; justify-content: center; align-self: stretch; flex: 1; min-width: 0; min-height: 56px; }
   .todo-open {
     display: flex;
     flex-direction: column;
     justify-content: center;
-    align-self: stretch;
-    flex: 1;
+    flex: 1 0 auto;
+    width: 100%;
     min-width: 0;
-    min-height: 56px;
+    min-height: 44px;
     padding: 9px 0;
     text-align: left;
   }
+  .todo-open:not(:last-child) { padding-bottom: 2px; }
   .todo-text {
     display: -webkit-box;
     -webkit-line-clamp: 2;
@@ -810,7 +793,8 @@
     line-height: 1.35;
   }
   .is-done .todo-text { text-decoration: line-through; text-decoration-thickness: 1px; text-decoration-color: #d9b89c; color: var(--muted); }
-  .todo-chips { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 4px; }
+  .todo-chips { display: flex; flex-wrap: wrap; align-items: center; gap: 4px; padding: 2px 0 9px; }
+
   .tchip {
     display: inline-block;
     max-width: 100%;
@@ -833,6 +817,11 @@
   .tchip-date { color: var(--muted); background: #f6ece2; }
   .tchip-age { color: var(--muted); background: transparent; padding: 0 2px; font-weight: 500; }
   .tchip-from { color: var(--muted); background: transparent; padding: 0 2px; font-weight: 500; }
+  /* A3-T2B: the clock on time chips (p2); the First step chip is a 44 px button that unfolds the whole step */
+  .tchip .icon { display: inline-block; width: 12px; height: 12px; margin: 0 4px 0 0; vertical-align: -1px; color: currentColor; stroke-width: 2; }
+  .todo-step { display: inline-flex; align-items: center; max-width: 100%; min-height: 44px; margin: -6px 0; text-align: left; }
+  .todo-step .tchip { max-width: 100%; }
+  .todo-step.is-open .tchip { height: auto; padding: 2px 10px; border-radius: 12px; line-height: 18px; white-space: normal; overflow: visible; }
   .todo-revive { flex: none; align-self: center; min-height: 44px; padding-left: 10px; font-size: 14px; }
   .todo-note-lead {
     display: -webkit-box;
@@ -845,6 +834,24 @@
   .todo-note-actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
   .todo-note-actions .btn-plain { flex: 0 0 auto; border: 0; border-radius: 22px; background: var(--card); }
   .lists-settings + .lists-settings { margin-top: 4px; }
+  .lists-settings .pill { min-height: 44px; padding: 0 16px; border-radius: 22px; font-size: 15px; font-weight: 600; color: var(--action); background: var(--tint); }
+  /* A3-T2B m5: what a swipe does, in the strip the row uncovers while it slides */
+  .swipe-under {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    display: flex;
+    align-items: center;
+    overflow: hidden;
+    white-space: nowrap;
+    font-size: 15px;
+    font-weight: 700;
+    pointer-events: none;
+  }
+  .swipe-done { justify-content: flex-start; padding-left: 18px; color: #2f5233; background: #dfeadd; }
+  .swipe-del { justify-content: flex-end; padding-right: 18px; color: #ffffff; background: #a64a18; }
+  .dock-undo > span { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .sheet-step { margin: 8px 2px 0; font-size: 14px; line-height: 1.4; color: var(--muted); }
   .sep { color: var(--muted); }
   .pause-menu { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-top: 8px; }
   .pause-menu .btn-plain { flex: 0 0 auto; }
@@ -866,14 +873,14 @@
   .todo-nottoday-menu { display: flex; flex-wrap: wrap; gap: 8px; padding: 0 0 12px 56px; }
   .todo-nottoday-menu .btn-plain { flex: 0 0 auto; border: 0; border-radius: 22px; background: #f6ece2; }
   .dock-toast button {
+    flex: none;
     min-height: 44px;
     min-width: 44px;
-    padding: 0 6px;
-    font-weight: 600;
-    text-decoration: underline;
-    text-underline-offset: 3px;
+    padding: 0 10px;
+    font-weight: 700;
+    color: #fbcda4;
   }
-  .dock-toast :focus-visible { outline-color: var(--on-cover); }
+  .dock-toast :focus-visible { outline-color: #fbcda4; }
   .sheet {
     position: fixed;
     inset: 0;
@@ -899,7 +906,9 @@
     box-shadow: 0 -4px 24px rgba(43, 29, 20, 0.25);
   }
   .sheet-panel:focus { outline: none; }
-  .sheet-handle { width: 40px; height: 5px; margin: 4px auto 14px; border-radius: 3px; background: var(--rule); }
+  .sheet-handle { width: 40px; height: 5px; margin: 2px auto 8px; border-radius: 3px; background: var(--rule); }
+  /* A3-T2A K2: on top of the keyboard while it is up (sheetPlace_); no safe-area gap there */
+  .sheet.is-kb .sheet-panel { padding-bottom: 10px; }
   .sheet-text {
     display: block;
     width: 100%;
@@ -917,8 +926,23 @@
     overflow-y: auto;
     field-sizing: content;
   }
+  .sheet-text::placeholder, .sheet-shop-input::placeholder { color: var(--muted); opacity: 1; } /* A3-T2B p4 */
   .sheet-label { margin: 16px 2px 8px; font-size: 13px; font-weight: 700; color: var(--muted); }
   .sheet-chips { display: flex; flex-wrap: wrap; gap: 6px; }
+  /* A3-T2A K1: one row per group, its label on the left, the chips scrolling sideways */
+  .sheet-row { display: flex; align-items: center; gap: 8px; margin-top: 6px; }
+  .sheet-row .sheet-label { flex: 0 0 44px; margin: 0; }
+  .sheet-scroll { flex: 1 1 auto; min-width: 0; flex-wrap: nowrap; overflow-x: auto; overscroll-behavior-x: contain; scrollbar-width: none; -webkit-overflow-scrolling: touch; }
+  .sheet-scroll::-webkit-scrollbar { display: none; }
+  .sheet-words { display: flex; align-items: center; gap: 8px; margin-top: 4px; }
+  .sheet-words[hidden] { display: none; }
+  .sheet-words-text { flex: 1; min-width: 0; font-size: 15px; font-weight: 600; color: var(--ink); }
+  .sheet-words-undo { flex: none; min-height: 44px; min-width: 44px; padding: 0 8px; font-size: 15px; font-weight: 700; color: var(--action); }
+  .sheet-discard { flex: none; min-height: 44px; min-width: 44px; padding: 0 10px; font-size: 15px; font-weight: 600; color: var(--muted); }
+  .qa-head .sheet-save { min-width: 88px; min-height: 44px; margin-left: 0; }
+  .todo-row.is-new, .gro-row.is-new { animation: row-new 2.4s ease-out; }
+  @keyframes row-new { 0%, 45% { background: #fde3cc; } 100% { background: transparent; } }
+  @media (prefers-reduced-motion: reduce) { .todo-row.is-new, .gro-row.is-new { animation: none; background: #fde3cc; } }
   /* A1-T7: soft chips; the picked one is a tint with a ring (a person's colour for Kev, Lili, Couple), never solid rust.
      A1 final fix 5: the ring is 2 px and dark (at least 3:1 against the resting chip), the label bold. */
   .schip {
@@ -932,12 +956,14 @@
     color: var(--muted);
     background: #f6ece2;
     text-align: center;
+    white-space: nowrap;
+    flex: none; /* A3-T2A: chips keep their size in a sideways row */
   }
   .schip[aria-pressed="true"] { color: #9c4615; font-weight: 700; background: #fde3cc; box-shadow: inset 0 0 0 2px #b4541d; }
   .schip-kev[aria-pressed="true"] { color: var(--kev-ink); background: var(--kev-bg); box-shadow: inset 0 0 0 2px var(--kev-ink); }
   .schip-lili[aria-pressed="true"] { color: var(--lili-ink); background: var(--lili-bg); box-shadow: inset 0 0 0 2px var(--lili-ink); }
   .schip-couple[aria-pressed="true"] { color: var(--couple-ink); background: var(--couple-bg); box-shadow: inset 0 0 0 2px var(--couple-ink); }
-  .sheet-day, .sheet-time input {
+  .sheet-day, .sheet-time {
     min-height: 44px;
     margin-top: 10px;
     padding: 8px 12px;
@@ -948,10 +974,8 @@
     border: 1px solid #eadfd5;
     border-radius: 12px;
   }
-  .sheet-time input:disabled { opacity: 0.55; }
-  .sheet-time .small { margin-top: 6px; }
-  .sheet-more { margin-top: 8px; }
-  .sheet-foot { display: flex; align-items: center; gap: 12px; margin-top: 22px; }
+  .sheet-day, .sheet-time { margin-top: 6px; margin-left: 52px; }
+  .sheet-foot { display: flex; align-items: center; gap: 12px; margin-top: 14px; }
   .sheet-delete { min-height: 44px; font-size: 15px; font-weight: 600; color: var(--muted); }
   .sheet-save { flex: 0 0 auto; min-width: 120px; min-height: 48px; margin-left: auto; border-radius: 14px; }
   .sheet-shop-input {
@@ -1017,7 +1041,7 @@
   .gro-add input:focus-visible { outline: none; }
   .gro-add input::placeholder { color: var(--muted); opacity: 1; }
   .gro-note { min-height: 22px; padding: 2px 12px 0; font-size: 14px; line-height: 20px; color: var(--muted); }
-  .gro-end { height: calc(var(--gro-dock-h, 150px) + 24px); }
+  .gro-end { height: calc(var(--gro-dock-h, 150px) + var(--gro-kb, 0px) + 24px); } /* A3-T2A: room to scroll a new row above the keyboard */
   .gro-main { padding-top: 14px; }
   .gro-recent { display: flex; align-items: center; gap: 8px; padding-bottom: 8px; }
   .gro-label { flex: none; margin: 0 0 0 4px; font-size: 13px; font-weight: 700; color: var(--muted); }
@@ -1047,17 +1071,24 @@
     box-shadow: 0 0 0 1px rgba(58, 34, 19, 0.06), 0 1px 2px rgba(58, 34, 19, 0.08);
   }
   .gro-row { position: relative; display: flex; align-items: center; min-height: 56px; background: var(--card); }
-  .gro-open {
+  /* A3-T2B M2: the row is one button (circle and text) that ticks; "..." at its end opens the sheet */
+  .gro-tap {
     display: flex;
-    flex-direction: column;
-    justify-content: center;
+    align-items: center;
     align-self: stretch;
     flex: 1;
     min-width: 0;
     min-height: 56px;
-    padding: 9px 0;
     text-align: left;
+    -webkit-tap-highlight-color: transparent;
   }
+  .gro-tap .gro-text { flex: 1; min-width: 0; padding: 9px 0; }
+  .gro-tap[aria-pressed="true"] .tick-zone .icon { background: var(--action); border-color: var(--action); }
+  .gro-tap:active .tick-zone .icon { background: var(--tint); }
+  .gro-tap[aria-pressed="true"]:active .tick-zone .icon { background: var(--action); }
+  .gro-edit { flex: none; display: flex; align-items: center; justify-content: center; width: 44px; min-height: 44px; margin-right: -8px; border-radius: 22px; color: var(--muted); }
+  .gro-edit .icon { width: 22px; height: 22px; color: currentColor; stroke-width: 3; }
+  .gro-edit:active { background: var(--tint); }
   .gro-text {
     display: -webkit-box;
     -webkit-line-clamp: 2;
@@ -1117,10 +1148,11 @@
   /* A2-T3 end */
 
   /* A1-T5 quick add */
-  .qa-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 12px; }
-  .qa-title { font: var(--type-card-title); }
+  .qa-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 8px; }
+  .qa-title { flex: 1 1 auto; min-width: 0; font: var(--type-card-title); }
+  .sheet-panel > .qa-head { position: sticky; top: 0; z-index: 1; background: var(--card); } /* A3-T2A fix 1: Add stays in view */
   .qa-save { flex: 0 0 auto; min-width: 96px; min-height: 44px; }
-  .qa-seg { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 2px; padding: 2px; margin-bottom: 14px; border-radius: 12px; background: #f6ece2; }
+  .qa-seg { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 2px; padding: 2px; margin-bottom: 8px; border-radius: 12px; background: #f6ece2; }
   .qa-segbtn { display: flex; align-items: center; justify-content: center; gap: 6px; min-height: 44px; border-radius: 10px; font: var(--type-caption); font-weight: 600; color: var(--muted); }
   .qa-segbtn .icon { width: 18px; height: 18px; color: currentColor; }
   .qa-segbtn[aria-pressed="true"] { color: var(--ink); background: var(--card); box-shadow: 0 1px 3px rgba(58, 34, 19, 0.16); }
@@ -1142,14 +1174,15 @@
     border-radius: 0;
   }
   .qa-amount:focus { outline: none; border-bottom-color: var(--action); }
-  .qa-amount::placeholder { color: #b9a796; opacity: 1; }
-  .qa-preview { min-height: 21px; margin-top: 6px; font: var(--type-secondary); color: var(--muted); font-variant-numeric: tabular-nums; }
+  .qa-amount::placeholder { color: #7a6657; opacity: 1; } /* A3-T2B p4: 5.4:1 on the white sheet */
+  .qa-under { display: flex; flex-wrap: wrap; align-items: baseline; column-gap: 10px; min-height: 21px; margin-top: 4px; }
+  .qa-preview { font: var(--type-secondary); color: var(--muted); font-variant-numeric: tabular-nums; }
   .qa-status { font-size: 15px; font-weight: 600; color: var(--action); }
   .qa-what {
     display: block;
     width: 100%;
     min-height: 48px;
-    margin-top: 12px;
+    margin-top: 8px;
     padding: 0 12px;
     font: inherit;
     font-size: 17px;
@@ -1159,14 +1192,22 @@
     border-radius: 12px;
   }
   .qa-what::placeholder { color: var(--muted); opacity: 1; }
-  .qa-hint { min-height: 18px; margin: 6px 2px 0; font: var(--type-caption); color: var(--muted); }
-  .qa-row { display: flex; align-items: center; gap: 8px; margin-top: 10px; }
+  .qa-hint { margin: 4px 2px 0; font: var(--type-caption); color: var(--muted); }
+  .qa-hint:empty { display: none; }
+  .qa-row { display: flex; align-items: center; gap: 8px; margin-top: 6px; }
   .qa-label { flex: 0 0 60px; font: var(--type-caption); font-weight: 600; color: var(--muted); }
   .qa-row .sheet-chips { flex: 1; gap: 6px; }
   .qa-row .schip { padding: 0 12px; }
   .qa-type { display: inline-flex; align-items: center; gap: 8px; min-height: 44px; padding: 0 14px 0 5px; border: 1px solid var(--rule); border-radius: 22px; font-size: 15px; font-weight: 600; }
   .qa-type .chev { margin: -4px 2px 0 4px; transform: rotate(135deg); }
-  .qa-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; margin-top: 10px; }
+  /* A3-T2A: More types, the last chip of the Add sheet's Type row (its own class: .qa-type is the Edit expense button) */
+  .qa-more { min-height: 44px; box-shadow: inset 0 0 0 1px var(--rule); }
+  .qa-more[aria-pressed="true"] { box-shadow: inset 0 0 0 2px #b4541d; }
+  /* A3-T2A: All types, a small sheet of its own over the expense sheet */
+  .qa-types-sheet { position: absolute; left: 0; right: 0; bottom: 0; max-height: 80vh; max-height: 80dvh; }
+  .qa-types-close { flex: none; min-height: 44px; min-width: 44px; padding: 0 10px; font-size: 15px; font-weight: 600; color: var(--action); }
+  .qa-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; margin-top: 4px; }
+  @media (max-width: 359px) { .qa-segbtn .icon { display: none; } }
   .qa-cat { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; min-height: 64px; padding: 6px 4px; border-radius: 12px; background: var(--paper); font-size: 13px; font-weight: 500; text-align: center; }
   .qa-cat[aria-pressed="true"] { box-shadow: inset 0 0 0 2px var(--action); }
   .qa-day { min-height: 44px; margin-top: 10px; padding: 8px 10px; font: inherit; font-size: 16px; color: var(--ink); background: var(--paper); border: 1px solid var(--muted); border-radius: 8px; }
@@ -1265,15 +1306,6 @@ var TOAST = null;  // the line after saving: {text, undo, busy, refreshing}
 var FOCUS_ROW = null;
 var FIRST_LOAD = true;
 var SESSION = 0;   // moves on at lock-out, so a late reply from before it is ignored
-var FIELDS = [
-  { field: 'item', label: 'Item' },
-  { field: 'amount', label: 'Amount' },
-  { field: 'currency', label: 'Currency' },
-  { field: 'date', label: 'Date' },
-  { field: 'category', label: 'Type' },
-  { field: 'paidBy', label: 'Paid by' },
-  { field: 'paidFor', label: 'Paid for' }
-];
 var CURRENCIES = [['IDR', 'IDR'], ['EUR', 'EUR'], ['USD', 'USD']];
 
 // ---- plain helpers ---------------------------------------------------------
@@ -1827,7 +1859,7 @@ function lockOut() {
   SESSION++;
   LOADING = false;
   TOKEN = null;
-  closeItemSheet_('lock'); // Task 7: an open sheet's change goes into the queue, sent after the unlock
+  closeItemSheet_('lock'); // Task 7: an open edit goes into the queue, sent after the unlock (A3-T2A: a new item is not added)
   whoShut_();
   QA_DRAFT = null; // A1-T5: an unsaved expense goes with the session; a queued one stays for after the PIN
   // A1 final fix 3: so does one kept as 'unsaved' in kl.kept; refused ones stay, as the queue does.
@@ -1838,6 +1870,7 @@ function lockOut() {
   DATA = null;
   MONEY_AT = 0;
   MONEY_LIVE = false;
+  MONEY_STALE = null;
   lsDel_(LS_MONEY); // A1-T3: the Money snapshot goes with the token
   VIEW = { screen: 'home', key: null };
   FILTER = null;
@@ -1869,9 +1902,10 @@ function loadFailed(quiet, err) {
     if (TOAST && TOAST.refreshing) {
       TOAST = { text: (TOAST.after ? TOAST.after + ' ' : '') + 'Could not refresh. These are the last numbers loaded.', key: TOAST.key };
     }
+    // A3-T2B M6: the failed refresh is said under the large title of every Money screen, with the time of the
+    // numbers on show ("Offline. Numbers from 10:42."); the bottom warning is gone.
+    MONEY_STALE = { offline: unreached(err) };
     render(true);
-    // A1-T3 fix 1: after a failed refresh, the age of the numbers on show, as the lists say it.
-    homeStatus('Could not update. These are the last numbers loaded.' + (MONEY_AT ? ' ' + updatedText_(MONEY_AT, Date.now()) + '.' : ''));
     return;
   }
   if (code === 'NOT_CONFIGURED') {
@@ -1926,6 +1960,7 @@ var HOME_STATUS = null;
 
 // ---- the Money snapshot (kl.money, A1-T3): drawn at once on the next visit, then refreshed ---------------
 var MONEY_AT = 0; // when the numbers on show were read from the server (ms)
+var MONEY_STALE = null; // A3-T2B M6: the last Money refresh failed: {offline}; cleared by the next data reply
 // A1 final fix 2: true once a data reply from the server has been on show in this session (the snapshot alone
 // never sets it). Settle up waits for it, so a settlement is never confirmed from figures the server has not just sent.
 var MONEY_LIVE = false;
@@ -1944,6 +1979,7 @@ function moneySet_(p) {
   DATA = p;
   MONEY_AT = Date.now();
   MONEY_LIVE = true;
+  MONEY_STALE = null;
   // A write that fails (storage full) drops the older snapshot, so a later visit never draws stale numbers.
   if (!lsSet_(LS_MONEY, JSON.stringify({ v: MONEY_V, at: MONEY_AT, data: p }))) lsDel_(LS_MONEY);
 }
@@ -1991,6 +2027,26 @@ function moneyAgeText_() {
   return MONEY_AT && now - MONEY_AT > 600000 ? updatedText_(MONEY_AT, now) + '.' : '';
 }
 
+// A3-T2B M6: the clock time data was read at, '10:42', with the day when it was not today ('12 Nov, 10:42').
+function staleClock_(at, now) {
+  var d = new Date(at);
+  var t = pad(d.getHours()) + ':' + pad(d.getMinutes());
+  if (d.toDateString() === new Date(now).toDateString()) return t;
+  return d.getDate() + ' ' + ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'][d.getMonth()] + ', ' + t;
+}
+
+// A3-T2B M6: one line under the large title when the last refresh failed: 'Offline. Numbers from 10:42.' (or Lists).
+// A refresh the server answered with an error is not called offline: 'Could not refresh. Lists from 10:42.'
+function staleNote_(wrap, what, at, offline) {
+  if (!at) return null;
+  // A plain line, not a live region: every repaint draws it again, and it must not be said again each time.
+  return add(wrap, 'p', 'title-note offline-note', (offline ? 'Offline.' : 'Could not refresh.') + ' ' + what + ' from ' + staleClock_(at, Date.now()) + '.');
+}
+
+function moneyStaleNote_(wrap) {
+  return MONEY_STALE && DATA ? staleNote_(wrap, 'Numbers', MONEY_AT, MONEY_STALE.offline) : null;
+}
+
 // ---- navigation ---------------------------------------------------------------
 // The screen lives in the address after #, so the phone's back button steps through screens.
 function remember(view) {
@@ -2008,6 +2064,7 @@ function go(view, fromHistory) {
   if (VIEW.screen === 'todo' && view.screen !== 'todo') todoLeave_();
   if (VIEW.screen === 'groceries' && view.screen !== 'groceries') groLeave_();
   if (view.screen !== 'month' || view.key !== VIEW.key) { FILTER = null; MONTH_MORE = false; }
+  if (view.screen === 'month' && typeof view.filter === 'string') FILTER = view.filter; // A3-T2B m1: a category tapped on Money
   VIEW = view;
   EDIT = null;
   TOAST = null;
@@ -2061,6 +2118,10 @@ function goHome() { go({ screen: 'home', key: null }); }
 function goMonth(key) { go({ screen: 'month', key: key }); }
 
 function render(keepScroll) {
+  // A3-T2B M7: the Edit expense sheet follows EDIT, before the screens are drawn, so a row or an Undo the repaint
+  // focuses is no longer inert behind it.
+  if (DATA && tabOf_(VIEW.screen) === 'money') editSheetPaint_();
+  else if (SHEET && SHEET.list === 'editexp') sheetShut_('close');
   clearScreens();
   HOME_STATUS = null;
   $('home').hidden = VIEW.screen !== 'home';
@@ -2108,7 +2169,8 @@ function largeTitleBox_(root, title, rightNode) {
   var row = add(w, 'div', 'large-title');
   var h = add(row, 'h1', 'title-big', title);
   h.setAttribute('tabindex', '-1');
-  if (rightNode) row.appendChild(rightNode);
+  // A3-T2B m4: To do puts Mine and the avatar on the title row, so rightNode may be a list.
+  (Array.isArray(rightNode) ? rightNode : [rightNode]).forEach(function (n) { if (n) row.appendChild(n); });
   return { wrap: w, h: h };
 }
 
@@ -2118,6 +2180,7 @@ function subTop_(root, title, cls) {
   panelBack(w);
   var h = add(w, 'h1', cls || 'title-big', title);
   h.setAttribute('tabindex', '-1');
+  moneyStaleNote_(w); // A3-T2B M6: every screen under Money
   return { wrap: w, h: h };
 }
 
@@ -2323,9 +2386,10 @@ function moneyHero_(wrap, m, label, today, rate) {
   bar.setAttribute('aria-hidden', 'true');
   add(bar, 'span', 'pace-fill').style.width = Math.min(100, pct) + '%';
   add(bar, 'span', 'pace-day').style.left = Math.round(d.day / d.days * 100) + '%';
+  // A3-T2B p10: the percent in words, then the usual month itself.
   var foot = add(w, 'div', 'hero-foot');
+  add(foot, 'span', 'hero-pct', pct + ' percent of a usual month, on day ' + d.day);
   add(foot, 'span', '', (rate ? fmtIdr(usual) : fmtEur(usual)) + ' in a usual month');
-  add(foot, 'span', 'hero-pct', pct + '%');
   return w;
 }
 
@@ -2346,6 +2410,14 @@ function settleReady_() {
   return MONEY_LIVE && !QUEUE.some(function (q) { return q.op === 'expense' && q.settle !== true; });
 }
 var SETTLE_WAIT = 'Checking the latest numbers.';
+var SETTLE_OFFLINE = 'Settle up works when you are back online.';
+
+// A3-T2B M6: why Settle up waits, in words that never hang: while a read or a send is on its way, the numbers are
+// being checked; once the last refresh failed, or a send waits for its retry, it works when the phone is back online.
+function settleWaitText_() {
+  if ((!MONEY_LIVE && MONEY_STALE) || RETRY_TIMER !== null) return SETTLE_OFFLINE;
+  return SETTLE_WAIT;
+}
 
 function openSettle_() {
   if (!DATA || !DATA.balance || settlePending_() || !settleReady_()) return;
@@ -2391,7 +2463,7 @@ function settleAmount_(eur) {
 function settleConfirm_(s) {
   if (SHEET !== s || s.done) return;
   if (!settleReady_()) { // A1 final fix 2: an expense still waits (another tab), or the numbers are not the server's
-    s.els.status.textContent = SETTLE_WAIT;
+    s.els.status.textContent = settleWaitText_();
     return;
   }
   s.done = true;
@@ -2443,6 +2515,19 @@ function settleStep_(i) {
   setTimeout(function () { settleStep_(i + 1); }, 40);
 }
 
+// A3-T2B: Settle up, the same on the card and on the balance screen. Gone when square or while a settlement waits
+// to be sent (never twice); visible but disabled, with the reason as a line, until the server's own numbers are on
+// show and no expense waits (M6, the guard of A1 final fix 2); otherwise it opens the confirm sheet.
+function settleButton_(parent, noteParent) {
+  var side = balanceSide_(DATA.balance.net);
+  if (side.square || settlePending_()) return null;
+  var ready = settleReady_();
+  var b = btn(parent, 'bal-settle', 'Settle up', function () { if (settleReady_()) openSettle_(); });
+  b.disabled = !ready;
+  if (!ready) add(noteParent, 'span', 'bal-note', settleWaitText_());
+  return b;
+}
+
 // The balance card: who pays whom, euros big (they settle in euros, exact to the cent), rupiah small at the
 // month's rate. The card opens the details; Settle up sits beside it and is gone when the balance is square.
 function renderBalanceCard_(parent, rate) {
@@ -2455,7 +2540,6 @@ function renderBalanceCard_(parent, rate) {
   var counting = square && SETTLE_ANIM && Date.now() - SETTLE_ANIM.at < 20000 && !settleCalm_();
   if (SETTLE_ANIM && (settleCalm_() || (square && !counting))) SETTLE_ANIM = null;
   var pending = !square && settlePending_();
-  var waiting = !square && !pending && !settleReady_(); // A1 final fix 2
   if (counting) {
     add(words, 'span', 'bal-label', 'Settled');
     SETTLE_EL = add(words, 'span', 'bal-big', fmtEur(SETTLE_ANIM.from));
@@ -2471,10 +2555,9 @@ function renderBalanceCard_(parent, rate) {
     add(words, 'span', 'bal-big', fmtEur(side.eur));
     if (rate) add(words, 'span', 'bal-small', fmtIdr(Math.round(side.eur * rate / 1000) * 1000));
     if (pending) add(words, 'span', 'bal-note', 'Settling up. Waiting to be sent.');
-    else if (waiting) add(words, 'span', 'bal-note', SETTLE_WAIT);
   }
   add(open, 'span', 'chev').setAttribute('aria-hidden', 'true');
-  if (!square && !pending && !waiting) btn(bal, 'bal-settle', 'Settle up', function () { openSettle_(); });
+  if (!counting) settleButton_(bal, words);
 }
 
 // ---- home -----------------------------------------------------------------------
@@ -2488,6 +2571,7 @@ function renderHome() {
   var cur = monthByKey(curKey) || emptyMonth(curKey);
 
   var top = largeTitleBox_(root, 'Money');
+  moneyStaleNote_(top.wrap); // A3-T2B M6
   moneyHero_(top.wrap, cur, monthName(curKey) + ' so far', today, rate);
   // A1-T5: an expense added here that has not reached the sheet yet (offline, or behind another change).
   var waiting = QUEUE.filter(function (q) { return q.op === 'expense' && q.uid !== INFLIGHT; }).length;
@@ -2496,7 +2580,9 @@ function renderHome() {
 
   var body = add(root, 'div', 'wrap');
   renderDonut_(section(body, 'Where it goes'));
-  var barsEl = renderBars(section(body, rate ? 'Month by month' : 'Month by month, in euros'), rate);
+  // A3-T2B p5: no empty chart reading 0.0: Month by month shows once a month has an expense.
+  var hasData = DATA.months.some(function (m) { return m.rows && m.rows.length > 0; });
+  var barsEl = hasData ? renderBars(section(body, rate ? 'Month by month' : 'Month by month, in euros'), rate) : null;
 
   if (DATA.notCountedYet > 0) {
     var nc = section(body);
@@ -2519,7 +2605,7 @@ function renderHome() {
   btn(foot, 'textbtn', 'Refresh', function () { loadData(true); });
   HOME_STATUS = add(foot, 'p', 'small', moneyAgeText_());
 
-  barsEl.scrollLeft = barsEl.scrollWidth; // newest month in view when there are many
+  if (barsEl) barsEl.scrollLeft = barsEl.scrollWidth; // newest month in view when there are many
 }
 
 // ---- where it goes (home donut, ruling R65; A1-T4 segmented control and fixed colours) ---------------
@@ -2624,6 +2710,10 @@ function drawDonut_(body, model, repaint) {
     add(body, 'p', 'dn-empty', model.emptyText);
     return;
   }
+  // A3-T2B m1: a category (its row or its slice) opens that month filtered to it; the month offers Show all.
+  var openCat = function (name) {
+    return model.key === 'all' ? null : function () { go({ screen: 'month', key: model.key, filter: name }); };
+  };
   var open = model.key === 'all' ? null : function () { goMonth(model.key); };
   var parts = model.rows.filter(function (r) { return r.color; });
   var fig = add(body, 'div', 'dn-fig');
@@ -2650,7 +2740,7 @@ function drawDonut_(body, model, repaint) {
     mark.setAttribute('fill', 'none');
     mark.setAttribute('stroke', parts[whole].color);
     mark.setAttribute('stroke-width', '26');
-    if (open) mark.addEventListener('click', open);
+    if (open) mark.addEventListener('click', openCat(parts[whole].name));
     svg.appendChild(mark);
   } else {
     spans.forEach(function (a, i) {
@@ -2658,7 +2748,7 @@ function drawDonut_(body, model, repaint) {
       mark.setAttribute('class', 'dn-slice');
       mark.setAttribute('d', donutPath_(a.start, a.end, 96, 70, 100));
       mark.setAttribute('fill', parts[i].color);
-      if (open) mark.addEventListener('click', open);
+      if (open) mark.addEventListener('click', openCat(parts[i].name));
       svg.appendChild(mark);
     });
   }
@@ -2669,7 +2759,7 @@ function drawDonut_(body, model, repaint) {
   var list = add(body, 'div', 'dn-list');
   var many = model.rows.length > 5;
   model.rows.slice(0, many && !DONUT_MORE ? 5 : model.rows.length).forEach(function (r) {
-    var line = open ? btn(list, 'dn-row dn-tap', null, open) : add(list, 'div', 'dn-row');
+    var line = open ? btn(list, 'dn-row dn-tap', null, openCat(r.name)) : add(list, 'div', 'dn-row');
     catAvatar_(line, r.name);
     var words = add(line, 'span', 'dn-words');
     add(words, 'span', 'dn-name', r.name);
@@ -2846,8 +2936,8 @@ function renderMonth() {
 var LIST_TOP = null;
 var EDIT_EL = null;
 
-// One expense: its category avatar, the item and who paid, rupiah big and EUR small. Tapping it opens the editor
-// in place, inside the same card.
+// One expense: its category avatar, the item and who paid, rupiah big and EUR small. A3-T2B M7: tapping it opens
+// the "Edit expense" bottom sheet (editSheet_), no longer a form under the row.
 function renderRow(parent, r, rate) {
   var wrap = add(parent, 'div', 'row-wrap');
   var editable = r.rowNumber && r.fingerprint && !r.settlement;
@@ -2856,7 +2946,7 @@ function renderRow(parent, r, rate) {
   if (editable) {
     row = btn(wrap, 'row row-btn' + (open ? ' row-open' : ''), null, function () { toggleEdit(r); });
     row.disabled = busy();
-    row.setAttribute('aria-expanded', open ? 'true' : 'false');
+    row.setAttribute('aria-haspopup', 'dialog');
     if (FOCUS_ROW === r.rowNumber) { row.focus({ preventScroll: true }); FOCUS_ROW = null; }
   } else {
     row = add(wrap, 'div', 'row');
@@ -2877,10 +2967,7 @@ function renderRow(parent, r, rate) {
     a.setAttribute('target', '_blank');
     a.setAttribute('rel', 'noopener');
   }
-  if (open) {
-    EDIT_EL = wrap;
-    renderEditor(wrap, r);
-  }
+  if (open) EDIT_EL = wrap;
 }
 
 // ---- fixing an expense ----------------------------------------------------------
@@ -2911,82 +2998,178 @@ function toggleEdit(r) {
   render(true);
 }
 
-function fieldDef(name) {
-  for (var i = 0; i < FIELDS.length; i++) if (FIELDS[i].field === name) return FIELDS[i];
-  return null;
+// ---- A3-T2B M7: the Edit expense sheet ------------------------------------------------------------------------
+// A bottom sheet in the Add sheet's language (chips, Save top right, Delete at the bottom as a text button), pre-filled
+// with the row. EDIT stays the one state: render() paints the sheet from it (editSheetPaint_), so every path that
+// opens, saves, fails or closes the editor keeps working as before. Each changed field is still one update call, in
+// order (saveEdit); Delete keeps its Undo. Closing it (tap outside, Escape, swipe down, back) saves like Save; a
+// screen change or a lock-out drops what was typed. Money words (M5): Paid by Joint, For Both; the value sent stays
+// Couple.
+var EDIT_WHO = { paidBy: [['Couple', 'Joint'], ['Kev', 'Kev'], ['Lili', 'Lili']], paidFor: [['Couple', 'Both'], ['Kev', 'Kev'], ['Lili', 'Lili']] };
+
+function editSheetPaint_() {
+  var s = SHEET && SHEET.list === 'editexp' ? SHEET : null;
+  if (!EDIT || VIEW.screen !== 'month') {
+    if (s) sheetShut_('close');
+    return;
+  }
+  var r = rowByNumber(DATA.months, EDIT.rowNumber);
+  if (s && s.editId === EDIT.id) { editSheetSync_(s); return; }
+  if (!r) return;
+  if (SHEET) closeItemSheet_('replace');
+  editSheetOpen_(r);
 }
 
-function renderEditor(parent, r) {
-  var box = add(parent, 'div', 'editor');
-  var controls = {};
-  function typed(f, type, extra) {
-    var id = 'edit-' + f.field;
-    var lab = add(box, 'label', '', f.label);
-    lab.setAttribute('for', id);
-    var input = add(box, 'input');
-    input.setAttribute('id', id);
-    input.setAttribute('type', type);
-    input.setAttribute('autocomplete', 'off');
-    for (var k in extra) input.setAttribute(k, extra[k]);
-    input.value = EDIT.draft[f.field];
-    input.disabled = EDIT.saving;
-    input.addEventListener('input', function () { EDIT.draft[f.field] = input.value; });
-    controls[f.field] = input;
-    return input;
-  }
-  function picker(f, options, typeSlot, locked) {
-    var id = 'edit-' + f.field;
-    var lab = add(box, 'label', '', f.label);
-    lab.setAttribute('for', id);
-    var line = add(box, 'div', 'select-line');
-    var slot = typeSlot ? add(line, 'span', 'type-icon') : null;
-    if (slot) slot.appendChild(icon(EDIT.draft[f.field]));
-    var sel = add(line, 'select');
-    sel.setAttribute('id', id);
-    editOptions(options, EDIT.draft[f.field]).forEach(function (o) {
-      var opt = add(sel, 'option', '', o[1]);
-      opt.value = o[0];
+function editSheetOpen_(r) {
+  whoShut_();
+  var s = { list: 'editexp', editId: EDIT.id, rowNumber: r.rowNumber, grid: false, els: {}, ctls: [], sync: [], focusEl: null, touch: null, inputs: {} };
+  var p = sheetFrame_(s, 'Edit expense');
+  var head = add(p, 'div', 'qa-head');
+  add(head, 'h2', 'qa-title', 'Edit expense');
+  s.els.save = sheetCtl_(s, btn(head, 'qa-save btn-main', 'Save', function () { editSheetSave_(s); }));
+  var input = function (field, cls, type, label, extra) {
+    var e = sheetCtl_(s, add(p, 'input', cls));
+    e.setAttribute('id', 'edit-' + field);
+    e.setAttribute('type', type);
+    e.setAttribute('autocomplete', 'off');
+    e.setAttribute('aria-label', label);
+    for (var k in extra) e.setAttribute(k, extra[k]);
+    e.value = EDIT.draft[field];
+    e.addEventListener('input', function () { if (SHEET === s && EDIT) EDIT.draft[field] = e.value; });
+    s.inputs[field] = e;
+    return e;
+  };
+  var amtLine = add(p, 'div', 'qa-amtline');
+  var amount = input('amount', 'qa-amount', 'text', 'Amount', { inputmode: 'decimal', maxlength: '20', placeholder: '0' });
+  amtLine.appendChild(amount);
+  var chipRow = function (field, label, options) {
+    var r0 = add(p, 'div', 'qa-row');
+    add(r0, 'p', 'qa-label', label).setAttribute('id', 'edit-' + field + '-label');
+    var g = add(r0, 'div', 'sheet-chips');
+    g.setAttribute('role', 'group');
+    g.setAttribute('id', 'edit-' + field);
+    g.setAttribute('aria-labelledby', 'edit-' + field + '-label');
+    editOptions(options, EDIT.draft[field]).forEach(function (o) {
+      var b = sheetCtl_(s, btn(g, 'schip', o[1], function () {
+        if (SHEET !== s || !EDIT || EDIT.saving) return;
+        EDIT.draft[field] = o[0];
+        sheetSync_(s);
+      }));
+      b.setAttribute('data-value', o[0]);
+      s.sync.push(function () {
+        b.setAttribute('aria-pressed', EDIT && EDIT.draft[field] === o[0] ? 'true' : 'false');
+        b.disabled = !!(EDIT && EDIT.saving);
+      });
     });
-    sel.value = EDIT.draft[f.field];
-    sel.disabled = EDIT.saving || !!locked;
-    sel.addEventListener('change', function () {
-      EDIT.draft[f.field] = sel.value;
-      if (slot) {
-        slot.textContent = '';
-        slot.appendChild(icon(sel.value));
-      }
-    });
-    controls[f.field] = sel;
-    return sel;
-  }
-  var cats = (DATA.categories || []).map(function (c) { return [c, c]; });
-  var typeLocked = !DATA.canChangeType;
-  typed(fieldDef('item'), 'text', { maxlength: '100' });
-  typed(fieldDef('amount'), 'text', { inputmode: 'decimal' });
-  picker(fieldDef('currency'), CURRENCIES);
-  typed(fieldDef('date'), 'date', {});
-  picker(fieldDef('category'), typeLocked ? [] : cats, true, typeLocked);
-  if (typeLocked) add(box, 'p', 'editor-note', 'Type cannot be changed right now.');
-  picker(fieldDef('paidBy'), [['Couple', 'Joint money'], ['Kev', 'Kev'], ['Lili', 'Lili']]);
-  picker(fieldDef('paidFor'), [['Couple', 'Both'], ['Kev', 'Kev'], ['Lili', 'Lili']]);
-  if (EDIT.error) add(box, 'p', 'editor-error', EDIT.error).setAttribute('role', 'alert');
-  var actions = add(box, 'div', 'editor-actions');
-  var save = btn(actions, 'btn-main', EDIT.saving && !EDIT.deleting ? 'Saving...' : 'Save', function () {
-    FIELDS.forEach(function (f) { EDIT.draft[f.field] = controls[f.field].value; });
-    var row = rowByNumber(DATA.months, r.rowNumber);
-    var checked = row ? editDraftValues(row, EDIT.draft, DATA.today) : { values: {} };
-    if (checked.error) {
-      EDIT.error = checked.error;
-      render(true);
-      return;
+    return g;
+  };
+  chipRow('currency', 'Currency', CURRENCIES);
+  var what = input('item', 'qa-what', 'text', 'What', { maxlength: '100', enterkeyhint: 'done', placeholder: 'What was it?' });
+  what.addEventListener('keydown', function (e) {
+    if (e && e.key === 'Enter' && !e.isComposing && SHEET === s) {
+      e.preventDefault();
+      editSheetSave_(s);
     }
-    saveEdit(r.rowNumber, checked.values);
   });
-  var cancel = btn(actions, 'btn-plain', 'Cancel', function () { toggleEdit(r); });
-  save.disabled = EDIT.saving;
-  cancel.disabled = EDIT.saving;
-  var del = btn(box, 'editor-delete', EDIT.deleting ? 'Deleting...' : 'Delete', function () { deleteExpense(r.rowNumber); });
-  del.disabled = EDIT.saving;
+  // Type: the chip shows the category; a tap opens the grid (Settlement is never offered).
+  var locked = !DATA.canChangeType;
+  var typeRow = add(p, 'div', 'qa-row');
+  add(typeRow, 'p', 'qa-label', 'Type').setAttribute('id', 'edit-category-label');
+  s.els.type = sheetCtl_(s, btn(typeRow, 'qa-type', null, function () {
+    if (SHEET !== s || locked || !EDIT || EDIT.saving) return;
+    s.grid = !s.grid;
+    sheetSync_(s);
+  }));
+  var grid = add(p, 'div', 'qa-grid');
+  grid.setAttribute('role', 'group');
+  grid.setAttribute('id', 'edit-category');
+  grid.setAttribute('aria-labelledby', 'edit-category-label');
+  var cats = locked ? [] : (DATA.categories || []).filter(function (c) { return c !== 'Settlement'; }).map(function (c) { return [c, c]; });
+  editOptions(cats, EDIT.draft.category).forEach(function (o) {
+    var b = sheetCtl_(s, btn(grid, 'qa-cat', null, function () {
+      if (SHEET !== s || locked || !EDIT || EDIT.saving) return;
+      EDIT.draft.category = o[0];
+      s.grid = false;
+      sheetSync_(s);
+      s.els.type.focus({ preventScroll: true });
+    }), function () { return s.grid; });
+    b.setAttribute('data-value', o[0]);
+    catAvatar_(b, o[0]);
+    add(b, 'span', '', o[1]);
+    s.sync.push(function () {
+      b.setAttribute('aria-pressed', EDIT && EDIT.draft.category === o[0] ? 'true' : 'false');
+      b.disabled = locked || !!(EDIT && EDIT.saving);
+    });
+  });
+  if (locked) add(p, 'p', 'editor-note', 'Type cannot be changed right now.');
+  s.sync.push(function () {
+    var cat = EDIT ? EDIT.draft.category : '';
+    s.els.type.textContent = '';
+    catAvatar_(s.els.type, cat);
+    add(s.els.type, 'span', '', cat || 'Not set');
+    if (!locked) add(s.els.type, 'span', 'chev').setAttribute('aria-hidden', 'true');
+    s.els.type.setAttribute('aria-label', 'Type: ' + (cat || 'Not set') + (locked ? '' : '. Change'));
+    s.els.type.setAttribute('aria-expanded', s.grid ? 'true' : 'false');
+    s.els.type.disabled = locked || !!(EDIT && EDIT.saving);
+    grid.hidden = !s.grid;
+  });
+  chipRow('paidBy', 'Paid by', EDIT_WHO.paidBy);
+  chipRow('paidFor', 'For', EDIT_WHO.paidFor);
+  var dayRow = add(p, 'div', 'qa-row');
+  add(dayRow, 'p', 'qa-label', 'Date').setAttribute('id', 'edit-date-label');
+  var day = input('date', 'qa-day', 'date', 'Date', { min: '2020-01-01' });
+  if (todoValidDay_(DATA.today)) day.setAttribute('max', nextDay(DATA.today));
+  dayRow.appendChild(day);
+  s.els.error = add(p, 'p', 'editor-error');
+  s.els.error.setAttribute('role', 'alert');
+  // Closing saves, so a value that cannot be saved would hold the sheet: with an error on show, Discard changes
+  // closes it and leaves the row as it is.
+  s.els.discard = sheetCtl_(s, btn(p, 'textbtn edit-discard', 'Discard changes', function () {
+    if (SHEET !== s || !EDIT || EDIT.saving) return;
+    FOCUS_ROW = s.rowNumber;
+    EDIT = null;
+    render(true);
+  }), function () { return !s.els.discard.hidden; });
+  var foot = add(p, 'div', 'sheet-foot');
+  s.els.del = sheetCtl_(s, btn(foot, 'textbtn sheet-delete', 'Delete', function () {
+    if (SHEET === s && EDIT && !EDIT.saving) deleteExpense(s.rowNumber);
+  }));
+  SHEET = s;
+  $('sheet').hidden = false;
+  sheetInert_(true);
+  sheetHistory_();
+  editSheetSync_(s);
+  s.focusEl = p;
+  p.focus({ preventScroll: true });
+}
+
+// The sheet in line with EDIT: saving disables everything, the error line, the button words.
+function editSheetSync_(s) {
+  var busyNow = !!(EDIT && EDIT.saving);
+  s.els.save.textContent = busyNow && !EDIT.deleting ? 'Saving...' : 'Save';
+  s.els.save.disabled = busyNow;
+  s.els.del.textContent = EDIT && EDIT.deleting ? 'Deleting...' : 'Delete';
+  s.els.del.disabled = busyNow;
+  for (var k in s.inputs) s.inputs[k].disabled = busyNow;
+  s.els.error.textContent = EDIT && EDIT.error ? EDIT.error : '';
+  s.els.error.hidden = !(EDIT && EDIT.error);
+  s.els.discard.hidden = !(EDIT && EDIT.error) || busyNow;
+  sheetSync_(s);
+}
+
+// Save, a tap outside, Escape, back: the typed values are checked, then sent field by field (saveEdit). Nothing
+// changed closes it. A bad value says so and the sheet stays.
+function editSheetSave_(s) {
+  if (SHEET !== s || !EDIT || EDIT.saving || EDIT.id !== s.editId) return;
+  ['item', 'amount', 'date'].forEach(function (f) { EDIT.draft[f] = s.inputs[f].value; });
+  var row = rowByNumber(DATA.months, s.rowNumber);
+  var checked = row ? editDraftValues(row, EDIT.draft, DATA.today) : { values: {} };
+  if (checked.error) {
+    EDIT.error = checked.error;
+    editSheetSync_(s);
+    return;
+  }
+  saveEdit(s.rowNumber, checked.values);
 }
 
 function refusalText(res) {
@@ -3116,7 +3299,7 @@ function saveEdit(rowNumber, values) {
     saved: [],
     done: function (saved, fingerprint) {
       closeEdit(editId);
-      setToast({ text: 'Changed.', undo: undoFor(rowNumber, fingerprint, applyChanges(row, saved), saved) }, key);
+      setToast({ text: 'Saved.', undo: undoFor(rowNumber, fingerprint, applyChanges(row, saved), saved) }, key); // A3-T2A M3
       render(true);
     },
     failed: function (saved, change, res, fingerprint) {
@@ -3227,7 +3410,7 @@ function deleteExpense(rowNumber) {
     }
     closeEdit(editId);
     if (res.data) moneySet_(res.data);
-    deletedToast('Deleted.', res.deletedId, key);
+    deletedToast(listsDeletedText_({ text: row.item }), res.deletedId, key); // A3-T2B m5: the line names the expense
     render(true);
     if (!res.data) loadData(true);
   }, function (err) {
@@ -3320,6 +3503,12 @@ function renderBalanceScreen() {
   side('In Kev’s favour', d.sides.kev, d.sides.kevTotal);
   side('In Lili’s favour', d.sides.lili, d.sides.liliTotal);
   if (d.rows.length) add(why, 'p', 'why-end', nb('The difference: ' + balanceText(net).replace('To even up: ', '') + '.'));
+  // A3-T2B m12: Settle up right under the difference, the same flow and guards as on the card.
+  var act = add(why, 'div', 'bal-act');
+  var actNote = add(act, 'span', 'bal-act-note');
+  var settleBtn = settleButton_(act, actNote);
+  if (settlePending_()) add(actNote, 'span', 'bal-note', 'Settling up. Waiting to be sent.');
+  if (!settleBtn && !actNote.children.length) act.hidden = true; // A3-T2A (2B minor): the waiting note shows
   add(why, 'p', 'caption', 'From the euro amounts stored in the sheet. Expenses that need an amount are left out.');
 
   if (d.byMonth.length) {
@@ -3327,7 +3516,7 @@ function renderBalanceScreen() {
     d.byMonth.forEach(function (m) {
       var r = add(ms, 'div', 'month-owes');
       add(r, 'span', '', m.label);
-      add(r, 'span', '', m.text);
+      add(r, 'span', '', String(m.text).replace(/ owes /, ' pays ')); // A3-T2B m12: "pays" everywhere, as the sentence says
     });
     if (d.byMonth.some(function (m) { return m.halfCent; })) {
       add(ms, 'p', 'caption', 'A month that lands on half a cent can differ from the sheet by one cent, because of how the sheet rounds.');
@@ -3507,7 +3696,8 @@ function openSession_() {
   }
   if (QUEUE.length) setTimeout(listsNoteUpdate_, 10000);
   listsFlush_();
-  qaKeptToast_(); // fix round 1: an expense the server refused earlier still waits in Add
+  // fix round 1: an expense the server refused earlier still waits in Add (A3-T2A: else a kept to-do or item)
+  qaKeptToast_(qaKeptNext_('expense') ? 'expense' : (qaKeptNext_('todo') ? 'todo' : 'grocery'));
 }
 
 // Writes kl.tab only when it changes, so a Money-only visit stores nothing new.
@@ -3530,9 +3720,15 @@ function renderTabs_() {
       else go(t[0] === 'money' ? { screen: 'home', key: null } : { screen: t[0], key: null });
     });
     if (t[0] === cur) b.setAttribute('aria-current', 'page');
-    if (isAdd) ADD_SLOT = b;
-    add(b, 'span', 'tab-pill').appendChild(svgIcon_(isAdd ? PLUS_PATHS : tabIconPaths_(t[0])));
+    var pill = add(b, 'span', 'tab-pill');
+    pill.appendChild(svgIcon_(isAdd ? PLUS_PATHS : tabIconPaths_(t[0])));
     add(b, 'span', 'tab-label', t[1]);
+    if (isAdd) {
+      ADD_SLOT = b;
+      ADD_DOT = add(pill, 'span', 'tab-dot'); // A3-T2B m9
+      ADD_DOT.setAttribute('aria-hidden', 'true');
+      qaAddDot_();
+    }
   });
 }
 
@@ -3654,7 +3850,7 @@ function listsApplyOp_(lists, op) {
         return t.replace(/[\u0300-\u036f]/g, '').replace(/[\u2018\u2019]/g, '\u0027').toLowerCase().replace(/\s+/g, ' ').trim();
       };
       if (!isTodo && Object.prototype.hasOwnProperty.call(f, 'shop')) {
-        // A2 final: No shop on a hand-shop item drops shopMap's entry for that very item when it names the shop
+        // A2 final: Any shop (once No shop, A3-T2B p7) on a hand-shop item drops shopMap's entry for that very item when it names the shop
         // being cleared (it came from this row), so the placement does not put it straight back; the next read
         // brings the server's own map.
         var map = lists.shopMap;
@@ -3702,6 +3898,7 @@ var LISTS_FETCHED = 0;   // when this page itself last loaded the lists (ms); 0 
 var LISTS_LOADING = false;
 var LISTS_AGAIN = false; // a forced load asked for while one was on its way
 var LISTS_FAILED = false;
+var LISTS_OFFLINE = false; // A3-T2B M6: the failed refresh never reached the server (offline), so the line says Offline
 var LISTS_TOAST = '';    // one short line in the dock; cleared on every navigation
 var LISTS_NOTE = null;   // the dock's "Not saved yet" element on screen now
 var QUEUE = [];          // ops not yet answered, oldest first; mirrored in kl.queue, shared with other tabs
@@ -3843,6 +4040,7 @@ function listsLoadFailed_(err) {
   var code = err ? err.code : '';
   if (code === 'NO_SESSION') { lockOut(); return; }
   LISTS_FAILED = true;
+  LISTS_OFFLINE = unreached(err);
   // A head waiting for this read tries again on the backoff (listsFlush_ asks for the read).
   if (WAITING_READ && RETRY_TIMER === null) listsRetryLater_();
   if (!isListScreen_(VIEW.screen)) return;
@@ -4068,6 +4266,7 @@ function listsFlush_() {
   WAITING_READ = false;
   var op = QUEUE[0];
   if (op.op === 'expense') { expenseSend_(op); return; } // A1-T5 (R-A5): on its own, through addExpense
+  LISTS_TRIED[op.uid] = true; // A3-T2A fix 1: sent once, so an Undo knows the item may exist (memory only)
   var sent = JSON.parse(JSON.stringify(op));
   if (HEAD_FAIL_UID !== op.uid) { HEAD_FAIL_UID = op.uid; HEAD_FAIL_N = 0; } // a new head starts from zero
   INFLIGHT = op.uid;
@@ -4270,6 +4469,8 @@ function listsLockOut_() {
   LISTS_FETCHED = 0;
   LISTS_TOAST = '';
   listsUndoClear_();
+  LISTS_NEW = null; // A3-T2A
+  LISTS_NEW_EL = null;
   LISTS_NOTE = null;
   SETTLED = [];
   LANDED_N = -1;     // the next read must land before a waiting head is resolved against anything
@@ -4277,15 +4478,15 @@ function listsLockOut_() {
 }
 
 // ---- lists: screens (Tasks 6 to 8 fill the lists-main container) ---------------------------------
-// A1-T3: the large title with this phone's avatar on its right. Under it, line (the Today count), and the age
-// of the lists only when they are over 10 minutes old or a refresh failed.
-function listsPanel_(root, title, line) {
-  var top = largeTitleBox_(root, title, whoAvatar_());
+// A1-T3: the large title with this phone's avatar on its right. Under it, line (In the shop), and the age
+// of the lists only when they are over 10 minutes old or a refresh failed. A3-T2B: extra (To do's Mine) sits on
+// the title row before the avatar; the "Today: N" line is gone (p9).
+function listsPanel_(root, title, line, extra) {
+  var top = largeTitleBox_(root, title, [extra || null, whoAvatar_()]);
   if (line) add(top.wrap, 'p', 'title-note', line);
   var now = Date.now();
-  if (LISTS_AT && (LISTS_FAILED || now - LISTS_AT > 600000)) {
-    add(top.wrap, 'p', 'title-note', (LISTS_FAILED ? 'Could not refresh. ' : '') + updatedText_(LISTS_AT, now) + '.');
-  }
+  if (LISTS_AT && LISTS_FAILED) staleNote_(top.wrap, 'Lists', LISTS_AT, LISTS_OFFLINE); // A3-T2B M6
+  else if (LISTS_AT && now - LISTS_AT > 600000) add(top.wrap, 'p', 'title-note', updatedText_(LISTS_AT, now) + '.');
   return top.h;
 }
 
@@ -4295,12 +4496,15 @@ var WHO_OPEN = false;
 var WHO_AVATAR = null;  // the header avatar on show now; it gets focus back when the sheet closes
 var WHO_CTLS = [];      // the two choices, for the Tab loop
 
+// A3-T2B m3: before the choice, a person icon labelled "Who?" (a bare "?" read as Help).
+var PERSON_PATHS = ['M12 4.5a3.5 3.5 0 1 1 0 7a3.5 3.5 0 1 1 0-7z', 'M5 19.5c0-3.6 3.1-6 7-6s7 2.4 7 6'];
 function whoAvatar_() {
   var me = whoAmI_();
-  var b = el('button', 'avatar avatar-' + (me ? me.toLowerCase() : 'q'));
+  var b = el('button', me ? 'avatar avatar-' + me.toLowerCase() : 'avatar avatar-who');
   b.setAttribute('type', 'button');
   b.setAttribute('aria-label', me ? 'This phone: ' + me + '. Change' : 'Who uses this phone?');
-  add(b, 'span', '', me ? me.charAt(0) : '?').setAttribute('aria-hidden', 'true');
+  if (!me) b.appendChild(svgIcon_(PERSON_PATHS));
+  add(b, 'span', '', me ? me.charAt(0) : 'Who?').setAttribute('aria-hidden', 'true');
   b.addEventListener('click', openWhoSheet_);
   WHO_AVATAR = b;
   return b;
@@ -4400,7 +4604,13 @@ function listsProblems_(parent, lists) {
   return lines.length ? add(parent, 'p', 'lists-problem', lines.join(' ')) : null;
 }
 
-// The fixed strip above the bar: "Not saved yet", the lists toast and the "Deleted. Undo" line.
+// A3-T2B m5: the delete line names the item: "Deleted: Clean the fridge." (its end punctuation dropped).
+function listsDeletedText_(it) {
+  var name = sheetOneLine_(it && it.text).replace(/[\s.!?,;:\u2026]+$/, '');
+  return name ? 'Deleted: ' + name + '.' : 'Deleted.';
+}
+
+// The fixed strip above the bar: "Not saved yet", the lists toast and the "Deleted: <item>. Undo" line.
 function listsDock_(root) {
   var dock = add(root, 'div', 'dock');
   LISTS_NOTE = add(dock, 'p', 'dock-note');
@@ -4416,7 +4626,7 @@ function listsDock_(root) {
     // M2: only "Deleted." is the live region, and it is said once: it goes on screen empty and is filled
     // 100 ms later on the line then on screen; every repaint after that draws it filled.
     var u = add(dock, 'div', 'dock-toast dock-undo');
-    var said = add(u, 'span', '', LISTS_UNDO.said ? 'Deleted.' : '');
+    var said = add(u, 'span', '', LISTS_UNDO.said ? listsDeletedText_(LISTS_UNDO.item) : '');
     said.setAttribute('role', 'status');
     LISTS_UNDO_SAY = said;
     if (!LISTS_UNDO.said && !LISTS_UNDO.saying) {
@@ -4425,7 +4635,7 @@ function listsDock_(root) {
       setTimeout(function () {
         if (LISTS_UNDO !== undo) return;
         undo.said = true;
-        if (LISTS_UNDO_SAY) LISTS_UNDO_SAY.textContent = 'Deleted.';
+        if (LISTS_UNDO_SAY) LISTS_UNDO_SAY.textContent = listsDeletedText_(undo.item);
       }, 100);
     }
     todoKey_(btn(u, '', 'Undo', listsUndo_), 'undo');
@@ -4476,6 +4686,13 @@ function todoDayLabel_(iso, today) {
   var out = days[d.getUTCDay()] + ' ' + d.getUTCDate();
   if (iso.slice(0, 7) !== String(today || '').slice(0, 7)) out += ' ' + months[d.getUTCMonth()];
   return out;
+}
+
+// A3-T2B p2: 'Today', 'Tomorrow', else the short day ('Fri 14', 'Tue 1 Dec').
+function todoWhenLabel_(iso, today) {
+  if (iso === today) return 'Today';
+  if (todoValidDay_(today) && iso === isoAddDays_(today, 1)) return 'Tomorrow';
+  return todoDayLabel_(iso, today);
 }
 
 // The muted age chip: nothing under 7 days, then '7 days' to '13 days', then '2+ weeks' and no higher.
@@ -4562,7 +4779,7 @@ function todoSections_(items, today) {
   week.forEach(function (it) {
     var g = out.week[out.week.length - 1];
     if (!g || g.due !== it.due) {
-      g = { due: it.due, label: todoDayLabel_(it.due, today), items: [] };
+      g = { due: it.due, label: todoWhenLabel_(it.due, today), items: [] };
       out.week.push(g);
     }
     g.items.push(it);
@@ -4608,7 +4825,10 @@ function todoMine_(items, me) {
 // ---- To do: screen state. A repaint rebuilds the screen, so what must survive lives here.
 var LS_NOTE = 'kl.noteSnooze'; // the Bali day the Anytime note shows again (yyyy-MM-dd)
 var NOTE_SNOOZE = null;  // memory copy of kl.noteSnooze, so "Not now" holds for this visit even without storage
-var TODO_MINE = false;   // the Mine toggle
+var LS_MINE = 'kl.mine';   // A3-T2B m4: the Mine toggle, remembered on this phone ('1' on, '0' off)
+var TODO_MINE = null;    // memory copy of kl.mine (null: not read yet), so Mine holds for this visit even without storage
+var TODO_STEP_OPEN = {}; // A3-T2B: id -> true, the First step chips unfolded on this visit
+var TODO_NOTE_ID = '';   // A3-T2B m10: the item the "has waited a while" card names on this paint (its age chip is not shown)
 var TODO_STRUCK = {};    // id -> {item, at}: ticked here, struck in place (at its old position) until the screen is left
 var TODO_OPEN = {};      // the collapsed sections opened on this visit: later, parked, done
 var TODO_PAUSE = '';     // the reminders Pause menu: '' closed, 'menu', or 'date' with the day field
@@ -4626,6 +4846,7 @@ var TICK_DONE_PATHS = ['M12 3.5a8.5 8.5 0 1 1 0 17a8.5 8.5 0 1 1 0-17z', 'M8 12.
 function todoLeave_() {
   TODO_STRUCK = {};
   TODO_OPEN = {};
+  TODO_STEP_OPEN = {};
   TODO_PAUSE = '';
   TODO_PAUSE_DAY = '';
   TODO_PAUSE_ERR = '';
@@ -4645,6 +4866,16 @@ function todoKey_(e, key) {
 
 function todoIsDay_(v) {
   return todoValidDay_(v);
+}
+
+function todoMineOn_() {
+  if (TODO_MINE === null) TODO_MINE = lsGet_(LS_MINE) === '1';
+  return TODO_MINE;
+}
+
+function todoMineSet_(on) {
+  TODO_MINE = !!on;
+  lsSet_(LS_MINE, on ? '1' : '0');
 }
 
 function todoSnoozedUntil_() {
@@ -4733,35 +4964,34 @@ function todoView_(lists, me, mineOnly) {
   }
   var today = listsToday_(lists);
   var sections = todoSections_(all, today);
-  var dueToday = sections.today.filter(function (it) { return !TODO_STRUCK[it.id]; }).length;
-  return { today: today, sections: sections, done: done, count: all.length, dueToday: dueToday };
+  return { today: today, sections: sections, done: done, count: all.length };
 }
 
 function renderTodo_(data, me, mineOnly) {
   var root = $('todo');
   var lists = data === undefined ? LISTS : data;
   if (me === undefined) me = whoAmI_();
-  if (mineOnly === undefined) mineOnly = TODO_MINE;
+  if (mineOnly === undefined) mineOnly = todoMineOn_();
   var view = lists ? todoView_(lists, me, mineOnly) : null;
   TODO_FOCUS_EL = null;
-  var title = listsPanel_(root, 'To do', view && view.dueToday > 0 ? 'Today: ' + view.dueToday : '');
+  // A3-T2B m4: Mine sits on the title row, before the avatar, and is remembered on this phone (kl.mine).
+  var mine = null;
+  if (view && me) {
+    mine = todoKey_(el('button', 'mine', 'Mine'), 'mine');
+    mine.setAttribute('type', 'button');
+    mine.setAttribute('aria-pressed', mineOnly ? 'true' : 'false');
+    mine.addEventListener('click', function () {
+      TODO_FOCUS = 'mine';
+      todoMineSet_(!todoMineOn_());
+      render(true);
+    });
+  }
+  var title = listsPanel_(root, 'To do', '', mine);
   var body = add(root, 'div', 'wrap');
   listsProblems_(body, lists);
   var main = add(body, 'div', 'lists-main');
-  if (!view) {
-    listsWaiting_(main);
-  } else {
-    if (me) {
-      var top = add(main, 'div', 'todo-top');
-      var mine = todoKey_(btn(top, 'mine', 'Mine', function () {
-        TODO_FOCUS = 'mine';
-        TODO_MINE = !TODO_MINE;
-        render(true);
-      }), 'mine');
-      mine.setAttribute('aria-pressed', mineOnly ? 'true' : 'false');
-    }
-    todoMain_(main, view);
-  }
+  if (!view) listsWaiting_(main);
+  else todoMain_(main, view);
   if (me) todoSettings_(body, lists, me);
   add(body, 'div', 'list-end');
   listsDock_(root);
@@ -4769,12 +4999,17 @@ function renderTodo_(data, me, mineOnly) {
   if (!TODO_FOCUS_EL && TODO_FOCUS === 'add' && ADD_SLOT) TODO_FOCUS_EL = ADD_SLOT;
   // An open sheet keeps focus: a repaint behind it never moves focus (iOS would close the keyboard).
   if (TODO_FOCUS_EL && !modalOpen_()) TODO_FOCUS_EL.focus({ preventScroll: true });
+  listsNewScroll_(); // A3-T2A M4
   return title;
 }
 
 function todoMain_(main, view) {
   var s = view.sections;
   var today = view.today;
+  // A3-T2B m10: the item the Anytime card names, picked first so its row (wherever it is) shows no age chip.
+  var pick = !s.anytime.length || (todoSnoozedUntil_() && today < todoSnoozedUntil_()) ? null
+    : todoNotePick_(s.anytime.filter(function (it) { return !TODO_STRUCK[it.id]; }));
+  TODO_NOTE_ID = pick ? pick.id : '';
   // A1-T7: nothing open is the calm "All clear" state, never an error; the line points to the Add slot below.
   if (!view.count) emptyState_(main, 'All clear', 'Nothing planned. Add one with the button below, or tell the bot.');
   if (s.today.length) {
@@ -4788,17 +5023,16 @@ function todoMain_(main, view) {
       g.items.forEach(function (it) { todoRow_(w, it, today, 'week'); });
     });
   }
+  // A3-T2B m2: the dates after this week are "Coming up", open by default when there are 3 or fewer.
   if (s.later.length) {
     var l = add(main, 'div', 'todo-sec todo-sec-later');
-    if (todoFold_(l, 'later', 'Later · ' + s.later.length + ' · next ' + todoDayLabel_(s.later[0].due, today))) {
+    if (todoFold_(l, 'later', 'Coming up · ' + s.later.length + ' · next ' + todoDayLabel_(s.later[0].due, today), s.later.length <= 3)) {
       var lc = listCard_(l);
       s.later.forEach(function (it) { todoRow_(lc, it, today, 'later'); });
     }
   }
   if (s.anytime.length) {
     var a = todoSection_(main, 'anytime', 'Anytime');
-    var pick = todoSnoozedUntil_() && today < todoSnoozedUntil_() ? null
-      : todoNotePick_(s.anytime.filter(function (it) { return !TODO_STRUCK[it.id]; }));
     if (pick) todoNote_(a, pick, today);
     s.anytime.forEach(function (it) { todoRow_(a, it, today, 'anytime'); });
   }
@@ -4829,27 +5063,32 @@ function listCard_(parent) {
   return add(parent, 'div', 'card list-card');
 }
 
-// A collapsed section's header. True when it is open.
-function todoFold_(sec, key, label) {
+// A collapsed section's header. True when it is open. dflt (A3-T2B): open until it is folded by hand on this visit.
+function todoFold_(sec, key, label, dflt) {
+  var open = Object.prototype.hasOwnProperty.call(TODO_OPEN, key) ? !!TODO_OPEN[key] : !!dflt;
   var h = add(sec, 'h2', 'todo-fold-h');
   var b = todoKey_(btn(h, 'todo-fold', label, function () {
     TODO_FOCUS = 'fold:' + key;
-    TODO_OPEN[key] = !TODO_OPEN[key];
+    TODO_OPEN[key] = !open;
     render(true);
   }), 'fold:' + key);
-  b.setAttribute('aria-expanded', TODO_OPEN[key] ? 'true' : 'false');
-  return !!TODO_OPEN[key];
+  b.setAttribute('aria-expanded', open ? 'true' : 'false');
+  return open;
 }
 
 // One row: the tick zone, the text (2 lines at most), then the chips. where says which section it is in.
+// A3-T2B: the text is the button that opens the sheet; the chips sit under it, outside that button, so the First
+// step chip can be a button of its own (it unfolds the whole step and never ticks or opens the sheet).
+var CLOCK_PATHS = ['M12 3.5a8.5 8.5 0 1 1 0 17a8.5 8.5 0 1 1 0-17z', 'M12 7.5v5l3 2'];
 function todoRow_(parent, it, today, where) {
   var done = where === 'done' || !!TODO_STRUCK[it.id];
   var row = add(parent, 'div', 'todo-row' + (done ? ' is-done' : ''));
+  listsNewMark_(row, it); // A3-T2A M4
   listsSwipe_(row, function () {
     TODO_FOCUS = 'tick:' + it.id;
     if (done) todoUntick_(it);
     else todoTick_(it);
-  }, done ? null : function () { listsDelete_('todo', it); });
+  }, done ? null : function () { listsDelete_('todo', it); }, done ? 'Not done' : 'Done');
   var tick = todoKey_(btn(row, 'tick-zone', null, function () {
     TODO_FOCUS = 'tick:' + it.id;
     if (done) todoUntick_(it);
@@ -4858,7 +5097,8 @@ function todoRow_(parent, it, today, where) {
   tick.setAttribute('aria-label', 'Done: ' + it.text);
   tick.setAttribute('aria-pressed', done ? 'true' : 'false');
   tick.appendChild(svgIcon_(done ? TICK_DONE_PATHS : TICK_OPEN_PATHS));
-  var main = done ? add(row, 'div', 'todo-open') : todoKey_(btn(row, 'todo-open', null, function () {
+  var body = add(row, 'div', 'todo-main');
+  var main = done ? add(body, 'div', 'todo-open') : todoKey_(btn(body, 'todo-open', null, function () {
     TODO_FOCUS = 'open:' + it.id;
     todoOpen_(it);
   }), 'open:' + it.id);
@@ -4890,15 +5130,40 @@ function todoRow_(parent, it, today, where) {
   var who = todoWho_(it.who);
   if (who) chips.push([who, 'tchip-who tchip-' + who.toLowerCase()]);
   var effort = todoEffortText_(it);
-  if (effort) chips.push([effort, 'tchip-effort']);
-  var age = todoAgeText_(it.ageDays);
+  if (effort) chips.push([effort, 'tchip-effort', it.kind === 'bigger']);
+  var age = TODO_NOTE_ID === it.id ? '' : todoAgeText_(it.ageDays); // m10: the card already says it waited
   if (age) chips.push([age, 'tchip-age']);
+  // p2: a time chip carries a clock icon, so it never reads like the effort chip.
   if (where === 'today' && today && it.due < today) chips.push(['from ' + todoDayLabel_(it.due, today), 'tchip-from']);
-  else if (where === 'later') chips.push([todoDayLabel_(it.due, today) + (it.time ? ' ' + it.time : ''), 'tchip-date']);
-  else if (it.time && (where === 'today' || where === 'week')) chips.push([it.time, 'tchip-date']);
+  else if (where === 'later') chips.push([todoDayLabel_(it.due, today) + (it.time ? ' ' + it.time : ''), 'tchip-date' + (it.time ? ' tchip-time' : '')]);
+  else if (it.time && (where === 'today' || where === 'week')) chips.push([it.time, 'tchip-date tchip-time']);
   if (!chips.length) return;
-  var box = add(main, 'span', 'todo-chips');
-  chips.forEach(function (c) { add(box, 'span', 'tchip ' + c[1], c[0]); });
+  var box = add(body, 'div', 'todo-chips');
+  // A tap on the chips (not on the First step) opens the sheet, as a tap on the text does.
+  if (!done) box.addEventListener('click', function () { TODO_FOCUS = 'open:' + it.id; todoOpen_(it); });
+  chips.forEach(function (c) {
+    if (c[2]) { todoStepChip_(box, it, c[0]); return; }
+    var chip = add(box, 'span', 'tchip ' + c[1]);
+    if (/\btchip-time\b/.test(c[1])) chip.appendChild(svgIcon_(CLOCK_PATHS));
+    chip.appendChild(document.createTextNode(c[0]));
+  });
+}
+
+// A3-T2B: the First step chip. One tap unfolds the whole step (aria-expanded), a second folds it. It never ticks
+// and never opens the sheet: it is its own 44 px button, outside the row's text button.
+function todoStepChip_(box, it, text) {
+  var key = 'step:' + it.id;
+  var open = !!TODO_STEP_OPEN[it.id];
+  var b = todoKey_(btn(box, 'todo-step' + (open ? ' is-open' : ''), null, function (e) {
+    if (e && typeof e.stopPropagation === 'function') e.stopPropagation();
+    TODO_FOCUS = key;
+    if (TODO_STEP_OPEN[it.id]) delete TODO_STEP_OPEN[it.id];
+    else TODO_STEP_OPEN[it.id] = true;
+    render(true);
+  }), key);
+  b.setAttribute('aria-expanded', open ? 'true' : 'false');
+  add(b, 'span', 'tchip tchip-effort tchip-step', text);
+  return b;
 }
 
 // The calm note at the top of Anytime: one item, its first step, two ways out.
@@ -4923,15 +5188,15 @@ function todoSettings_(body, lists, me) {
   var until = todoPausedUntil_(lists, me);
   var line = add(body, 'p', 'lists-settings small');
   line.appendChild(document.createTextNode(until ? 'Reminders: paused until ' + todoDayLabel_(until, today) : 'Reminders: on'));
-  add(line, 'span', 'sep', '·').setAttribute('aria-hidden', 'true');
+  // A3-T2B m7: Pause and Resume are 44 px pills, not small links.
   if (until) {
-    todoKey_(btn(line, 'textbtn', 'Resume', function () {
+    todoKey_(btn(line, 'pill', 'Resume', function () {
       TODO_FOCUS = 'pause';
       todoPause_('');
     }), 'resume');
     return;
   }
-  var pause = todoKey_(btn(line, 'textbtn', 'Pause', function () {
+  var pause = todoKey_(btn(line, 'pill', 'Pause reminders', function () {
     TODO_FOCUS = 'pause';
     TODO_PAUSE = TODO_PAUSE ? '' : 'menu';
     TODO_PAUSE_ERR = '';
@@ -5005,20 +5270,271 @@ var LISTS_UNDO = null;     // {list, item}: the "Deleted. Undo" line, for 6 s
 var LISTS_UNDO_TIMER = null;
 var LISTS_UNDO_SAY = null; // the "Deleted." status line on screen now
 
+// ---- A3-T2A: day and time words in a to-do ("demain 6h40") ----------------------------------------------------
+// A copy of parseWhen_ in Lists.gs (the bot), unchanged: tests/when-cases.json runs both, and a test checks the two are
+// the same function line for line. parseWhen_(text, now) -> {text (the words cut), due 'yyyy-MM-dd' or '', time 'HH:mm' or ''}.
+function parseWhen_(text, now) {
+  if (typeof text !== 'string' || text === '') return { text: typeof text === 'string' ? text : '', due: '', time: '' };
+  var ms = (now && typeof now.getTime === 'function' && isFinite(now.getTime())) ? now.getTime() : new Date().getTime();
+  var bali = new Date(ms + 8 * 3600000);
+  var Y = bali.getUTCFullYear(), M0 = bali.getUTCMonth(), D = bali.getUTCDate(), WD = bali.getUTCDay();
+  var nowMin = bali.getUTCHours() * 60 + bali.getUTCMinutes();
+
+  var MONTHS = [
+    ['janvier', 'january', 'januari', 'jan'], ['fevrier', 'february', 'februari', 'fevr', 'feb', 'fev'],
+    ['mars', 'march', 'maart', 'mar', 'mrt'], ['avril', 'april', 'apr', 'avr'], ['mai', 'may', 'mei'],
+    ['juin', 'june', 'juni', 'jun'], ['juillet', 'july', 'juli', 'juil', 'jul'], ['aout', 'august', 'augustus', 'aug'],
+    ['septembre', 'september', 'sept', 'sep'], ['octobre', 'october', 'oktober', 'oct', 'okt'],
+    ['novembre', 'november', 'nov'], ['decembre', 'december', 'dec']
+  ];
+  var DAYS = [ // index = getUTCDay(): 0 is Sunday
+    ['dimanche', 'sunday', 'zondag'], ['lundi', 'monday', 'maandag'], ['mardi', 'tuesday', 'dinsdag'],
+    ['mercredi', 'wednesday', 'woensdag'], ['jeudi', 'thursday', 'donderdag'], ['vendredi', 'friday', 'vrijdag'],
+    ['samedi', 'saturday', 'zaterdag']
+  ];
+  var SHORT = ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat'];
+
+  // Folded copy f; map[j] is the index in text of folded character j.
+  var f = '', map = [], i, j, k;
+  for (i = 0; i < text.length; i++) {
+    var g = text.charAt(i).toLowerCase();
+    if (g.normalize) g = g.normalize('NFD');
+    g = g.replace(/[\u0300-\u036f]/g, '').replace(/[\u2018\u2019\u02bc\u00b4\u0060]/g, "'");
+    for (k = 0; k < g.length; k++) { f += g.charAt(k); map.push(i); }
+  }
+
+  function isWord(ch) {
+    return ch !== '' && (/[0-9a-z_]/.test(ch) || (ch > '\u007f' && ch.toLowerCase() !== ch.toUpperCase()));
+  }
+  function isDigit(ch) { return ch !== '' && ch >= '0' && ch <= '9'; }
+  // Free on the left: no letter or digit before, and not the tail of a number like 1,5 or 10:30.
+  function freeLeft(s) {
+    var p = f.charAt(s - 1);
+    return s === 0 || (!isWord(p) && !(/[.,:\/]/.test(p) && isDigit(f.charAt(s - 2))));
+  }
+  // Free on the right: no letter, digit or apostrophe after ("today's"), and not the head of 10:30:45.
+  function freeRight(e) {
+    var n = f.charAt(e);
+    return !isWord(n) && n !== "'" && !(/[.,:\/]/.test(n) && isDigit(f.charAt(e + 1)));
+  }
+  function alt(list) { // longest first, so "mars" is tried before "mar"
+    var a = list.slice().sort(function (x, y) { return y.length - x.length; });
+    return '(?:' + a.join('|') + ')';
+  }
+  function two(n) { return (n < 10 ? '0' : '') + n; }
+  function ymd(y, m0, d) { // '' when the day does not exist
+    var t = new Date(Date.UTC(y, m0, d));
+    if (t.getUTCFullYear() !== y || t.getUTCMonth() !== m0 || t.getUTCDate() !== d) return '';
+    return y + '-' + two(m0 + 1) + '-' + two(d);
+  }
+  function addDays(n) {
+    var t = new Date(Date.UTC(Y, M0, D + n));
+    return t.getUTCFullYear() + '-' + two(t.getUTCMonth() + 1) + '-' + two(t.getUTCDate());
+  }
+  function inYear(m0, d, yText) { // a day and month: the given year, else this year or next if past
+    if (m0 < 0 || m0 > 11 || d < 1) return '';
+    if (yText) return ymd(parseInt(yText, 10), m0, d);
+    var past = m0 < M0 || (m0 === M0 && d < D);
+    return (!past && ymd(Y, m0, d)) || ymd(Y + 1, m0, d);
+  }
+  function monthOf(word) {
+    for (var a = 0; a < MONTHS.length; a++) {
+      for (var b = 0; b < MONTHS[a].length; b++) if (MONTHS[a][b] === word) return a;
+    }
+    return -1;
+  }
+
+  // ---- the time: the first free clock time in the text ----
+  var TIME_FORMS = [
+    { re: /^(\d{1,2})[.:h](\d{2})\s?(am|pm)/, ap: true },
+    { re: /^(\d{1,2})\s?(am|pm)/, ap: true, noMin: true },
+    { re: /^(\d{1,2})\s?uur/, noMin: true },
+    { re: /^(\d{1,2})[h:u](\d{2})/ },
+    { re: /^(\d{1,2})[hu]/, noMin: true }
+  ];
+  var MORNING = /^\s+(?:du\s+matin|in\s+the\s+morning|'?s\s+(?:ochtends|morgens))/;
+  var LATER = /^\s+(?:du\s+soir|de\s+l'?\s?apres[\s-]?midi|in\s+the\s+(?:afternoon|evening)|'?s\s+(?:avonds|middags))/;
+  // A bare hour (6h, 8u, 8 uur) with no qualifier is a duration, not a clock time, before de/d'/of/van
+  // ("2h de menage") or after pendant/for/during/il y a/gedurende/in/dans/binnen/over ("in 2h"). A time inside
+  // a range (9h-17h, de 6h a 8h, from 9 to 5pm, van 9u tot 17u) is never taken, so the range stays whole.
+  // Final fix: an hour 0 to 5 (1h, 1h30, 4:30) with no am/pm, no qualifier and no a/at/om/vers right before it
+  // is a duration too ("sport 1h" is not 01:00); "a 4h30", "5h du matin" and "3am" stay clock times.
+  var DUR_AFTER = /^\s+(?:d'|(?:de|of|van)(?![a-z]))/;
+  var DUR_BEFORE = /(?:^|[^a-z])(?:pendant|for|during|il\s+y\s+a|gedurende|in|dans|binnen|over)\s+$/;
+  var LEAD = /(?:a|at|om|vers)\s+$/;
+  var RANGE_AFTER = /^(?:\s*-\s*\d|\s+(?:a|to|tot|jusqu'a)\s+\d)/;
+  var NUM_BEFORE = '(?:^|[^0-9\\/.,:])\\d{1,2}';
+  var RANGE_BEFORE = [
+    new RegExp(NUM_BEFORE + '(?:[h:.u]\\d{0,2})?(?:\\s?(?:am|pm))?\\s*-\\s*$'),
+    new RegExp(NUM_BEFORE + '(?:[h:.u]\\d{0,2})?(?:\\s?(?:am|pm))?\\s+(?:to|tot)\\s+$'),
+    new RegExp('(?:' + NUM_BEFORE + '[h:u]\\d{0,2}|(?:^|[^a-z])de\\s+\\d{1,2})\\s+(?:a|jusqu\'a)\\s+$')
+  ];
+  var tm = null;
+  for (i = 0; i < f.length && !tm; i++) {
+    if (!isDigit(f.charAt(i)) || !freeLeft(i)) continue;
+    var rest = f.slice(i), before = f.slice(0, i);
+    for (k = 0; k < TIME_FORMS.length && !tm; k++) {
+      var x = TIME_FORMS[k].re.exec(rest);
+      if (!x || !freeRight(i + x[0].length)) continue;
+      var h = parseInt(x[1], 10);
+      var mi = TIME_FORMS[k].noMin ? 0 : parseInt(x[2], 10);
+      var ap = TIME_FORMS[k].ap ? x[TIME_FORMS[k].noMin ? 2 : 3] : '';
+      if (mi > 59 || (ap ? (h < 1 || h > 12) : h > 23)) continue;
+      var end = i + x[0].length, after = f.slice(end);
+      var q = MORNING.exec(after) || LATER.exec(after);
+      if (q && !freeRight(end + q[0].length)) q = null;
+      if (!ap && TIME_FORMS[k].noMin && !q && (DUR_AFTER.test(after) || DUR_BEFORE.test(before))) continue;
+      var lead = LEAD.exec(before);
+      if (lead && !freeLeft(lead.index)) lead = null;
+      if (!ap && !q && !lead && h <= 5) continue;
+      if (RANGE_AFTER.test(after) || RANGE_BEFORE[0].test(before) || RANGE_BEFORE[1].test(before) || RANGE_BEFORE[2].test(before)) continue;
+      if (ap === 'pm' && h < 12) h += 12;
+      if (ap === 'am' && h === 12) h = 0;
+      if (q && !ap && LATER.test(after) && h >= 1 && h <= 11) h += 12;
+      tm = { s: lead ? lead.index : i, e: end + (q ? q[0].length : 0), h: h, mi: mi, fixed: !!ap || !!q };
+    }
+  }
+
+  // ---- the day: the first free day phrase that does not overlap the time ----
+  var ORD = '(?:er|st|nd|rd|th)?';
+  var MON = '(' + alt([].concat.apply([], MONTHS)) + ')';
+  var DAY_FORMS = [
+    { kind: 'dmy', re: /^(\d{1,2})\/(\d{1,2})(?:\/(\d{4}))?/ },
+    { kind: 'dm', re: new RegExp('^(?:(?:le|on|op)\\s+)?(\\d{1,2})' + ORD + '\\s+' + MON + '\\.?(?:\\s+(\\d{4}))?') },
+    { kind: 'md', re: new RegExp('^(?:(?:on|op)\\s+)?' + MON + '\\.?\\s+(\\d{1,2})' + ORD + '(?:,?\\s+(\\d{4}))?') },
+    { kind: 'le', re: /^le\s+(\d{1,2})(?:er)?/ },
+    { kind: 'rel', re: /^(?:(?:the\s+)?day\s+after\s+tomorrow|apres[\s-]?demain|overmorgen|aujourd'?\s?hui|auj|today|tonight|ce\s+soir|vandaag|vanavond|demain|tomorrow|tmrw|morgen)/ },
+    { kind: 'wd', re: new RegExp('^(?:(on|op)\\s+)?(?:(next|volgende)\\s+)?(' + alt([].concat.apply([], DAYS)) + '|' + alt(SHORT) + ')(?:\\s+prochaine?)?') }
+  ];
+  var REL = { 'aujourd': 0, 'aujourdhui': 0, 'auj': 0, 'today': 0, 'tonight': 0, 'ce': 0, 'vandaag': 0, 'vanavond': 0,
+    'demain': 1, 'tomorrow': 1, 'tmrw': 1, 'morgen': 1 };
+  var dy = null;
+  for (i = 0; i < f.length && !dy; i++) {
+    if (!freeLeft(i) || (tm && i >= tm.s && i < tm.e)) continue;
+    var rest2 = f.slice(i);
+    for (k = 0; k < DAY_FORMS.length && !dy; k++) {
+      var y = DAY_FORMS[k].re.exec(rest2);
+      if (!y) continue;
+      var e = i + y[0].length;
+      var form = DAY_FORMS[k].kind;
+      if (form === 'wd' && SHORT.indexOf(y[3]) >= 0) { // a short form: no "prochain", and only before nothing, punctuation or the time
+        e = i + y[0].lastIndexOf(y[3]) + y[3].length;
+        var tail = f.slice(e).replace(/^\s+/, '');
+        var nextAt = f.length - tail.length;
+        if (!y[1] && !y[2] && !(tail === '' || /^[,.;:!?)]/.test(tail) || (tm && nextAt === tm.s))) continue;
+      }
+      if (!freeRight(e) || (tm && i < tm.e && e > tm.s)) continue;
+      var due = '';
+      if (form === 'dmy') due = (y[0] === '24/7') ? '' : inYear(parseInt(y[2], 10) - 1, parseInt(y[1], 10), y[3]); // 24/7 is never a date
+      else if (form === 'dm') due = inYear(monthOf(y[2]), parseInt(y[1], 10), y[3]);
+      else if (form === 'md') due = inYear(monthOf(y[1]), parseInt(y[2], 10), y[3]);
+      else if (form === 'le') {
+        var dd = parseInt(y[1], 10);
+        for (j = 0; j <= 12 && !due; j++) {
+          var t = new Date(Date.UTC(Y, M0 + j, dd));
+          if (dd >= 1 && t.getUTCDate() === dd && (j > 0 || dd >= D)) due = ymd(t.getUTCFullYear(), t.getUTCMonth(), dd);
+        }
+      } else if (form === 'rel') {
+        var w0 = /^[a-z]+/.exec(y[0])[0];
+        due = addDays(REL.hasOwnProperty(w0) ? REL[w0] : 2);
+      } else {
+        var name = y[3];
+        var wd = SHORT.indexOf(name);
+        for (j = 0; j < DAYS.length && wd < 0; j++) if (DAYS[j].indexOf(name) >= 0) wd = j;
+        var delta = (wd - WD + 7) % 7;
+        due = addDays(delta === 0 ? 7 : delta);
+      }
+      if (!due) continue;
+      dy = { s: i, e: e, due: due, evening: form === 'rel' && /^(?:tonight|ce\s|vanavond)/.test(y[0]) };
+    }
+  }
+
+  if (!tm && !dy) return { text: text, due: '', time: '' };
+  if (tm && dy && dy.evening && !tm.fixed && tm.h >= 1 && tm.h <= 11) tm.h += 12;
+  var out = { text: text, due: '', time: '' };
+  if (tm) out.time = two(tm.h) + ':' + two(tm.mi);
+  out.due = dy ? dy.due : addDays(tm.h * 60 + tm.mi > nowMin ? 0 : 1);
+
+  // Cut the phrases from the text as typed; a comma or . ! ? ) after a cut joins the word before it.
+  var cuts = [tm, dy].filter(function (c) { return !!c; }).sort(function (a, b) { return a.s - b.s; });
+  var pieces = [], from = 0;
+  for (i = 0; i < cuts.length; i++) {
+    pieces.push(text.slice(from, map[cuts[i].s]));
+    from = cuts[i].e < f.length ? map[cuts[i].e] : text.length;
+  }
+  pieces.push(text.slice(from));
+  var joined = '';
+  for (i = 0; i < pieces.length; i++) {
+    var p = pieces[i].replace(/^\s+|\s+$/g, '');
+    if (p === '') continue;
+    // A connector left alone at the end after a cut ("rdv demain a" -> "rdv") goes with the phrase.
+    var lw = p.toLowerCase();
+    if (lw.normalize) lw = lw.normalize('NFD');
+    if (i > 0 && i === pieces.length - 1 && /^(?:a|at|om|vers)$/.test(lw.replace(/[\u0300-\u036f]/g, ''))) continue;
+    joined = joined === '' ? p : (/^[,;.!?)]/.test(p) ? joined + p : joined + ' ' + p);
+  }
+  joined = joined.replace(/\s*\(\s*\)/g, '').replace(/\s+/g, ' ').replace(/^[\s,;:\-]+|[\s,;:\-]+$/g, ''); // "pain (demain)" leaves no ()
+  if (joined !== '') out.text = joined;
+  return out;
+}
+
 // Who as the sheet shows it: the old stored Both, blank and anything unknown read as Either.
 function sheetWho_(who) {
   return (who === 'Kev' || who === 'Lili' || who === 'Couple') ? who : 'Either';
 }
 
-// The When day chips from the server's Bali day: Today, Tomorrow, then the next 5 weekday names.
+// The When day chips from the page's Bali day (A3-T2A K1): Today, Tomorrow, This week (the coming Saturday, or
+// Sunday when today is Saturday). The weekday chips are gone from the row; Pick a day opens the native date field.
 function sheetWhenChips_(today) {
   if (!todoValidDay_(today)) return [];
-  var out = [{ label: 'Today', due: today }, { label: 'Tomorrow', due: isoAddDays_(today, 1) }];
-  for (var n = 2; n < 7; n++) {
-    var d = isoAddDays_(today, n);
-    out.push({ label: todoDayLabel_(d, d).split(' ')[0], due: d });
-  }
-  return out;
+  var wd = new Date(Date.UTC(Number(today.slice(0, 4)), Number(today.slice(5, 7)) - 1, Number(today.slice(8, 10)))).getUTCDay();
+  return [
+    { label: 'Today', due: today },
+    { label: 'Tomorrow', due: isoAddDays_(today, 1) },
+    { label: 'This week', due: isoAddDays_(today, wd === 6 ? 1 : 6 - wd) }
+  ];
+}
+
+// The Time chips (A3-T2A K1): No time, three usual times, Pick time (the native time field).
+var SHEET_TIMES = ['08:00', '12:00', '18:00'];
+
+// Minutes since midnight in Bali on the phone's clock.
+function baliMinutes_(ms) {
+  var d = new Date(Number(ms) + 8 * 3600000);
+  return d.getUTCHours() * 60 + d.getUTCMinutes();
+}
+
+// The day a time alone goes on: today when that time is still ahead in Bali, else tomorrow.
+function sheetDayFor_(time, today, nowMin) {
+  if (!todoValidDay_(today) || !/^\d{2}:\d{2}$/.test(time || '')) return '';
+  var t = Number(time.slice(0, 2)) * 60 + Number(time.slice(3, 5));
+  return t > nowMin ? today : isoAddDays_(today, 1);
+}
+
+// The next quarter hour after nowMin, as 'HH:mm' (23:50 gives 00:00).
+function sheetNextQuarter_(nowMin) {
+  var q = (Math.floor(nowMin / 15) + 1) * 15 % 1440;
+  var h = Math.floor(q / 60);
+  var m = q % 60;
+  return (h < 10 ? '0' : '') + h + ':' + (m < 10 ? '0' : '') + m;
+}
+
+// What the words line says: the parts the words decide (a part picked by hand is not theirs), or '' for no line.
+function sheetWordsText_(w, hand, today) {
+  if (!w || !w.due) return '';
+  var parts = [];
+  if (!hand.when) parts.push(todoWhenLabel_(w.due, today));
+  if (!hand.time && w.time) parts.push(w.time);
+  return parts.length ? parts.join(' ') + ', from your words' : '';
+}
+
+// A3-T2A M4: where a new to-do landed, in words: "Added for Lili, tomorrow 06:40." or "Added to Anytime."
+function todoAddedText_(f, today) {
+  var who = { Kev: 'Kev', Lili: 'Lili', Couple: 'you both' }[f.who] || '';
+  if (!todoValidDay_(f.due)) return 'Added to Anytime' + (who ? ', for ' + who : '') + '.';
+  var day = todoWhenLabel_(f.due, today);
+  if (day === 'Today' || day === 'Tomorrow') day = day.toLowerCase();
+  return 'Added for ' + (who ? who + ', ' : '') + day + (f.time ? ' ' + f.time : '') + '.';
 }
 
 // The sheet's starting values: the item's, or for a new item no text, this phone's Who (else Either), no
@@ -5087,15 +5603,30 @@ function openItemSheet_(it, list, prefill, quick) {
   if (SHEET) closeItemSheet_('replace');
   var cur = it && it.id ? (listsItem_(list, it.id) || it) : null;
   var orig = cur ? JSON.parse(JSON.stringify(cur)) : null;
-  var today = LISTS ? listsToday_(LISTS) : '';
+  var today = listsToday_(LISTS); // A3-T2A: the phone's Bali day when the lists are not in yet
   var s = {
     list: list, id: orig ? orig.id : '', orig: orig, draft: sheetDraft_(list, orig, prefill, whoAmI_()),
-    today: today, chips: sheetWhenChips_(today), more: false, pick: false,
+    today: today, chips: sheetWhenChips_(today), pickTap: false, pickTimeTap: false,
     returnKey: orig ? 'open:' + orig.id : 'add', els: {}, ctls: [], focusEl: null, touch: null,
+    hand: { when: false, time: false }, words: null, wordsOff: false, kept: '', done: false,
   };
-  s.more = !!s.draft.time;
-  s.pick = !!s.draft.due && !s.chips.some(function (c) { return c.due === s.draft.due; });
   s.quick = !orig && !!quick;
+  // A3-T2A M3: a new item closed without Add waits in kl.kept; the next Add of that list opens it again.
+  var words = prefill && typeof prefill.text === 'string' ? sheetOneLine_(prefill.text) : '';
+  var keep = !orig && !words ? qaKeptNext_(list) : null;
+  if (keep) {
+    var kd = keep.draft || {};
+    ['text', 'who', 'due', 'time', 'shop'].forEach(function (k) { if (typeof kd[k] === 'string') s.draft[k] = kd[k]; });
+    s.draft.who = sheetWho_(s.draft.who);
+    s.hand = { when: !!(kd.hand && kd.hand.when), time: !!(kd.hand && kd.hand.time) };
+    s.wordsOff = !!kd.wordsOff;
+    s.kept = keep.key;
+  }
+  s.base = orig ? { due: s.draft.due, time: s.draft.time } : { due: '', time: '' }; // what the chips go back to
+  // A new item's words (typed, carried from another segment, or kept) are read at once; an edit's only once typed.
+  if (!orig && list === 'todo') sheetWordsRead_(s);
+  // A3-T2B: an edit shows the item's whole first step under the text (not when the text was just set to it).
+  s.step = list === 'todo' && orig && !(prefill && typeof prefill.text === 'string') ? todoStep_(orig) : '';
   SHEET = s;
   sheetBuild_(s);
   sheetInert_(true);
@@ -5119,7 +5650,8 @@ function sheetHistory_() {
 }
 
 // how: 'close' (tap outside, Escape, swipe, Save, Enter), 'back' (the phone's back), 'nav' (the screen changes),
-// 'lock' (lock-out), 'replace' (another sheet opens), 'hide' (pagehide, R58). Every one saves; only close and back give focus back.
+// 'lock' (lock-out), 'replace' (another sheet opens), 'hide' (pagehide, R58). An edit saves on every one; only close and back give focus back.
+// A3-T2A M3: a new to-do or grocery is added only by Add; every other close keeps it in kl.kept (a lock-out drops it).
 // A1-T5: the expense sheet saves only on its Save button; any other close keeps what was typed for the next Add.
 // A1 final fix 3: with an amount typed, a close, back, screen change or pagehide keeps it in kl.kept (a reload keeps
 // it) and close, back and a screen change say so; an empty one closes silently.
@@ -5129,6 +5661,17 @@ function closeItemSheet_(how) {
   if (s.list === 'settle') {
     sheetShut_(how); // nothing typed, nothing kept
     if (how === 'close' || how === 'back') moneyRepaint_();
+    return null;
+  }
+  if (s.list === 'editexp') { // A3-T2B M7: closing saves (the sheet stays while it saves); leaving drops it
+    if (how === 'close' || how === 'back') {
+      if (how === 'back') SHEET_IN_HISTORY = false;
+      editSheetSave_(s);
+      if (SHEET === s && how === 'back') sheetHistory_(); // still open (saving, or a value to fix): back closes it again
+      return null;
+    }
+    sheetShut_(how);
+    if (EDIT && EDIT.id === s.editId) EDIT = null;
     return null;
   }
   if (s.list === 'expense') {
@@ -5141,13 +5684,192 @@ function closeItemSheet_(how) {
     return null;
   }
   sheetShut_(how);
-  var op = sheetOp_(s);
   var quiet = how === 'nav' || how === 'lock' || how === 'replace' || how === 'hide';
   if (!quiet && s.list === 'todo') TODO_FOCUS = s.returnKey;
   if (!quiet && s.list === 'grocery') GRO_FOCUS = s.returnKey;
-  if (op) listsQueue_(op);
-  else if (!quiet) listsPaint_();
+  // A3-T2A M3: one close rule. A new item is added only by Add (or the return key); any other close keeps what was
+  // typed in kl.kept ("Not added yet. It is in Add." with Open); a lock-out lets it go with the session.
+  if (!s.orig) {
+    if (!s.done) sheetKeepOnClose_(s, how);
+    if (!quiet) listsPaint_();
+    if (how === 'close' || how === 'back' || how === 'nav') {
+      qaKeptToast_(s.list);
+      if (how !== 'nav') qaFocusAdd_();
+    }
+    return null;
+  }
+  // An edit saves on close, says "Saved." and offers Undo (the fields as they were).
+  var op = sheetOp_(s);
+  if (op) {
+    listsQueue_(op);
+    if (how === 'close' || how === 'back' || how === 'nav') {
+      var back = {};
+      Object.keys(op.fields).forEach(function (k) {
+        var v = s.orig[k];
+        back[k] = k === 'who' ? sheetWho_(v) : String(v === undefined || v === null ? '' : v);
+      });
+      listsToast_('Saved.', { kind: 'edit', list: s.list, id: s.id, fields: back });
+    }
+  } else if (!quiet) listsPaint_();
   return op;
+}
+
+// A3-T2A M3: a new to-do or grocery closed without Add. A reopened kept entry takes the edits, an emptied one leaves
+// the list; a new draft joins it (the oldest of a list opens first). A lock-out keeps nothing (an unsaved draft goes with the session, as for expenses).
+function sheetKeepOnClose_(s, how) {
+  var typed = sheetOneLine_(s.draft.text) !== '';
+  var d = {
+    text: s.draft.text, who: s.draft.who, due: s.draft.due, time: s.draft.time, shop: s.draft.shop,
+    hand: { when: !!s.hand.when, time: !!s.hand.time }, wordsOff: !!s.wordsOff
+  };
+  if (how === 'lock') {
+    if (s.kept) qaKeptDrop_(s.kept);
+    return;
+  }
+  if (s.kept) {
+    if (typed) qaKeptPut_(s.kept, d);
+    else qaKeptDrop_(s.kept);
+    return;
+  }
+  if (!typed) return;
+  // fix 1: words carried from another segment start a new entry; an older kept one of that list stays (it opens first).
+  qaKeptChange_(function (list) {
+    list.push({ key: 'k' + newId_().slice(1), at: Date.now(), draft: d, why: 'unsaved', list: s.list });
+  });
+}
+
+// A3-T2A: Add in a new to-do or grocery sheet (or the return key in its text field): adds what the sheet shows,
+// the day and time words cut from the text as the bot cuts them. Empty text adds nothing and keeps the sheet.
+function sheetAdd_(s) {
+  if (SHEET !== s || s.done || s.orig) return;
+  var fields = sheetAddFields_(s.list, sheetFinal_(s));
+  if (!fields) {
+    s.els.text.focus({ preventScroll: true });
+    return;
+  }
+  s.done = true;
+  if (s.kept) qaKeptDrop_(s.kept);
+  if (s.list === 'todo') TODO_FOCUS = 'add';
+  else GRO_FOCUS = 'add';
+  sheetShut_('close');
+  listsAddNew_(s.list, fields, '');
+  qaFocusAdd_();
+}
+
+// The draft as it will be saved: the words cut from the text while the words line stands. Final fix 2: once any part
+// (day or time) is picked by hand, the hand overrules the phrase, so nothing is cut and the phrase stays in the text.
+function sheetFinal_(s) {
+  var d = JSON.parse(JSON.stringify(s.draft));
+  if (s.list === 'todo' && sheetWordsShown_(s) && !s.hand.when && !s.hand.time) d.text = s.words.text;
+  return d;
+}
+
+function sheetWordsShown_(s) {
+  return !!s.words && !s.wordsOff && sheetWordsText_(s.words, s.hand, s.today) !== '';
+}
+
+// Discard (A3-T2A M3): a new draft is dropped, kept or not; the sheet closes with nothing added.
+function sheetDiscard_(s) {
+  if (SHEET !== s || s.done) return;
+  s.done = true;
+  if (s.kept) qaKeptDrop_(s.kept);
+  if (s.list === 'expense') QA_DRAFT = null;
+  else if (s.list === 'todo') TODO_FOCUS = 'add';
+  else GRO_FOCUS = 'add';
+  sheetShut_('close');
+  if (s.list === 'expense') moneyRepaint_();
+  else listsPaint_();
+  qaFocusAdd_();
+}
+
+// A3-T2A M4: one add of a new to-do or grocery, from the sheet or the Groceries dock: queued with its id, then the
+// dark toast says where it landed, with Undo; the new row is brought into view and briefly marked.
+var LISTS_TRIED = {};    // fix 1: uids of list ops sent at least once on this page
+var LISTS_NEW = null;    // {list, id, until}: the item just added, marked on its row until 'until'
+var LISTS_NEW_EL = null; // its row on show after the latest paint, scrolled into view once
+function listsAddNew_(list, fields, here) {
+  var id = newId_();
+  LISTS_NEW = { list: list, id: id, until: Date.now() + 2500, shown: false };
+  var op = listsQueue_({ op: 'add', list: list, id: id, fields: fields });
+  var it = listsItem_(list, id) || { due: fields.due, time: fields.time, who: fields.who, shop: fields.shop };
+  var text;
+  if (list === 'todo') text = todoAddedText_(it, listsToday_(LISTS));
+  else if (here && foldKey_(it.shop) === foldKey_(here)) text = 'Added to ' + here + '.';
+  else text = 'Added under ' + (sheetOneLine_(it.shop) || 'Any shop') + '.';
+  listsToast_(text, { kind: 'add', list: list, id: id, uid: op.uid });
+  return op;
+}
+
+// The one dark toast for a list add or edit, with Undo. It replaces a "Deleted" line still on show (one at a time).
+function listsToast_(text, undo) {
+  if (LISTS_UNDO) {
+    listsUndoClear_();
+    listsPaint_();
+  }
+  qaToastSet_({ text: text, action: 'undo', listUndo: undo });
+}
+
+// Undo from that toast: an add is deleted (it shows as gone at once; the delete waits for the add to land), an edit
+// is changed back to the fields it had.
+function listsToastUndo_(u) {
+  if (u.kind === 'add') {
+    // Never sent, not on its way and not the head: it simply leaves the queue. Otherwise it may exist: the delete goes after it
+    // (it waits for the add's reply, or a fresh read, and is dropped if the item is gone), lists loaded or not.
+    // fix 2: never the head: another tab that adopted kl.queue may be sending it now.
+    var q = listsByUid_(u.uid);
+    if (q && !LISTS_TRIED[q.uid] && INFLIGHT !== q.uid && QUEUE[0] !== q) {
+      listsQueueRemove_(q.uid);
+      listsRebuild_();
+      listsPaint_();
+    } else {
+      listsQueue_({ op: 'delete', list: u.list, id: u.id });
+    }
+    qaToastSet_({ text: 'Removed.' });
+    return;
+  }
+  // Final fix 5: an item no longer listed (deleted or changed elsewhere) is left alone, and the line says so.
+  if (!listsItem_(u.list, u.id)) {
+    qaToastSet_({ text: 'This item changed.' });
+    return;
+  }
+  listsQueue_({ op: 'edit', list: u.list, id: u.id, fields: u.fields });
+  qaToastSet_({ text: 'Changed back.' });
+}
+
+// After a paint: the new row comes into view once, smoothly unless the phone asks for less motion. It is centred in
+// the part of the screen nothing covers (above the toast, the Groceries dock, the keyboard and the tab bar); a row
+// already in that part stays where it is.
+function listsNewScroll_() {
+  var e = LISTS_NEW_EL;
+  LISTS_NEW_EL = null;
+  if (!e) return;
+  var calm = !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
+  var how = calm ? 'auto' : 'smooth';
+  if (typeof e.getBoundingClientRect !== 'function' || typeof window.scrollBy !== 'function') {
+    if (typeof e.scrollIntoView === 'function') e.scrollIntoView({ block: 'center', behavior: how });
+    return;
+  }
+  var low = (Number(window.innerHeight) || 0) - GRO_KB;
+  ['qa-toast', 'tabbar'].forEach(function (id) {
+    var n = $(id);
+    if (n && !n.hidden) low = Math.min(low, n.getBoundingClientRect().top);
+  });
+  if (GRO && GRO.box && VIEW.screen === 'groceries') low = Math.min(low, GRO.box.getBoundingClientRect().top);
+  var r = e.getBoundingClientRect();
+  var high = 64; // under a sticky shop header or the top of the screen
+  if (r.top >= high && r.bottom <= low - 8) return;
+  window.scrollBy({ top: r.top - (high + (low - high) / 2 - r.height / 2), behavior: how });
+}
+
+// A row being drawn: the item just added gets the brief mark, and the first row drawn for it is the one to show.
+function listsNewMark_(row, it) {
+  var n = LISTS_NEW;
+  if (!n || !it || it.id !== n.id || Date.now() >= n.until) return;
+  row.className += ' is-new';
+  if (!n.shown) {
+    n.shown = true;
+    LISTS_NEW_EL = row;
+  }
 }
 
 function sheetShut_(how) {
@@ -5177,7 +5899,7 @@ function sheetOp_(s) {
     var fields = sheetAddFields_(s.list, s.draft);
     return fields ? { op: 'add', list: s.list, fields: fields } : null;
   }
-  var diff = sheetDiff_(s.list, s.orig, s.draft);
+  var diff = sheetDiff_(s.list, s.orig, sheetFinal_(s)); // A3-T2A: the words cut once they set the day
   if (!diff) return null;
   var op = { op: 'edit', list: s.list, id: s.id, fields: diff };
   var cur = listsItem_(s.list, s.id);
@@ -5205,11 +5927,35 @@ function listsDelete_(list, it) {
 // ---- swipe on a list row (A1-T3): right ticks (a struck row unticks), left deletes; both as their taps do --------
 // A sideways move of 80 px or more counts; a mostly up-and-down move is the page scrolling and does nothing.
 // onLeft null: no delete by swipe (a struck row). The row follows the finger while it moves sideways.
+// A3-T2B m5: while it slides, what the swipe does shows in the strip it uncovers: rightLabel ('Done', 'Bought',
+// 'Not done') on the left, 'Delete' on the right. The strip is the row's own child, moved back by as much as the
+// row moved, so it stays put in the gap; it is hidden again when the finger lifts.
 var SWIPE_MIN = 80;
 
-function listsSwipe_(row, onRight, onLeft) {
+function listsSwipe_(row, onRight, onLeft, rightLabel) {
   var s = null;
-  var reset = function () { row.style.transform = ''; };
+  var under = null;
+  var show = function (dx) {
+    if (!under) {
+      under = add(row, 'span', 'swipe-under');
+      under.setAttribute('aria-hidden', 'true');
+    }
+    var right = dx > 0;
+    under.className = 'swipe-under ' + (right ? 'swipe-done' : 'swipe-del');
+    under.textContent = right ? (rightLabel || 'Done') : 'Delete';
+    under.style.width = Math.abs(dx) + 'px';
+    under.style.left = right ? '0' : '';
+    under.style.right = right ? '' : '0';
+    under.style.transform = 'translateX(' + (-dx) + 'px)';
+    under.hidden = false;
+  };
+  var reset = function () {
+    row.style.transform = '';
+    if (under) {
+      under.hidden = true;
+      under.textContent = '';
+    }
+  };
   row.addEventListener('touchstart', function (e) {
     var t = e && e.touches && e.touches[0];
     s = t && e.touches.length === 1 ? { x: t.clientX, y: t.clientY, side: false } : null;
@@ -5223,7 +5969,13 @@ function listsSwipe_(row, onRight, onLeft) {
       if (Math.abs(dy) > 10 && Math.abs(dy) >= Math.abs(dx)) { s = null; reset(); return; }
       if (Math.abs(dx) > 10 && Math.abs(dx) > Math.abs(dy) * 1.5) s.side = true;
     }
-    if (s.side && (dx > 0 ? onRight : onLeft)) row.style.transform = 'translateX(' + Math.round(dx * 0.6) + 'px)';
+    if (s.side && (dx > 0 ? onRight : onLeft)) {
+      var moved = Math.round(dx * 0.6);
+      row.style.transform = 'translateX(' + moved + 'px)';
+      show(moved);
+    } else if (s.side) {
+      reset();
+    }
   }, { passive: true });
   row.addEventListener('touchend', function (e) {
     var a = s;
@@ -5242,6 +5994,7 @@ function listsSwipe_(row, onRight, onLeft) {
 
 function listsUndoStart_(list, snap) {
   listsUndoClear_();
+  if (QA_TOAST && QA_TOAST.listUndo) qaToastSet_(null); // A3-T2A: one line at a time, the newest
   LISTS_UNDO = { list: list, item: snap };
   LISTS_UNDO_TIMER = setTimeout(function () {
     LISTS_UNDO_TIMER = null;
@@ -5281,7 +6034,15 @@ function sheetCtl_(s, e, shown) {
 }
 
 function sheetFocusables_(s) {
-  return s.ctls.filter(function (c) { return !c.e.disabled && (!c.shown || c.shown()); }).map(function (c) { return c.e; });
+  return s.ctls.filter(function (c) {
+    if (s.list === 'expense' && s.grid && !sheetInGrid_(s, c.e)) return false; // A3-T2A: All types keeps Tab
+    return !c.e.disabled && (!c.shown || c.shown());
+  }).map(function (c) { return c.e; });
+}
+
+function sheetInGrid_(s, e) {
+  for (var n = e; n; n = n.parentNode) if (n === s.els.gridPanel) return true;
+  return false;
 }
 
 function sheetKey_(e) {
@@ -5289,7 +6050,8 @@ function sheetKey_(e) {
   if (!s || !e) return;
   if (e.key === 'Escape') {
     e.preventDefault();
-    closeItemSheet_('close');
+    if (s.grid && s.list === 'expense') qaGridClose_(s); // A3-T2A: All types closes first
+    else closeItemSheet_('close');
     return;
   }
   if (e.key !== 'Tab') return;
@@ -5371,53 +6133,142 @@ function sheetFrame_(s, label) {
   return p;
 }
 
+// A3-T2A K2: the header row, before everything else, so the phone keyboard never covers it: the visible title, then
+// Discard (a new draft with content only, M3) and the main button top right (Add for a new item, Save for an edit).
+function sheetHead_(p, s, title, mainLabel, mainCls, onMain) {
+  var head = add(p, 'div', 'qa-head');
+  add(head, 'h2', 'qa-title', title);
+  if (!s.orig) {
+    var dis = btn(head, 'textbtn sheet-discard', 'Discard', function () { sheetDiscard_(s); });
+    s.els.drop = sheetCtl_(s, dis, function () { return !dis.hidden; });
+    dis.hidden = true;
+  }
+  s.els.main = sheetCtl_(s, btn(head, mainCls, mainLabel, onMain));
+  return head;
+}
+
 function sheetBuild_(s) {
   var root = $('sheet');
   var p = sheetFrame_(s, sheetTitle_(s));
+  sheetHead_(p, s, sheetTitle_(s), s.orig ? 'Save' : 'Add', 'btn-main sheet-save', function () {
+    if (SHEET !== s) return;
+    if (s.orig) closeItemSheet_('close');
+    else sheetAdd_(s);
+  });
   if (s.quick) qaSegments_(p, s); // A1-T5
   var ta = sheetCtl_(s, add(p, 'textarea', 'sheet-text'));
   ta.setAttribute('aria-label', s.list === 'grocery' ? 'Item' : 'To-do');
   ta.setAttribute('maxlength', '500');
   ta.setAttribute('rows', '1');
-  ta.setAttribute('enterkeyhint', 'done');
-  if (s.list === 'grocery' && !s.orig) ta.setAttribute('placeholder', 'Add an item');
+  ta.setAttribute('enterkeyhint', s.orig ? 'done' : 'go');
+  if (!s.orig) ta.setAttribute('placeholder', s.list === 'grocery' ? 'Add an item' : 'What needs doing?');
   ta.value = s.draft.text;
   ta.addEventListener('input', function () {
     if (SHEET !== s) return;
     s.draft.text = ta.value;
     sheetGrow_(ta);
+    if (s.list === 'todo') sheetWordsRead_(s); // A3-T2A K1: the words are read on every keystroke
+    sheetSync_(s);
   });
-  // Enter saves and closes; a to-do is one line.
+  // Enter: a new item is added with what the sheet shows; an edit saves and closes. A to-do is one line.
   ta.addEventListener('keydown', function (e) {
     if (e && e.key === 'Enter' && !e.isComposing && SHEET === s) {
       e.preventDefault();
-      closeItemSheet_('close');
+      if (s.orig) closeItemSheet_('close');
+      else sheetAdd_(s);
     }
   });
   s.els.text = ta;
+  if (s.step) add(p, 'p', 'sheet-step', 'First step: ' + s.step);
   if (s.list === 'todo') sheetTodoFields_(p, s);
   else if (s.orig) { // A2-T3: a new grocery item has no shop to pick; it is placed by itself
     s.els.shop = add(p, 'div', 'sheet-shop');
     if (typeof sheetShop_ === 'function') sheetShop_(s.els.shop, s); // Task 8
   }
-  var foot = add(p, 'div', 'sheet-foot');
-  if (s.orig) sheetCtl_(s, btn(foot, 'textbtn sheet-delete', 'Delete', sheetDelete_));
-  sheetCtl_(s, btn(foot, 'btn-main sheet-save', 'Save', function () { if (SHEET === s) closeItemSheet_('close'); }));
+  if (s.orig) {
+    var foot = add(p, 'div', 'sheet-foot');
+    sheetCtl_(s, btn(foot, 'textbtn sheet-delete', 'Delete', sheetDelete_));
+  }
   root.hidden = false;
   sheetSync_(s);
   sheetGrow_(ta);
+  groDockPlace_(); // A3-T2A K2: on top of the keyboard when it is up
 }
 
-// To do: When (day chips, Pick a day, No date), Who, and More with Time.
+// A3-T2A K1: the words in the text, read with the bot's parser. Unless Undo set them aside for this item, the When
+// and Time chips follow them, except a part picked by hand (hand wins). No words: those chips go back to how they
+// started. A time always comes with a day: one alone goes on today when it is still ahead in Bali, else tomorrow.
+function sheetWordsRead_(s) {
+  var w = null;
+  if (!s.wordsOff) {
+    try { w = parseWhen_(s.draft.text, new Date()); } catch (e) { w = null; }
+  }
+  s.words = w && w.due ? w : null;
+  sheetWordsApply_(s);
+}
+
+function sheetWordsApply_(s) {
+  var w = s.wordsOff ? null : s.words;
+  if (!s.hand.when) {
+    s.draft.due = w ? w.due : s.base.due;
+    s.dayByTime = false;
+  }
+  if (!s.hand.time) s.draft.time = w ? w.time : s.base.time;
+  sheetTimeNeedsDay_(s);
+}
+
+// A3-T2A fix 1: a day set by a time alone (never by hand or by the words) follows the next time picked.
+function sheetTimeNeedsDay_(s) {
+  if (!s.draft.time) return;
+  if (todoValidDay_(s.draft.due) && !s.dayByTime) return; // fix 2: No date is not a day picked by hand
+  s.draft.due = sheetDayFor_(s.draft.time, s.today, baliMinutes_(Date.now()));
+  s.dayByTime = true;
+}
+
+// A label on the left and one row of chips that scrolls sideways (A3-T2A K1, K2).
+function sheetRow_(p, id, label, cls) {
+  var r = add(p, 'div', 'sheet-row');
+  add(r, 'p', 'sheet-label', label).setAttribute('id', id);
+  var g = add(r, 'div', 'sheet-chips sheet-scroll' + (cls ? ' ' + cls : ''));
+  g.setAttribute('role', 'group');
+  g.setAttribute('aria-labelledby', id);
+  return g;
+}
+
+function sheetScrollRow_(s, g) {
+  if (!s.scrolls) s.scrolls = [];
+  s.scrolls.push({ g: g, on: null });
+  return g;
+}
+
+// A native picker: shown at once where the browser can, else the field takes focus (a tap there opens it).
+function sheetPicker_(input) {
+  try {
+    if (typeof input.showPicker === 'function') { input.showPicker(); return; }
+  } catch (e) {}
+  input.focus({ preventScroll: true });
+}
+
+// To do (A3-T2A K1): the words line, then When, Time and Who, each one row with its label on the left.
 function sheetTodoFields_(p, s) {
   s.sync = [];
-  var group = function (id, label) {
-    add(p, 'p', 'sheet-label', label).setAttribute('id', id);
-    var g = add(p, 'div', 'sheet-chips');
-    g.setAttribute('role', 'group');
-    g.setAttribute('aria-labelledby', id);
-    return g;
-  };
+  var line = add(p, 'div', 'sheet-words');
+  var said = add(line, 'p', 'sheet-words-text');
+  said.setAttribute('role', 'status');
+  var undo = sheetCtl_(s, btn(line, 'textbtn sheet-words-undo', 'Undo', function () {
+    if (SHEET !== s) return;
+    s.wordsOff = true;
+    s.words = null;
+    sheetWordsApply_(s);
+    sheetSync_(s);
+    s.els.text.focus({ preventScroll: true });
+  }), function () { return !line.hidden; });
+  undo.setAttribute('aria-label', 'Undo: do not read the words');
+  s.sync.push(function () {
+    var t = s.wordsOff ? '' : sheetWordsText_(s.words, s.hand, s.today);
+    line.hidden = !t;
+    said.textContent = t;
+  });
   var chip = function (g, label, onTap, isOn, cls) {
     var b = sheetCtl_(s, btn(g, 'schip' + (cls ? ' ' + cls : ''), label, function () {
       if (SHEET !== s) return;
@@ -5427,20 +6278,39 @@ function sheetTodoFields_(p, s) {
     s.sync.push(function () { b.setAttribute('aria-pressed', isOn() ? 'true' : 'false'); });
     return b;
   };
-  var when = group('sheet-when', 'When');
+  var isChipDay = function (d) { return s.chips.some(function (c) { return c.due === d; }); };
+  var picking = function () { return s.pickTap || (todoValidDay_(s.draft.due) && !isChipDay(s.draft.due)); };
+  var firstChip = function (d) {
+    for (var i = 0; i < s.chips.length; i++) if (s.chips[i].due === d) return s.chips[i];
+    return null;
+  };
+  var when = sheetScrollRow_(s, sheetRow_(p, 'sheet-when', 'When'));
   s.chips.forEach(function (c) {
     chip(when, c.label, function () {
       s.draft.due = c.due;
-      s.pick = false;
-    }, function () { return !s.pick && s.draft.due === c.due; });
+      s.hand.when = true;
+      s.dayByTime = false; // fix 2: a day picked by hand never follows a time
+      s.pickTap = false;
+    }, function () { return !picking() && firstChip(s.draft.due) === c; });
   });
-  chip(when, 'Pick a day', function () { s.pick = true; }, function () { return s.pick; });
+  var day;
+  chip(when, 'Pick a day', function () {
+    s.hand.when = true;
+    s.dayByTime = false;
+    s.pickTap = true;
+    sheetSync_(s);
+    sheetPicker_(day);
+  }, picking);
   chip(when, 'No date', function () {
     s.draft.due = '';
     s.draft.time = '';
-    s.pick = false;
-  }, function () { return !s.pick && !s.draft.due; });
-  var day = sheetCtl_(s, add(p, 'input', 'sheet-day'), function () { return s.pick; });
+    s.hand.when = true; // the words leave the day alone; a time picked next still sets (and moves) the day
+    s.hand.time = true;
+    s.dayByTime = false;
+    s.pickTap = false;
+    s.pickTimeTap = false;
+  }, function () { return !picking() && !s.draft.due; });
+  day = sheetCtl_(s, add(p, 'input', 'sheet-day'), function () { return picking(); });
   day.setAttribute('type', 'date');
   day.setAttribute('aria-label', 'Pick a day');
   if (s.today) day.setAttribute('min', s.today);
@@ -5449,52 +6319,108 @@ function sheetTodoFields_(p, s) {
   var takeDay = function (resync) {
     if (SHEET !== s) return;
     var ok = todoValidDay_(day.value);
-    if (ok) s.draft.due = day.value;
+    if (ok) {
+      s.draft.due = day.value;
+      s.hand.when = true;
+      s.dayByTime = false;
+      s.pickTap = true;
+    }
     if (ok || resync) sheetSync_(s);
   };
   day.addEventListener('input', function () { takeDay(false); });
   day.addEventListener('change', function () { takeDay(true); });
   s.sync.push(function () {
-    day.hidden = !s.pick;
-    if (s.pick) day.value = todoValidDay_(s.draft.due) ? s.draft.due : '';
+    var on = picking();
+    day.hidden = !on;
+    if (on) day.value = todoValidDay_(s.draft.due) ? s.draft.due : '';
   });
-  var who = group('sheet-who', 'Who');
-  // A1-T7: Kev, Lili and Couple carry their person's colour when picked (as the row chips); Either stays plain.
-  ['Kev', 'Lili', 'Either', 'Couple'].forEach(function (name) {
-    chip(who, name, function () { s.draft.who = name; }, function () { return sheetWho_(s.draft.who) === name; },
-      name === 'Either' ? '' : 'schip-' + name.toLowerCase());
+
+  var timing = function () { return s.pickTimeTap || (!!s.draft.time && SHEET_TIMES.indexOf(s.draft.time) < 0); };
+  var times = sheetScrollRow_(s, sheetRow_(p, 'sheet-time-label', 'Time'));
+  chip(times, 'No time', function () {
+    s.draft.time = '';
+    s.hand.time = true;
+    s.pickTimeTap = false;
+    if (s.dayByTime) { // final fix 3: a day set by the time alone goes with it
+      s.draft.due = '';
+      s.dayByTime = false;
+    }
+  }, function () { return !timing() && !s.draft.time; });
+  SHEET_TIMES.forEach(function (t) {
+    chip(times, t, function () {
+      s.draft.time = t;
+      s.hand.time = true;
+      s.pickTimeTap = false;
+      sheetTimeNeedsDay_(s);
+    }, function () { return !timing() && s.draft.time === t; }, 'schip-time');
   });
-  var more = sheetCtl_(s, btn(p, 'textbtn sheet-more', 'More', function () {
-    if (SHEET !== s) return;
-    s.more = !s.more;
+  var time;
+  chip(times, 'Pick time', function () {
+    if (!s.draft.time || SHEET_TIMES.indexOf(s.draft.time) >= 0) s.draft.time = sheetNextQuarter_(baliMinutes_(Date.now()));
+    s.hand.time = true;
+    s.pickTimeTap = true;
+    sheetTimeNeedsDay_(s);
     sheetSync_(s);
-  }));
-  var box = add(p, 'div', 'sheet-time');
-  add(box, 'p', 'sheet-label', 'Time').setAttribute('aria-hidden', 'true');
-  var time = sheetCtl_(s, add(box, 'input', ''), function () { return s.more; });
+    sheetPicker_(time);
+  }, timing);
+  time = sheetCtl_(s, add(p, 'input', 'sheet-time'), function () { return timing(); });
   time.setAttribute('type', 'time');
   time.setAttribute('aria-label', 'Time');
-  time.value = s.draft.time;
-  var takeTime = function () {
+  time.setAttribute('step', '300');
+  var takeTime = function (resync) {
     if (SHEET !== s) return;
     var v = String(time.value || '');
-    s.draft.time = /^\d{2}:\d{2}/.test(v) ? v.slice(0, 5) : '';
+    if (/^\d{2}:\d{2}/.test(v)) {
+      s.draft.time = v.slice(0, 5);
+      s.hand.time = true;
+      s.pickTimeTap = true;
+      sheetTimeNeedsDay_(s);
+    }
+    if (resync) sheetSync_(s);
   };
-  time.addEventListener('input', takeTime);
-  time.addEventListener('change', takeTime);
-  var needDay = add(box, 'p', 'small', 'Set a day to add a time.');
+  time.addEventListener('input', function () { takeTime(false); });
+  time.addEventListener('change', function () { takeTime(true); });
   s.sync.push(function () {
-    var hasDay = todoValidDay_(s.draft.due);
-    more.setAttribute('aria-expanded', s.more ? 'true' : 'false');
-    box.hidden = !s.more;
-    time.disabled = !hasDay;
-    time.value = s.draft.time; // M3: shown is saved; No date clears draft.time itself
-    needDay.hidden = hasDay;
+    var on = timing();
+    time.hidden = !on;
+    if (on && time.value !== s.draft.time) time.value = s.draft.time; // shown is saved
+  });
+
+  var who = sheetRow_(p, 'sheet-who', 'Who');
+  // A1-T7: Kev, Lili and Couple carry their person's colour when picked (as the row chips); Either stays plain.
+  ['Kev', 'Lili', 'Couple', 'Either'].forEach(function (name) {
+    chip(who, name, function () { s.draft.who = name; }, function () { return sheetWho_(s.draft.who) === name; },
+      name === 'Either' ? '' : 'schip-' + name.toLowerCase());
   });
 }
 
 function sheetSync_(s) {
   (s.sync || []).forEach(function (f) { f(); });
+  if (s.els && s.els.drop) s.els.drop.hidden = !sheetHasContent_(s); // A3-T2A M3
+  (s.scrolls || []).forEach(function (r) { // A3-T2A: a pick that changed is scrolled into its row's view
+    var on = null;
+    for (var i = 0; i < r.g.children.length && !on; i++) if (r.g.children[i].getAttribute('aria-pressed') === 'true') on = r.g.children[i];
+    if (on && on !== r.on && r.seen) sheetReveal_(r.g, on); // not on open: the row starts at its first chips
+    r.on = on;
+    r.seen = true;
+  });
+}
+
+// Scrolls a sideways row just enough to show chip b (the user's own scrolling is left alone otherwise).
+function sheetReveal_(g, b) {
+  var x = (Number(b.offsetLeft) || 0) - (Number(g.offsetLeft) || 0);
+  var w = Number(b.offsetWidth) || 0;
+  var cw = Number(g.clientWidth) || 0;
+  var at = Number(g.scrollLeft) || 0;
+  if (!cw || !w) return;
+  if (x < at) g.scrollLeft = Math.max(0, x - 8);
+  else if (x + w > at + cw) g.scrollLeft = x + w - cw + 8;
+}
+
+// A new draft has content: words typed (a to-do or grocery), an amount or words (an expense).
+function sheetHasContent_(s) {
+  if (s.list === 'expense') return String(s.draft.amount || '').trim() !== '' || String(s.draft.item || '').trim() !== '';
+  return sheetOneLine_(s.draft.text) !== '';
 }
 
 // ---- A1-T5 quick add: Expense, To-do, Grocery behind the Add slot ---------------------------------------------
@@ -5505,7 +6431,6 @@ function sheetSync_(s) {
 // after a reload and a double tap are all safe.
 var QA_SEGMENTS = [['expense', 'Expense'], ['todo', 'To-do'], ['grocery', 'Grocery']];
 var QA_CURRENCIES = ['IDR', 'EUR', 'USD'];
-var QA_WHO = ['Couple', 'Kev', 'Lili'];
 var QA_WHEN = [['today', 'Today'], ['yesterday', 'Yesterday'], ['pick', 'Pick a day']];
 var QA_DRAFT = null;       // an expense typed and not saved (closed, switched away, refused); memory only, this visit
 var QA_TOAST = null;       // the line above the bar: {text, action ('undo', 'open' or none), uid, row, answered}
@@ -5683,6 +6608,7 @@ function qaKeptChange_(change) {
   } else {
     QA_KEPT_MEM = !lsSet_(LS_KEPT, JSON.stringify(list));
   }
+  qaAddDot_();
 }
 
 // why: 'capped', 'invalid' or (A1 final fix 3) 'unsaved', for the line that says so.
@@ -5701,22 +6627,51 @@ function qaKeptDrop_(key) {
 }
 
 // The entry Add opens next: the oldest refused one, else (A1 final fix 3) the oldest one closed without Save.
-function qaKeptNext_() {
-  var list = qaKept_();
-  for (var i = 0; i < list.length; i++) if (list[i].why !== 'unsaved') return list[i];
-  return list[0] || null;
+// A3-T2A M3: entries carry their list ('todo', 'grocery'; none for an expense); list picks whose entry.
+function qaKeptOf_(e) {
+  return e.list === 'todo' || e.list === 'grocery' ? e.list : 'expense';
+}
+
+function qaKeptNext_(list) {
+  var want = list || 'expense';
+  var all = qaKept_().filter(function (e) { return qaKeptOf_(e) === want; });
+  for (var i = 0; i < all.length; i++) if (all[i].why !== 'unsaved') return all[i];
+  return all[0] || null;
 }
 
 // The line that says an expense waits in Add, with Open; its words follow the entry Open opens.
-function qaKeptToast_() {
-  var next = qaKeptNext_();
+// A3-T2B m9: "Not saved yet. It is in Add." is said at most once a Bali day (kl.keptSaid); after that the dot on
+// the Add slot says it (qaAddDot_). A refused expense is still said every time.
+var LS_KEPT_SAID = 'kl.keptSaid';
+var QA_KEPT_SAID = null; // memory copy of kl.keptSaid, so once a day holds for this visit even without storage
+function qaKeptToast_(list) {
+  var next = qaKeptNext_(list);
+  qaAddDot_();
   if (!next) return;
-  qaToastSet_({ text: QA_KEPT_TEXT[next.why] || QA_KEPT_TEXT.invalid, action: 'open' });
+  if (next.why === 'unsaved') {
+    var day = baliDay_(Date.now());
+    if (QA_KEPT_SAID === null) QA_KEPT_SAID = lsGet_(LS_KEPT_SAID) || '';
+    if (day && QA_KEPT_SAID === day) return;
+    QA_KEPT_SAID = day;
+    lsSet_(LS_KEPT_SAID, day);
+  }
+  qaToastSet_({ text: QA_KEPT_TEXT[next.why] || QA_KEPT_TEXT.invalid, action: 'open', open: qaKeptOf_(next) });
+}
+
+// A3-T2B m9: a small dot on the Add slot while an expense waits in Add (kl.kept).
+var ADD_DOT = null;
+function qaAddDot_() {
+  var kinds = [];
+  qaKept_().forEach(function (e) { if (kinds.indexOf(qaKeptOf_(e)) < 0) kinds.push(qaKeptOf_(e)); });
+  var on = kinds.length > 0;
+  if (ADD_DOT) ADD_DOT.hidden = !on;
+  var what = kinds.length > 1 ? 'drafts wait here' : ({ expense: 'an expense', todo: 'a to-do', grocery: 'an item' }[kinds[0]] + ' waits here');
+  if (ADD_SLOT) ADD_SLOT.setAttribute('aria-label', on ? 'Add, ' + what : 'Add');
 }
 var QA_KEPT_TEXT = {
   capped: 'Not saved: the limit of 100 adds today is reached. It is kept in Add.',
   invalid: 'Not saved. It is kept in Add to check.',
-  unsaved: 'Not saved yet. It is in Add.'
+  unsaved: 'Not added yet. It is in Add.' // A3-T2A M3: the one close rule, the same words for every new draft
 };
 
 // A1 final fix 4: a kept draft keeps the day it was for. Today or Yesterday become that day, picked.
@@ -5793,6 +6748,7 @@ function openExpenseSheet_(carry) {
   var s = { list: 'expense', quick: true, draft: draft, kept: keep ? keep.key : '', cats: qaCats_(), today: qaToday_(), grid: false, done: false, els: {}, ctls: [], sync: [], focusEl: null, touch: null };
   SHEET = s;
   qaBuild_(s);
+  qaAmountShow_(s); // A3-T2A (2B minor): a kept "120" shows as 120,000 from the start
   sheetInert_(true);
   sheetHistory_();
   s.focusEl = s.els.amount;
@@ -5826,7 +6782,7 @@ function qaSwitch_(s, to) {
       QA_DRAFT = s.draft;
     }
     s.done = true;
-  }
+  } else if (s.kept) qaKeptDrop_(s.kept); // A3-T2A: a kept to-do or item moves on with its words
   sheetShut_('replace');
   if (to === 'expense') {
     openExpenseSheet_(words);
@@ -5837,12 +6793,28 @@ function qaSwitch_(s, to) {
   openItemSheet_(null, to, { text: sheetOneLine_(words) }, true);
 }
 
-// The expense sheet. Save sits in the header row, above the amount, so the phone keyboard never covers it.
+// The expense sheet. Add sits in the header row, above the amount, so the phone keyboard never covers it.
+// A3-T2A B2, K2: the amount, then Paid by right under it (Joint is the default, values stay Couple), then What, then
+// one sideways row of the six most used types plus More types (a small sheet of its own), then For and When.
+var QA_BY = [['Couple', 'Joint'], ['Kev', 'Kev'], ['Lili', 'Lili']];
+var QA_FOR = [['Couple', 'Both'], ['Kev', 'Kev'], ['Lili', 'Lili']];
+
+// The six types used most in the months on hand (Settlement never), the rest in the grid's order.
+function qaTopCats_(cats, months) {
+  var n = {};
+  (Array.isArray(months) ? months : []).forEach(function (m) {
+    ((m && Array.isArray(m.rows)) ? m.rows : []).forEach(function (r) {
+      if (r && typeof r.category === 'string' && cats.indexOf(r.category) >= 0) n[r.category] = (n[r.category] || 0) + 1;
+    });
+  });
+  return cats.map(function (c, i) { return { c: c, i: i, n: n[c] || 0 }; }).sort(function (a, b) {
+    return (b.n - a.n) || (a.i - b.i);
+  }).slice(0, 6).map(function (x) { return x.c; });
+}
+
 function qaBuild_(s) {
   var p = sheetFrame_(s, 'New expense');
-  var head = add(p, 'div', 'qa-head');
-  add(head, 'h2', 'qa-title', 'New expense');
-  sheetCtl_(s, btn(head, 'qa-save btn-main', 'Save', function () { qaSave_(s); }));
+  sheetHead_(p, s, 'New expense', 'Add', 'qa-save btn-main', function () { qaSave_(s); });
   qaSegments_(p, s);
 
   var line = add(p, 'div', 'qa-amtline');
@@ -5851,6 +6823,7 @@ function qaBuild_(s) {
     var i = QA_CURRENCIES.indexOf(s.draft.currency);
     s.draft.currency = QA_CURRENCIES[(i + 1) % QA_CURRENCIES.length];
     qaSync_(s);
+    qaAmountShow_(s);
   }));
   var amount = sheetCtl_(s, add(line, 'input', 'qa-amount'));
   amount.setAttribute('type', 'text');
@@ -5866,16 +6839,44 @@ function qaBuild_(s) {
     s.els.status.textContent = '';
     qaSync_(s);
   });
+  // A3-T2B p12: once the field is left, rupiah shorthand shows its full value ("120" shows "120,000"); back in the
+  // field it shows what was typed. The draft keeps the typed text, so a switch to EUR keeps 120 as 120 euros.
+  amount.addEventListener('focus', function () { if (SHEET === s) { s.amountIn = true; qaAmountShow_(s); } });
+  amount.addEventListener('blur', function () { if (SHEET === s) { s.amountIn = false; qaAmountShow_(s); } });
   s.els.amount = amount;
-  s.els.preview = add(p, 'p', 'qa-preview');
-  s.els.status = add(p, 'p', 'qa-status');
+  var under = add(p, 'div', 'qa-under');
+  s.els.preview = add(under, 'p', 'qa-preview');
+  s.els.status = add(under, 'p', 'qa-status');
   s.els.status.setAttribute('role', 'status');
+
+  var row = function (id, label) {
+    var r = add(p, 'div', 'qa-row');
+    add(r, 'p', 'qa-label', label).setAttribute('id', id);
+    return r;
+  };
+  var chips = function (cls, label, options, key) {
+    var r = row(cls + '-label', label);
+    var g = sheetScrollRow_(s, add(r, 'div', 'sheet-chips sheet-scroll ' + cls));
+    g.setAttribute('role', 'group');
+    g.setAttribute('aria-labelledby', cls + '-label');
+    options.forEach(function (o) {
+      var value = o[0];
+      var b = sheetCtl_(s, btn(g, 'schip', o[1], function () {
+        if (SHEET !== s) return;
+        s.draft[key] = value;
+        if (key === 'when' && value === 'pick' && !todoValidDay_(s.draft.day)) s.draft.day = s.today;
+        qaSync_(s);
+      }));
+      s.sync.push(function () { b.setAttribute('aria-pressed', s.draft[key] === value ? 'true' : 'false'); });
+    });
+  };
+  chips('qa-by', 'Paid by', QA_BY, 'paidBy');
 
   var what = sheetCtl_(s, add(p, 'input', 'qa-what'));
   what.setAttribute('type', 'text');
   what.setAttribute('autocomplete', 'off');
   what.setAttribute('maxlength', '100');
-  what.setAttribute('enterkeyhint', 'done');
+  what.setAttribute('enterkeyhint', 'go');
   what.setAttribute('aria-label', 'What');
   what.setAttribute('placeholder', 'What was it?');
   what.value = s.draft.item;
@@ -5892,56 +6893,40 @@ function qaBuild_(s) {
   });
   s.els.hint = add(p, 'p', 'qa-hint');
 
-  var row = function (id, label) {
-    var r = add(p, 'div', 'qa-row');
-    add(r, 'p', 'qa-label', label).setAttribute('id', id);
-    return r;
+  var pickCat = function (name) {
+    if (SHEET !== s) return;
+    s.draft.category = name;
+    s.draft.hand = true;
+    s.grid = false;
+    qaSync_(s);
   };
   var typeRow = row('qa-type-label', 'Type');
-  s.els.type = sheetCtl_(s, btn(typeRow, 'qa-type', null, function () {
-    if (SHEET !== s) return;
-    s.grid = !s.grid;
-    qaSync_(s);
-  }));
-  var grid = add(p, 'div', 'qa-grid');
-  grid.setAttribute('role', 'group');
-  grid.setAttribute('aria-labelledby', 'qa-type-label');
-  s.cats.forEach(function (name) {
-    var b = sheetCtl_(s, btn(grid, 'qa-cat', null, function () {
-      if (SHEET !== s) return;
-      s.draft.category = name;
-      s.draft.hand = true;
-      s.grid = false;
-      qaSync_(s);
-      s.els.type.focus({ preventScroll: true });
-    }), function () { return s.grid; });
-    catAvatar_(b, name);
-    add(b, 'span', '', name);
+  var types = sheetScrollRow_(s, add(typeRow, 'div', 'sheet-chips sheet-scroll qa-types'));
+  types.setAttribute('role', 'group');
+  types.setAttribute('aria-labelledby', 'qa-type-label');
+  var top = qaTopCats_(s.cats, (qaData_() || {}).months);
+  top.forEach(function (name) {
+    var b = sheetCtl_(s, btn(types, 'schip qa-tchip', name, function () { pickCat(name); }));
     s.sync.push(function () { b.setAttribute('aria-pressed', qaCategory_(s) === name ? 'true' : 'false'); });
   });
+  // More types: its label is the type on show when that one is not in the row, so the pick is always visible.
+  s.els.type = sheetCtl_(s, btn(types, 'schip qa-more', 'More types', function () {
+    if (SHEET !== s) return;
+    s.grid = true;
+    qaSync_(s);
+    var on = s.els.gridBtns.filter(function (b) { return b.getAttribute('aria-pressed') === 'true'; })[0];
+    (on || s.els.gridBtns[0] || s.els.gridPanel).focus({ preventScroll: true });
+  }));
   s.sync.push(function () {
-    grid.hidden = !s.grid;
+    var cat = qaCategory_(s);
+    var outside = top.indexOf(cat) < 0;
+    s.els.type.textContent = outside ? cat : 'More types';
+    s.els.type.setAttribute('aria-pressed', outside ? 'true' : 'false');
+    s.els.type.setAttribute('aria-label', outside ? 'Type: ' + cat + '. More types' : 'More types');
     s.els.type.setAttribute('aria-expanded', s.grid ? 'true' : 'false');
   });
 
-  var chips = function (cls, label, options, key) {
-    var r = row(cls + '-label', label);
-    var g = add(r, 'div', 'sheet-chips ' + cls);
-    g.setAttribute('role', 'group');
-    g.setAttribute('aria-labelledby', cls + '-label');
-    options.forEach(function (o) {
-      var value = typeof o === 'string' ? o : o[0];
-      var b = sheetCtl_(s, btn(g, 'schip', typeof o === 'string' ? o : o[1], function () {
-        if (SHEET !== s) return;
-        s.draft[key] = value;
-        if (key === 'when' && value === 'pick' && !todoValidDay_(s.draft.day)) s.draft.day = s.today;
-        qaSync_(s);
-      }));
-      s.sync.push(function () { b.setAttribute('aria-pressed', s.draft[key] === value ? 'true' : 'false'); });
-    });
-  };
-  chips('qa-by', 'Paid by', QA_WHO, 'paidBy');
-  chips('qa-for', 'For', QA_WHO, 'paidFor');
+  chips('qa-for', 'For', QA_FOR, 'paidFor');
   chips('qa-when', 'When', QA_WHEN, 'when');
   var day = sheetCtl_(s, add(p, 'input', 'qa-day'), function () { return s.draft.when === 'pick'; });
   day.setAttribute('type', 'date');
@@ -5960,8 +6945,61 @@ function qaBuild_(s) {
     day.hidden = s.draft.when !== 'pick';
     if (s.draft.when === 'pick') day.value = s.draft.day;
   });
+
+  // All types: a small sheet of its own over the expense sheet. A tap outside, Close or Escape goes back to it.
+  var shade = add($('sheet'), 'div', 'sheet-backdrop qa-types-shade');
+  shade.addEventListener('click', function () { qaGridClose_(s); });
+  var gp = add($('sheet'), 'div', 'sheet-panel qa-types-sheet');
+  gp.setAttribute('role', 'dialog');
+  gp.setAttribute('aria-modal', 'true');
+  gp.setAttribute('aria-label', 'All types');
+  gp.setAttribute('tabindex', '-1');
+  s.els.gridPanel = gp;
+  add(gp, 'div', 'sheet-handle').setAttribute('aria-hidden', 'true');
+  var gh = add(gp, 'div', 'qa-head');
+  add(gh, 'h2', 'qa-title', 'Type');
+  sheetCtl_(s, btn(gh, 'textbtn qa-types-close', 'Close', function () { qaGridClose_(s); }), function () { return s.grid; });
+  var grid = add(gp, 'div', 'qa-grid');
+  grid.setAttribute('role', 'group');
+  grid.setAttribute('aria-label', 'All types');
+  s.els.gridBtns = [];
+  s.cats.forEach(function (name) {
+    var b = sheetCtl_(s, btn(grid, 'qa-cat', null, function () {
+      pickCat(name);
+      s.els.type.focus({ preventScroll: true });
+    }), function () { return s.grid; });
+    catAvatar_(b, name);
+    add(b, 'span', '', name);
+    s.els.gridBtns.push(b);
+    s.sync.push(function () { b.setAttribute('aria-pressed', qaCategory_(s) === name ? 'true' : 'false'); });
+  });
+  s.sync.push(function () {
+    shade.hidden = !s.grid;
+    gp.hidden = !s.grid;
+    s.els.panel.inert = s.grid; // the expense sheet waits behind it
+  });
   $('sheet').hidden = false;
   qaSync_(s);
+  groDockPlace_(); // A3-T2A K2: on top of the keyboard when it is up
+}
+
+// Back from All types to the expense sheet, on its More types chip.
+function qaGridClose_(s) {
+  if (SHEET !== s || !s.grid) return;
+  s.grid = false;
+  qaSync_(s);
+  s.els.type.focus({ preventScroll: true });
+}
+
+// A3-T2B p12: what the amount field shows: the typed text while in it (or when it is not a rupiah amount), the full
+// rupiah value once it is left. Only written when it differs, so a caret is never moved for nothing.
+function qaAmountShow_(s) {
+  var f = s.els.amount;
+  if (!f) return;
+  var typed = String(s.draft.amount === undefined || s.draft.amount === null ? '' : s.draft.amount);
+  var n = s.draft.currency === 'IDR' && !s.amountIn ? qaAmount_(typed, 'IDR') : null;
+  var show = n === null ? typed : group(n);
+  if (f.value !== show) f.value = show;
 }
 
 // Brings the sheet in line with its draft: the currency, the preview, the type chip, the hint, the chips.
@@ -5972,12 +7010,6 @@ function qaSync_(s) {
   e.cur.setAttribute('aria-label', 'Currency: ' + s.draft.currency + '. Change');
   var d = qaData_();
   e.preview.textContent = qaPreview_(qaAmount_(s.draft.amount, s.draft.currency), s.draft.currency, d ? d.fx : null);
-  var cat = qaCategory_(s);
-  e.type.textContent = '';
-  catAvatar_(e.type, cat);
-  add(e.type, 'span', '', cat);
-  add(e.type, 'span', 'chev').setAttribute('aria-hidden', 'true');
-  e.type.setAttribute('aria-label', 'Type: ' + cat + '. Change');
   var guessed = !(s.draft.hand && s.cats.indexOf(s.draft.category) >= 0) && !!qaFold_(s.draft.item).trim();
   e.hint.textContent = guessed ? 'Type guessed from the words.' : '';
   sheetSync_(s);
@@ -6009,12 +7041,13 @@ function qaSave_(s) {
   qaFocusAdd_(); // after the repaint, which draws a new Add slot
 }
 
-// A1 final fix 5: who paid and who it was for, named in the Added line when not Couple: ", paid by Kev for Lili".
+// A1 final fix 5: who paid and who it was for, in the Added line. A3-T2A B2: the payer is always named, joint money
+// too: ", joint money." / ", paid by Kev." / ", paid by Kev for Lili." / ", joint money, for Lili."
 function qaWhoText_(f) {
-  var parts = [];
-  if (f.paidBy && f.paidBy !== 'Couple') parts.push('paid by ' + f.paidBy);
-  if (f.paidFor && f.paidFor !== 'Couple') parts.push('for ' + f.paidFor);
-  return parts.length ? ', ' + parts.join(' ') : '';
+  var joint = !f.paidBy || f.paidBy === 'Couple';
+  var forWho = f.paidFor && f.paidFor !== 'Couple' ? f.paidFor : '';
+  if (joint) return ', joint money' + (forWho ? ', for ' + forWho : '');
+  return ', paid by ' + f.paidBy + (forWho ? ' for ' + forWho : '');
 }
 
 // The queue op: the fields addExpense takes, its 'x:' id, from (only ever Kev or Lili, else left out), and the
@@ -6150,6 +7183,7 @@ function expenseRefused_(op, why) {
 // so the op is marked, and its reply is followed by the delete. Answered: the delete of the row the reply named.
 function qaUndo_() {
   var t = QA_TOAST;
+  if (t && t.listUndo) { listsToastUndo_(t.listUndo); return; } // A3-T2A M4: a list add or edit
   if (!t || !t.uid) return;
   var q = listsByUid_(t.uid);
   if (q && !q.tried && INFLIGHT !== q.uid) {
@@ -6216,7 +7250,11 @@ function qaToastPaint_() {
   else if (t.action === 'open') {
     btn(root, '', 'Open', function () {
       qaToastSet_(null);
-      openExpenseSheet_();
+      if (t.open === 'todo' || t.open === 'grocery') {
+        if (t.open === 'todo') TODO_FOCUS = 'add';
+        else GRO_FOCUS = 'add';
+        openItemSheet_(null, t.open, null, true);
+      } else openExpenseSheet_();
     });
   }
 }
@@ -6437,7 +7475,7 @@ function groSay_(t) {
   if (GRO && GRO.note) GRO.note.textContent = t;
 }
 
-// One add, unless that text (without case or accents) is already on the list. No shop: it is placed by itself.
+// One add, unless that text (without case or accents) is already on the list. No shop given: it is placed by itself.
 function groAdd_(raw) {
   var text = sheetOneLine_(raw).slice(0, 500).trim();
   if (!text) return false;
@@ -6448,12 +7486,11 @@ function groAdd_(raw) {
     return false;
   }
   groSay_('');
-  var op = listsQueue_({ op: 'add', list: 'grocery', fields: { text: text } });
-  // A2-T3: in the shop, an item that lands under another shop is out of sight; the line says where it went.
-  // A2 final: one under Any shop shows here too, so it needs no line.
+  // A3-T2A m6: in the shop, a new item is for that shop (a hand shop), so it shows right here. M4: the dark toast
+  // says where it landed ("Added to Pepito." / "Added under Gran Lucky." / "Added under Any shop."), with Undo.
   var here = groHere_();
-  var it = op && listsItem_('grocery', op.id);
-  if (here && it && foldKey_(it.shop) && foldKey_(it.shop) !== foldKey_(here)) groSay_('Added under ' + sheetOneLine_(it.shop));
+  var fields = here ? { text: text, shop: here.slice(0, 40) } : { text: text };
+  listsAddNew_('grocery', fields, here);
   return true;
 }
 
@@ -6572,13 +7609,32 @@ function groDockPlace_() {
   var ih = Number(window.innerHeight) || 0;
   var cover = vv && ih > 0 ? Math.round(ih - (Number(vv.height) || 0) - (Number(vv.offsetTop) || 0)) : 0;
   GRO_KB = cover > 120 ? cover : 0;
-  if (!GRO || !GRO.box) return;
+  sheetPlace_(vv);
+  var toast = $('qa-toast');
+  if (!GRO || !GRO.box) {
+    toast.style.bottom = '';
+    return;
+  }
   GRO.box.style.bottom = GRO_KB ? GRO_KB + 'px' : ''; // right on the keyboard; '' is the CSS place above the bar
   GRO.box.className = 'gro-dock' + (GRO_KB ? ' is-kb' : '');
   // The dock's height, so the end of the list and the quick add toast clear it.
   var h = Number(GRO.box.offsetHeight) || 0;
   var rootStyle = document.documentElement && document.documentElement.style;
   if (h > 0 && rootStyle && typeof rootStyle.setProperty === 'function') rootStyle.setProperty('--gro-dock-h', h + 'px');
+  if (rootStyle && typeof rootStyle.setProperty === 'function') rootStyle.setProperty('--gro-kb', GRO_KB + 'px');
+  // A3-T2A M4: with the keyboard up the toast rides above the dock, so an add from the dock is seen.
+  toast.style.bottom = GRO_KB && VIEW.screen === 'groceries' ? (GRO_KB + h + 8) + 'px' : '';
+}
+
+// A3-T2A K2, B2: the open sheet sits right on top of the phone keyboard (the same visual viewport reading as the
+// Groceries dock), never taller than what is left above it, so its header (Add, Save) always shows.
+function sheetPlace_(vv) {
+  var root = $('sheet');
+  root.style.bottom = GRO_KB ? GRO_KB + 'px' : '';
+  root.className = 'sheet' + (GRO_KB ? ' is-kb' : '');
+  var room = GRO_KB && vv ? Math.round((Number(vv.height) || 0) - 8) : 0;
+  var panels = Array.prototype.filter.call(root.children || [], function (c) { return /(^| )sheet-panel( |$)/.test(c.className || ''); });
+  panels.forEach(function (p) { p.style.maxHeight = room > 120 ? room + 'px' : ''; });
 }
 
 function renderGroceries_(data) {
@@ -6619,6 +7675,7 @@ function renderGroceries_(data) {
   if (!GRO_FOCUS_EL && GRO_FOCUS === 'add' && ADD_SLOT) GRO_FOCUS_EL = ADD_SLOT; // A1-T5: back to the Add slot
   // The add field is never rebuilt, so it is never focused from here (that would raise the keyboard).
   if (GRO_FOCUS_EL && !modalOpen_()) GRO_FOCUS_EL.focus({ preventScroll: true });
+  listsNewScroll_(); // A3-T2A M4
   groTimerEnsure_();
   return title;
 }
@@ -6739,30 +7796,38 @@ function groHereMain_(main, lists, here, recentSlot) {
 }
 
 // One row: the tick zone, then the text (2 lines at most). The section says the shop; the row never does.
+// A3-T2B M2: the whole row is one button that ticks (and unticks) it, as in the mockup; editing moves to a 44 px
+// "..." button at the end of an open row. The swipe stays.
+var DOTS_PATHS = ['M6 12h.01', 'M12 12h.01', 'M18 12h.01'];
 function groRow_(parent, it, done) {
   var row = add(parent, 'div', 'gro-row' + (done ? ' is-done' : ''));
+  listsNewMark_(row, it); // A3-T2A M4
   listsSwipe_(row, function () {
     GRO_FOCUS = 'tick:' + it.id;
     if (done) groUntick_(it);
     else groTick_(it);
-  }, done ? null : function () { listsDelete_('grocery', it); });
-  var tick = groKey_(btn(row, 'tick-zone', null, function () {
+  }, done ? null : function () { listsDelete_('grocery', it); }, done ? 'Not bought' : 'Bought');
+  var tap = groKey_(btn(row, 'gro-tap', null, function () {
     GRO_FOCUS = 'tick:' + it.id;
     if (done) groUntick_(it);
     else groTick_(it);
   }), 'tick:' + it.id);
-  tick.setAttribute('aria-label', 'Bought: ' + it.text);
-  tick.setAttribute('aria-pressed', done ? 'true' : 'false');
-  tick.appendChild(svgIcon_(done ? TICK_DONE_PATHS : TICK_OPEN_PATHS));
-  var main = done ? add(row, 'div', 'gro-open') : groKey_(btn(row, 'gro-open', null, function () {
+  tap.setAttribute('aria-label', 'Bought: ' + it.text);
+  tap.setAttribute('aria-pressed', done ? 'true' : 'false');
+  add(tap, 'span', 'tick-zone').appendChild(svgIcon_(done ? TICK_DONE_PATHS : TICK_OPEN_PATHS));
+  add(tap, 'span', 'gro-text', it.text);
+  if (done) return;
+  var more = groKey_(btn(row, 'gro-edit', null, function () {
     GRO_FOCUS = 'open:' + it.id;
     openItemSheet_(it, 'grocery');
   }), 'open:' + it.id);
-  add(main, 'span', 'gro-text', it.text);
+  more.setAttribute('aria-label', 'Edit ' + it.text);
+  more.appendChild(svgIcon_(DOTS_PATHS));
 }
 
 // The edit sheet's Shop part (called by sheetBuild_, for an item on the list): a chip for each of the 12 newest
-// shops the server knows (plus the item's own shop when it is not among them), No shop, then a small New shop that
+// shops the server knows (plus the item's own shop when it is not among them), Any shop (A3-T2B p7: the list's own
+// word; it was No shop), then a small New shop that
 // shows a text field only when tapped. The shop the item is shown under is pressed; picking another sends it as
 // the item's own (hand) shop. Matching ignores case and accents; a typed known shop is saved with its known
 // spelling; the same shop typed differently is no change.
@@ -6792,9 +7857,10 @@ function sheetShop_(slot, s) {
   };
   shops.forEach(function (n) { chip(n, n); });
   // Fix 1 (ruling): a learned or guessed shop cannot be cleared by hand (the next read would place it again), so
-  // such an item offers no No shop; picking another shop makes it a hand shop.
+  // such an item offers no Any shop; picking another shop makes it a hand shop. A3-T2B p7 (controller ruling): the
+  // audit asked to always offer it, but the server has no hand "none", so it stays hidden here; only its words changed.
   var placed = s.orig && (s.orig.shopFrom === 'learned' || s.orig.shopFrom === 'guess') && !!own;
-  if (!placed) chip('No shop', '');
+  if (!placed) chip('Any shop', '');
   var more = sheetCtl_(s, btn(g, 'sheet-newshop', 'New shop', function () {
     if (SHEET !== s) return;
     if (!s.newShop) s.shopKeep = s.draft.shop; // fix 1: an emptied field gives this back
@@ -6811,7 +7877,7 @@ function sheetShop_(slot, s) {
   input.setAttribute('enterkeyhint', 'done');
   input.addEventListener('input', function () {
     if (SHEET !== s) return;
-    s.draft.shop = sheetOneLine_(input.value) ? input.value : (s.shopKeep || ''); // fix 1: empty never clears; No shop does
+    s.draft.shop = sheetOneLine_(input.value) ? input.value : (s.shopKeep || ''); // fix 1: empty never clears; Any shop does
     sheetSync_(s);
   });
   input.addEventListener('keydown', function (e) {
