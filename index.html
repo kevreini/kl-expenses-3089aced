@@ -33,6 +33,21 @@
     --font: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
     /* Type scale: weight, size and line height. Nothing uses weight 300. */
     --type-numeral: 600 44px/1.1 var(--font);
+    /* F4: the home hero and balance card (restored, Kevin 2026-11-14). Their look is held in these tokens only, so
+       the values from the mockup Kevin picks are set here and nowhere else. */
+    --hero-bg: #fffdfa;
+    --hero-ink: var(--ink);
+    --hero-muted: var(--soft-ink);
+    --hero-faint: var(--faint-ink);
+    --hero-shadow: 0 1px 0 rgba(43, 29, 20, 0.04), 0 10px 28px -16px rgba(120, 70, 30, 0.3);
+    --type-hero: 600 28px/1.05 var(--font);
+    --type-hero-cur: 500 14px/1 var(--font);
+    --type-bal: 600 20px/1.25 var(--font);
+    --pace-track: #f6e9dc;
+    --pace-fill: linear-gradient(90deg, #f3b98e, #e8955f);
+    /* Kevin's pick B text colours: the soft line and the faint line under a figure */
+    --soft-ink: #6f5c4d;
+    --faint-ink: #806c5c; /* F4 fix 2: Kevin's faint colour darkened to 4.98:1 on white, 4.90 on the hero, 4.57 on the page */
     --type-title: 700 30px/1.15 var(--font);
     --type-card-title: 600 20px/1.25 var(--font);
     --type-body: 400 17px/1.45 var(--font);
@@ -274,8 +289,27 @@
   .mrow-note { display: block; margin-top: 2px; font-size: 13px; color: var(--muted); }
   .mrow-val { flex: none; display: inline-flex; align-items: center; gap: 10px; font-weight: 500; font-variant-numeric: tabular-nums; white-space: nowrap; }
   .mrow-soft { font-weight: 400; color: var(--muted); }
-  .mrow-btn:active { background: var(--tint); }
   .mrows-foot { padding: 10px 0 14px; border-top: 1px solid var(--rule); }
+  /* F4: the home top again (Kevin 2026-11-14): the hero card (the month so far, rupiah big and EUR small, one pace bar
+     against the usual month, Day N of M) and the balance card (EUR big, rupiah small, Settle up on the card). The
+     month and balance screens keep their rows. Colours, sizes and weights come from the F4 tokens on :root. */
+  .hero-card { margin-top: var(--card-gap); padding: 18px 20px; border-radius: 22px; background: var(--hero-bg); color: var(--hero-ink); box-shadow: var(--hero-shadow); }
+  .hero-top { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; font-size: 14px; color: var(--hero-muted); }
+  .hero { margin: 10px 0 2px; font: var(--type-hero); letter-spacing: -0.6px; font-variant-numeric: tabular-nums; color: var(--hero-ink); }
+  .hero-cur { margin-right: 3px; font: var(--type-hero-cur); vertical-align: 0.38em; opacity: 0.55; }
+  .hero-sub { font-size: 14px; color: var(--hero-faint); }
+  .pace { position: relative; height: 4px; margin: 18px 0 9px; border-radius: 2px; background: var(--pace-track); }
+  .pace-fill { position: absolute; left: 0; top: 0; bottom: 0; border-radius: 2px; background: var(--pace-fill); }
+  .pace-day { position: absolute; top: -5px; width: 1.5px; height: 14px; margin-left: -0.75px; background: var(--hero-ink); opacity: 0.35; }
+  .hero-foot { font-size: 13px; color: var(--hero-muted); }
+  .bal { display: flex; align-items: center; gap: 10px; margin-top: var(--card-gap); padding: 6px 14px 6px 18px; }
+  .bal-open { display: flex; flex: 1; min-width: 0; align-items: center; justify-content: space-between; gap: 10px; min-height: 64px; padding: 8px 0; text-align: left; }
+  .bal-words { display: block; min-width: 0; }
+  .bal-label, .bal-big, .bal-small, .bal-words .bal-note { display: block; }
+  .bal-label { font-size: 14px; color: var(--soft-ink); }
+  .bal-big { font: var(--type-bal); letter-spacing: -0.3px; white-space: nowrap; font-variant-numeric: tabular-nums; }
+  .bal-small { margin-top: 2px; font-size: 13px; color: var(--faint-ink); white-space: nowrap; }
+  .bal .bal-settle { min-height: 44px; padding: 11px 15px; border: 1.5px solid #ecc7ab; border-radius: 999px; font-size: 14px; font-weight: 600; color: var(--action); background: transparent; }
   .panel-verdict { font-size: 15px; font-weight: 500; }
   .panel-note { font-size: 15px; color: var(--muted); }
   .panel-small { margin-top: 6px; font-size: 14px; color: var(--muted); }
@@ -366,9 +400,23 @@
 
   /* Donut */
   .dn-head { font-size: 15px; font-weight: 600; }
-  .dn-fig { position: relative; width: 140px; height: 140px; margin: 14px auto 10px; }
-  .dn-fig svg { display: block; width: 140px; height: 140px; }
+  .dn-fig { position: relative; width: 176px; height: 176px; margin: 14px auto 10px; }
+  .dn-fig svg { display: block; width: 176px; height: 176px; }
   .dn-slice { stroke: var(--card); stroke-width: 2px; stroke-linejoin: round; }
+  /* F4 (Kevin's pick B, 2026-11-14): the centre holds the period's total, or the picked category's share and total */
+  .dn-slice, .dn-ring { cursor: pointer; transition: opacity 0.2s; }
+  .dn-slice:focus, .dn-ring:focus { outline: none; } /* a tap keeps the focus there without a box; the keyboard sees the ink edge */
+  .dn-slice:focus-visible { stroke: var(--ink); }
+  .dn-ring:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+  .dn-dim { opacity: 0.22; }
+  .dn-centre { position: absolute; top: 50%; left: 50%; width: 132px; transform: translate(-50%, -50%); text-align: center; pointer-events: none; }
+  .dn-c-what { font-size: 13px; line-height: 1.25; color: var(--soft-ink); }
+  .dn-c-amt { margin: 2px 0; font-size: 19px; font-weight: 600; letter-spacing: -0.3px; line-height: 1.2; font-variant-numeric: tabular-nums; color: var(--ink); white-space: nowrap; }
+  .dn-c-eur { font-size: 13px; color: var(--faint-ink); }
+  .dn-row.dn-picked { gap: 0; width: calc(100% + 28px); margin: 0 -14px; padding: 0 14px; background: #fff3ea; border-top-color: transparent; }
+  .dn-pick { display: flex; flex: 1; min-width: 0; align-items: center; gap: 12px; min-height: 48px; padding: 10px 0; font-weight: 600; text-align: left; }
+  .dn-see { display: inline-flex; flex: none; align-items: center; gap: 8px; min-height: 44px; padding: 0 2px 0 10px; font-size: 14px; font-weight: 600; color: var(--action); }
+  @media (prefers-reduced-motion: reduce) { .dn-slice, .dn-ring { transition: none; } }
   .dn-row {
     display: flex;
     align-items: center;
@@ -1180,6 +1228,26 @@
     box-shadow: inset 0 0 0 1.5px #dccbbb;
   }
   .sheet-newshop[aria-expanded="true"] { color: #9c4615; box-shadow: inset 0 0 0 2px #b4541d; }
+  /* F4: the shop at add time: one sideways row of shop chips in the dock (only while there is text) and in the Add
+     sheet's Grocery segment. On the dock's page colour the resting chips are white, like Bought recently. */
+  .gro-shop { display: flex; flex-wrap: wrap; align-items: center; gap: 0 8px; padding-bottom: 8px; }
+  .gro-shop-chips {
+    display: flex;
+    flex: 1 1 0;
+    min-width: 0;
+    flex-wrap: nowrap;
+    gap: 6px;
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+    padding: 2px;
+    scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
+  }
+  .gro-shop-chips::-webkit-scrollbar { display: none; }
+  .gro-shop .schip:not([aria-pressed="true"]) { background: var(--card); box-shadow: 0 0 0 1px rgba(58, 34, 19, 0.06), 0 1px 2px rgba(58, 34, 19, 0.08); }
+  .gro-shop-chips .sheet-newshop, .sheet-gshop .sheet-newshop { flex: none; white-space: nowrap; }
+  .gro-shop .gro-shop-input { flex: 1 0 100%; margin-top: 6px; }
+  .sheet-gshop-input { margin-left: 52px; width: calc(100% - 52px); }
   /* A2-T3 end */
 
   /* A1-T5 quick add */
@@ -1284,7 +1352,8 @@
   /* A1-T6 end */
 
   @media (hover: hover) {
-    .barcol:hover, .cat:hover, .dn-tap:hover, .row-btn:hover, .mrow-btn:hover { background: var(--tint); }
+    .barcol:hover, .cat:hover, .dn-tap:hover, .row-btn:hover { background: var(--tint); }
+    .bal-open:hover { opacity: 0.8; }
     .seg-btn[aria-pressed="false"]:hover { color: var(--ink); }
     .back:hover, .bal-settle:hover { opacity: 0.8; }
   }
@@ -2411,19 +2480,16 @@ function usualRow_(card, rate) {
   return mrow_(card, 'A usual month', rate ? roundIdr_(u) : fmtEur(u), true);
 }
 
-// The balance as a row: who pays whom and the euros (they settle in euros, exact to the cent). On the home it is a
-// 44 px button to the balance screen with a chevron; on the balance screen a plain row. All square has no amount.
-// After Mark as settled the figure counts down to zero once, then reads All square (not when the phone asks for no
-// motion). A settlement waiting to be sent says so on the home row; the balance screen says it beside Settle up.
-function balanceRow_(card, onHome) {
+// The balance as a row on the balance screen: who pays whom and the euros (they settle in euros, exact to the cent).
+// All square has no amount. After Mark as settled the figure counts down to zero once, then reads All square (not
+// when the phone asks for no motion). F4: the home shows the balance card instead (renderBalanceCard_).
+function balanceRow_(card) {
   var side = balanceSide_(DATA.balance.net);
   var square = side.square;
   if (!square) SETTLE_ANIM = null;
   var counting = square && SETTLE_ANIM && Date.now() - SETTLE_ANIM.at < 20000 && !settleCalm_();
   if (SETTLE_ANIM && (settleCalm_() || (square && !counting))) SETTLE_ANIM = null;
-  var row = onHome
-    ? btn(card, 'mrow mrow-btn bal-row', null, function () { go({ screen: 'balance', key: null }); })
-    : add(card, 'div', 'mrow');
+  var row = add(card, 'div', 'mrow');
   var words = add(row, 'span', 'mrow-label');
   if (counting) {
     add(words, 'span', '', 'Settled');
@@ -2436,11 +2502,76 @@ function balanceRow_(card, onHome) {
     add(words, 'span', '', 'All square');
   } else {
     add(words, 'span', '', side.who);
-    var val = add(row, 'span', 'mrow-val', fmtEur(side.eur));
-    if (onHome) add(val, 'span', 'chev').setAttribute('aria-hidden', 'true');
-    if (onHome && settlePending_()) add(words, 'span', 'mrow-note', 'Settling up. Waiting to be sent.');
+    add(row, 'span', 'mrow-val', fmtEur(side.eur));
   }
   return row;
+}
+
+// ---- F4: the home top restored (Kevin 2026-11-14), from the page before MC, on today's guards
+// The big number of the hero: a small currency, then the figure; EUR small underneath when it is rupiah.
+function heroNumber_(w, idr, eur) {
+  var h = add(w, 'p', 'hero');
+  var v = idr !== null ? idr : eur;
+  add(h, 'span', 'hero-cur', idr !== null ? 'Rp' : 'EUR');
+  h.appendChild(document.createTextNode((v < 0 ? '-' : '') + (idr !== null ? group(Math.abs(Math.round(idr))) : fixed2(eur))));
+  if (idr !== null) add(w, 'p', 'hero-sub', nb(eurRound_(eur))); // F4 pick B: whole euros under the rupiah
+}
+
+// The hero card on the home (Kevin's pick B, "White, papaya thread"): the month so far, rupiah in full and EUR small,
+// "Day N of M", one fine line against the usual month with today marked on it, and the usual month rounded. Past
+// the usual month the line is simply full: no warning words, no percentage.
+function moneyHero_(wrap, m, label, today, rate) {
+  var w = add(wrap, 'div', 'hero-card');
+  var d = dayOfMonth(today);
+  var top = add(w, 'div', 'hero-top');
+  add(top, 'span', '', label);
+  add(top, 'span', '', 'Day ' + d.day + ' of ' + d.days);
+  var idr = totalIdr_(m.rows, rate);
+  heroNumber_(w, idr, m.totalEur);
+  var usual = usualOf_(rate);
+  if (usual === null || !(usual > 0)) return w; // F4 pick B: no usual month yet, no line and no foot
+  var now = idr !== null ? idr : m.totalEur;
+  var pct = Math.round(Math.max(0, now) / usual * 100);
+  var bar = add(w, 'div', 'pace');
+  bar.setAttribute('aria-hidden', 'true');
+  add(bar, 'span', 'pace-fill').style.width = Math.min(100, pct) + '%';
+  add(bar, 'span', 'pace-day').style.left = Math.round(d.day / d.days * 1000) / 10 + '%';
+  add(w, 'p', 'hero-foot', nb('A usual month is ' + (rate ? roundIdr_(usual) : fmtEur(usual)))); // no percentage
+  return w;
+}
+
+// The balance card on the home: who pays whom, euros big (they settle in euros, to the cent), rupiah small at the
+// month's rate. The card opens the balance screen; Settle up sits on it (the same button and guards as the balance
+// screen: gone when square or while a settlement waits, disabled with its reason until the numbers are the server's).
+// After Mark as settled the euros count down once, then it reads All square.
+function renderBalanceCard_(parent, rate) {
+  var side = balanceSide_(DATA.balance.net);
+  var square = side.square;
+  var bal = add(parent, 'div', 'card bal');
+  var open = btn(bal, 'bal-open', null, function () { go({ screen: 'balance', key: null }); });
+  var words = add(open, 'span', 'bal-words');
+  if (!square) SETTLE_ANIM = null;
+  var counting = square && SETTLE_ANIM && Date.now() - SETTLE_ANIM.at < 20000 && !settleCalm_();
+  if (SETTLE_ANIM && (settleCalm_() || (square && !counting))) SETTLE_ANIM = null;
+  if (counting) {
+    add(words, 'span', 'bal-label', 'Settled');
+    SETTLE_EL = add(words, 'span', 'bal-big', fmtEur(SETTLE_ANIM.from));
+    if (!SETTLE_ANIM.running) {
+      SETTLE_ANIM.running = true;
+      setTimeout(function () { settleStep_(0); }, 40);
+    }
+  } else if (square) {
+    add(words, 'span', 'bal-label', 'All square');
+    add(words, 'span', 'bal-note', 'Nothing to settle. See how it adds up');
+  } else {
+    add(words, 'span', 'bal-label', side.who);
+    add(words, 'span', 'bal-big', fmtEur(side.eur));
+    if (rate) add(words, 'span', 'bal-small', fmtIdr(Math.round(side.eur * rate / 1000) * 1000));
+    if (settlePending_()) add(words, 'span', 'bal-note', 'Settling up. Waiting to be sent.');
+  }
+  add(open, 'span', 'chev').setAttribute('aria-hidden', 'true');
+  if (!counting) settleButton_(bal, words);
+  return bal;
 }
 // ---- MC end
 
@@ -2591,13 +2722,11 @@ function renderHome() {
 
   var top = largeTitleBox_(root, 'Money');
   moneyStaleNote_(top.wrap); // A3-T2B M6
-  var rows = mrowsCard_(top.wrap);
-  mrow_(rows, monthName(curKey) + ' so far', moneyShort_(totalIdr_(cur.rows, rate), cur.totalEur), false);
-  usualRow_(rows, rate);
-  balanceRow_(rows, true);
+  moneyHero_(top.wrap, cur, monthName(curKey) + ' so far', today, rate); // F4: the hero card again
   // A1-T5: an expense added here that has not reached the sheet yet (offline, or behind another change).
   var waiting = QUEUE.filter(function (q) { return q.op === 'expense' && q.uid !== INFLIGHT; }).length;
   if (waiting) add(top.wrap, 'p', 'title-note qa-wait', waiting === 1 ? '1 new expense is waiting to be sent.' : waiting + ' new expenses are waiting to be sent.');
+  renderBalanceCard_(top.wrap, rate); // F4: the balance card, Settle up on it
 
   var body = add(root, 'div', 'wrap');
   renderDonut_(section(body, 'Where it goes'));
@@ -2633,7 +2762,8 @@ function renderHome() {
 var DONUT_VIEW = 'cur'; // This month ('cur'), Last month ('last') or All time ('all'); for this visit only
 var DONUT_MORE = false; // the list past the top 5 is open
 var DONUT_SMALL = false; // MC: the "Other small" row is open and lists what it holds
-var DONUT_REFOCUS = false; // MC fix 3: the Other small row was tapped; its new row takes the focus after the repaint
+var DONUT_PICK = '';     // F4: the category picked in the ring or its list ('Other small' for the group); '' for none
+var DONUT_FOCUS = '';    // F4 (was MC fix 3): the control tapped ('row:', 'slice:' or 'see:' and a name); it keeps the focus after the repaint
 var SMALL_SHARE = 0.03;  // MC (audit p6): slices under 3 percent are grouped into one "Other small" slice
 var SMALL_COLOUR = '#9890b0'; // its own fixed colour: 3:1 on white, apart from every category colour
 
@@ -2688,8 +2818,12 @@ function donutModel_(months, view, todayIso, rate) {
   var list = pos.concat(cats.filter(function (c) { return !(c.eur > 0); }).map(function (c) {
     return { name: c.name, eur: c.eur, idr: c.idr, share: c.share, color: null };
   }));
+  // F4: the line in the ring's centre over the period's total.
+  var first = months.length ? months[months.length - 1].key : '';
+  var centre = key === 'all' ? (first ? 'Since ' + monthName(first) + (first.slice(0, 4) !== cur.slice(0, 4) ? ' ' + first.slice(0, 4) : '') : 'All time')
+    : (key === cur ? 'This month' : 'Last month');
   return {
-    key: key, head: head, emptyText: emptyText, totalEur: totalEur, totalIdr: totalIdr_(rows, rate), rows: list,
+    key: key, head: head, centre: centre, emptyText: emptyText, totalEur: totalEur, totalIdr: totalIdr_(rows, rate), rows: list,
     empty: !list.some(function (r) { return r.color; })
   };
 }
@@ -2731,7 +2865,7 @@ function renderDonut_(s) {
   var segs = [];
   [['cur', 'This month'], ['last', 'Last month'], ['all', 'All time']].forEach(function (o) {
     var b = btn(seg, 'seg-btn', o[1], function () {
-      if (DONUT_VIEW !== o[0]) { DONUT_MORE = false; DONUT_SMALL = false; }
+      if (DONUT_VIEW !== o[0]) { DONUT_MORE = false; DONUT_SMALL = false; DONUT_PICK = ''; } // F4: a new period clears the pick
       DONUT_VIEW = o[0];
       paint();
     });
@@ -2747,43 +2881,79 @@ function renderDonut_(s) {
   paint();
 }
 
+// F4: euros as a whole number, for a total under a rupiah figure.
+function eurRound_(n) {
+  var a = Math.round(Math.abs(n));
+  return (n < 0 && a > 0 ? '-' : '') + 'EUR ' + group(a);
+}
+
+// F4 (Kevin 2026-11-14): the centre shows the period's total; a tap on a slice or a list line picks that category
+// (the others fade, its slice is thicker, the centre shows its share and total, its line offers "See its expenses");
+// the same tap again, or another period, clears it. "Other small" is picked like a category and lists what it holds.
+function donutOpenCat_(model, name) {
+  if (model.key !== 'all') return function () { go({ screen: 'month', key: model.key, filter: name }); };
+  // All time: there is no view of one category across months, so the newest month that has it, filtered to it.
+  var m = null;
+  for (var i = 0; i < DATA.months.length && !m; i++) {
+    if ((DATA.months[i].rows || []).some(function (r) { return r.category === name && !r.settlement; })) m = DATA.months[i];
+  }
+  return m ? function () { go({ screen: 'month', key: m.key, filter: name }); } : null;
+}
+
 function drawDonut_(body, model, repaint) {
-  add(body, 'p', 'dn-head', model.head);
   if (model.empty) {
+    add(body, 'p', 'dn-head', model.head);
     add(body, 'p', 'dn-empty', model.emptyText);
     return;
   }
-  // A3-T2B m1: a category (its row or its slice) opens that month filtered to it; the month offers Show all.
-  var openCat = function (name) {
-    return model.key === 'all' ? null : function () { go({ screen: 'month', key: model.key, filter: name }); };
-  };
-  var open = model.key === 'all' ? null : function () { goMonth(model.key); };
-  // MC: the "Other small" slice opens its row (and the list past the top 5 when it sits there), in every view.
+  var parts = model.rows.filter(function (r) { return r.color; });
+  var picked = null;
+  model.rows.forEach(function (r) { if (r.color && r.name === DONUT_PICK) picked = r; });
+  if (!picked) DONUT_PICK = '';
   var at = -1;
   model.rows.forEach(function (r, i) { if (r.group) at = i; });
-  var openSmall = function () {
-    DONUT_SMALL = true;
-    if (at >= 5) DONUT_MORE = true;
-    repaint();
+  var focusEl = null;
+  var keyed = function (e, k) { if (DONUT_FOCUS === k) focusEl = e; return e; };
+  var pick = function (r, k) {
+    return function () {
+      DONUT_PICK = DONUT_PICK === r.name ? '' : r.name;
+      DONUT_SMALL = !!(r.group && DONUT_PICK);
+      if (DONUT_PICK && model.rows.indexOf(r) >= 5) DONUT_MORE = true; // its line shows
+      DONUT_FOCUS = k;
+      repaint();
+    };
   };
-  var tapOf = function (r) { return r.group ? openSmall : (open ? openCat(r.name) : null); };
-  var parts = model.rows.filter(function (r) { return r.color; });
   var fig = add(body, 'div', 'dn-fig');
   var svg = document.createElementNS(SVG_NS, 'svg');
   svg.setAttribute('viewBox', '0 0 200 200');
-  svg.setAttribute('width', '140');
-  svg.setAttribute('height', '140');
-  svg.setAttribute('role', 'img');
+  svg.setAttribute('width', '176');
+  svg.setAttribute('height', '176');
+  svg.setAttribute('role', 'group');
   svg.setAttribute('focusable', 'false');
   svg.setAttribute('aria-label', 'Where it goes, ' + model.head + ': ' + parts.slice(0, 3).map(function (r) {
     return r.name + ' ' + shareText(r.share);
   }).join(', ') + '.');
   fig.appendChild(svg);
-  var mark;
+  // A slice is a button for the keyboard and the screen reader: its name and share, pressed when picked.
+  var asButton = function (mark, r) {
+    var tap = pick(r, 'slice:' + r.name);
+    mark.setAttribute('role', 'button');
+    mark.setAttribute('tabindex', '0');
+    mark.setAttribute('aria-pressed', r === picked ? 'true' : 'false');
+    mark.setAttribute('aria-label', r.name + ', ' + shareText(r.share));
+    mark.addEventListener('click', tap);
+    mark.addEventListener('keydown', function (e) {
+      if (e && (e.key === 'Enter' || e.key === ' ')) {
+        if (typeof e.preventDefault === 'function') e.preventDefault();
+        tap();
+      }
+    });
+    keyed(mark, 'slice:' + r.name);
+  };
   var spans = donutSlices_(parts.map(function (r) { return r.eur; }));
   var whole = -1; // a part of 359.5 degrees or more is drawn as the full ring; the rest would vanish under the gaps
   spans.forEach(function (a, i) { if (a.end - a.start >= 359.5) whole = i; });
-  // MC: a thin ring, about 140 px across (16 of 200 in the drawing), with nothing in its centre.
+  var mark;
   if (whole >= 0) {
     mark = document.createElementNS(SVG_NS, 'circle');
     mark.setAttribute('class', 'dn-ring');
@@ -2792,51 +2962,71 @@ function drawDonut_(body, model, repaint) {
     mark.setAttribute('r', '88');
     mark.setAttribute('fill', 'none');
     mark.setAttribute('stroke', parts[whole].color);
-    mark.setAttribute('stroke-width', '16');
-    if (tapOf(parts[whole])) mark.addEventListener('click', tapOf(parts[whole]));
+    mark.setAttribute('stroke-width', parts[whole] === picked ? '22' : '16');
+    asButton(mark, parts[whole]);
     svg.appendChild(mark);
   } else {
     spans.forEach(function (a, i) {
+      var on = parts[i] === picked;
       mark = document.createElementNS(SVG_NS, 'path');
-      mark.setAttribute('class', 'dn-slice');
-      mark.setAttribute('d', donutPath_(a.start, a.end, 96, 80, 100));
+      mark.setAttribute('class', 'dn-slice' + (picked && !on ? ' dn-dim' : ''));
+      mark.setAttribute('d', on ? donutPath_(a.start, a.end, 99, 77, 100) : donutPath_(a.start, a.end, 96, 80, 100));
       mark.setAttribute('fill', parts[i].color);
-      if (tapOf(parts[i])) mark.addEventListener('click', tapOf(parts[i]));
+      asButton(mark, parts[i]);
       svg.appendChild(mark);
     });
   }
-  // MC: legend rows like the rows card: a dot in the category colour, the name, one rounded value.
-  var legend = function (line, r) {
+  // The centre: the period's total, or the picked category's share and total; EUR small under rupiah.
+  var c = add(fig, 'div', 'dn-centre');
+  c.setAttribute('aria-live', 'polite');
+  add(c, 'p', 'dn-c-what', picked ? picked.name + ', ' + Math.round(picked.share * 100) + ' percent' : model.centre);
+  var idr = picked ? picked.idr : model.totalIdr;
+  var eur = picked ? picked.eur : model.totalEur;
+  var hasIdr = idr !== null && idr !== undefined;
+  add(c, 'p', 'dn-c-amt', nb(hasIdr ? roundIdr_(idr) : fmtEur(eur)));
+  if (hasIdr) add(c, 'p', 'dn-c-eur', nb(eurRound_(eur)));
+  // Legend lines: a dot in the category colour, the name, one rounded value. Each picks; the picked one is
+  // highlighted and offers "See its expenses" (Other small lists what it holds instead).
+  var legend = function (line, r, noVal) {
     var dot = add(line, 'span', 'dn-dot');
     dot.setAttribute('aria-hidden', 'true');
     dot.style.background = r.color || '';
     var words = add(line, 'span', 'dn-words');
     add(words, 'span', 'dn-name', r.name);
-    add(line, 'span', 'dn-val', moneyShort_(r.idr, r.eur));
+    if (!noVal) add(line, 'span', 'dn-val', moneyShort_(r.idr, r.eur));
     return words;
   };
   var list = add(body, 'div', 'dn-list');
   var many = model.rows.length > 5;
   model.rows.slice(0, many && !DONUT_MORE ? 5 : model.rows.length).forEach(function (r) {
+    if (!r.color) { // at zero or below: no slice, nothing to pick
+      legend(add(list, 'div', 'dn-row'), r);
+      return;
+    }
+    var on = r === picked;
+    var box = on ? add(list, 'div', 'dn-row dn-picked') : list;
+    var b = keyed(btn(box, on ? 'dn-tap dn-pick' : 'dn-row dn-tap', null, pick(r, 'row:' + r.name)), 'row:' + r.name);
+    b.setAttribute('aria-pressed', on ? 'true' : 'false');
     if (r.group) {
-      var g = btn(list, 'dn-row dn-tap dn-group', null, function () {
-        DONUT_SMALL = !DONUT_SMALL;
-        DONUT_REFOCUS = true;
-        repaint();
-      });
-      // MC fix 3: the repaint makes a new row; the keyboard stays on it.
-      if (DONUT_REFOCUS) { DONUT_REFOCUS = false; g.focus({ preventScroll: true }); }
-      g.setAttribute('aria-expanded', DONUT_SMALL ? 'true' : 'false');
-      // The fold mark sits after the name, so the values stay in one column.
-      add(legend(g, r), 'span', 'dn-fold' + (DONUT_SMALL ? ' dn-fold-open' : '')).setAttribute('aria-hidden', 'true');
-      if (DONUT_SMALL) {
+      b.className += ' dn-group';
+      b.setAttribute('aria-expanded', on ? 'true' : 'false');
+      add(legend(b, r, on), 'span', 'dn-fold' + (on ? ' dn-fold-open' : '')).setAttribute('aria-hidden', 'true');
+      if (on) {
         r.group.forEach(function (m) {
-          legend(open ? btn(list, 'dn-row dn-sub dn-tap', null, openCat(m.name)) : add(list, 'div', 'dn-row dn-sub'), m);
+          var go1 = donutOpenCat_(model, m.name);
+          legend(go1 ? btn(list, 'dn-row dn-sub dn-tap', null, go1) : add(list, 'div', 'dn-row dn-sub'), m);
         });
       }
       return;
     }
-    legend(open ? btn(list, 'dn-row dn-tap', null, openCat(r.name)) : add(list, 'div', 'dn-row'), r);
+    legend(b, r, on);
+    if (on) {
+      var see = donutOpenCat_(model, r.name);
+      if (see) {
+        var sb = keyed(btn(box, 'dn-see', 'See its expenses', see), 'see:' + r.name);
+        add(sb, 'span', 'chev').setAttribute('aria-hidden', 'true');
+      }
+    }
   });
   if (many) {
     var more = btn(body, 'dn-more', DONUT_MORE ? 'Show less' : 'Show ' + (model.rows.length - 5) + ' more', function () {
@@ -2845,6 +3035,8 @@ function drawDonut_(body, model, repaint) {
     });
     more.setAttribute('aria-expanded', DONUT_MORE ? 'true' : 'false');
   }
+  DONUT_FOCUS = '';
+  if (focusEl && typeof focusEl.focus === 'function') focusEl.focus({ preventScroll: true });
 }
 
 // Month by month: one bar per month, the only month picker. Rupiah in millions (added up from the rows like every
@@ -3560,7 +3752,7 @@ function renderBalanceScreen() {
   // MC: a plain title, then the same row as the home (who pays whom, EUR), at reading size.
   var top = subTop_(root, 'Balance');
   var title = top.h;
-  balanceRow_(mrowsCard_(top.wrap, 'bal-rows'), false);
+  balanceRow_(mrowsCard_(top.wrap, 'bal-rows'));
   var body = add(root, 'div', 'wrap');
 
   var ts = section(body, 'The totals in plain words');
@@ -4886,23 +5078,10 @@ function todoNotePick_(items) {
   return waited[0] || null;
 }
 
-// The note as [lead, rest]: '<text> has waited a while.' (a trailing punctuation mark of the text dropped) and the
-// first step and minutes when known, else ''. Minutes only for a quick item: a bigger item's minutes are the
-// whole task, not its first step (R70).
-function todoNoteParts_(it) {
-  var lead = String(it.text).replace(/[\s.!?,;:\u2026]+$/, '') + ' has waited a while.';
-  var mins = Number(it.minutes);
-  var hasMins = it.kind === 'quick' && isFinite(mins) && mins > 0;
-  var step = todoStep_(it).replace(/[.\s]+$/, '');
-  var rest = '';
-  if (step) rest = 'First step: ' + step + (hasMins ? ', about ' + mins + ' min.' : '.');
-  else if (hasMins) rest = 'About ' + mins + ' min.';
-  return [lead, rest];
-}
-
+// The note: '<text> has waited a while.' (a trailing punctuation mark of the text dropped). F4 fix 4 (Kevin: "no
+// need to tell me how to do it"): no first step and no minutes; the row's First step chip and the sheet keep them.
 function todoNoteText_(it) {
-  var p = todoNoteParts_(it);
-  return p[1] ? p[0] + ' ' + p[1] : p[0];
+  return String(it.text).replace(/[\s.!?,;:\u2026]+$/, '') + ' has waited a while.';
 }
 
 // Mine: the items for me, plus Either and Couple. With no phone identity, everything.
@@ -5408,13 +5587,11 @@ function todoStepChip_(box, it, text) {
   return b;
 }
 
-// The calm note at the top of Anytime: one item, its first step, two ways out.
+// The calm note at the top of Anytime: one item, one sentence, two ways out (F4 fix 4: no first step line).
 function todoNote_(parent, it, today) {
   var n = add(parent, 'div', 'todo-note');
   n.setAttribute('role', 'note');
-  var parts = todoNoteParts_(it);
-  add(n, 'p', 'todo-note-lead', parts[0]);
-  if (parts[1]) add(n, 'p', '', parts[1]);
+  add(n, 'p', 'todo-note-lead', todoNoteText_(it));
   var actions = add(n, 'div', 'todo-note-actions');
   // R55: only with a first step to make it smaller to; R70: never for an item already made small.
   var step = todoStep_(it);
@@ -5725,15 +5902,17 @@ function sheetWho_(who) {
   return (who === 'Kev' || who === 'Lili' || who === 'Couple') ? who : 'Either';
 }
 
-// The When day chips from the page's Bali day (A3-T2A K1): Today, Tomorrow, This week (the coming Saturday, or
-// Sunday when today is Saturday). The weekday chips are gone from the row; Pick a day opens the native date field.
+// The When day chips from the page's Bali day (A3-T2A K1): Today, Tomorrow, This week. The weekday chips are gone
+// from the row; Pick a day opens the native date field. F4 fix 1 (ruling): This week is the coming Sunday, or today
+// when today is Sunday, never beyond this week, so the item shows under This week (Today on a Sunday). On Saturday it
+// is tomorrow's day and on Sunday today's: the chip tapped stays the pressed one (s.whenChip), never its twin.
 function sheetWhenChips_(today) {
   if (!todoValidDay_(today)) return [];
   var wd = new Date(Date.UTC(Number(today.slice(0, 4)), Number(today.slice(5, 7)) - 1, Number(today.slice(8, 10)))).getUTCDay();
   return [
     { label: 'Today', due: today },
     { label: 'Tomorrow', due: isoAddDays_(today, 1) },
-    { label: 'This week', due: isoAddDays_(today, wd === 6 ? 1 : 6 - wd) }
+    { label: 'This week', due: isoAddDays_(today, wd === 0 ? 0 : 7 - wd) }
   ];
 }
 
@@ -5876,7 +6055,7 @@ function openItemSheet_(it, list, prefill, quick) {
     list: list, id: orig ? orig.id : '', orig: orig, draft: sheetDraft_(list, orig, prefill, whoAmI_()),
     today: today, chips: sheetWhenChips_(today), pickTap: false, pickTimeTap: false,
     returnKey: orig ? 'open:' + orig.id : 'add', els: {}, ctls: [], focusEl: null, touch: null,
-    hand: { when: false, time: false, priority: false }, words: null, priWords: null, wordsOff: false, kept: '', done: false,
+    hand: { when: false, time: false, priority: false, shop: false }, words: null, priWords: null, wordsOff: false, kept: '', done: false,
   };
   s.quick = !orig && !!quick;
   // A3-T2A M3: a new item closed without Add waits in kl.kept; the next Add of that list opens it again.
@@ -5887,7 +6066,7 @@ function openItemSheet_(it, list, prefill, quick) {
     ['text', 'who', 'due', 'time', 'shop', 'priority'].forEach(function (k) { if (typeof kd[k] === 'string') s.draft[k] = kd[k]; });
     s.draft.who = sheetWho_(s.draft.who);
     s.draft.priority = todoPriority_(s.draft.priority);
-    s.hand = { when: !!(kd.hand && kd.hand.when), time: !!(kd.hand && kd.hand.time), priority: !!(kd.hand && kd.hand.priority) };
+    s.hand = { when: !!(kd.hand && kd.hand.when), time: !!(kd.hand && kd.hand.time), priority: !!(kd.hand && kd.hand.priority), shop: !!(kd.hand && kd.hand.shop) };
     s.wordsOff = !!kd.wordsOff;
     s.kept = keep.key;
   }
@@ -5989,7 +6168,7 @@ function sheetKeepOnClose_(s, how) {
   var typed = sheetOneLine_(s.draft.text) !== '';
   var d = {
     text: s.draft.text, who: s.draft.who, due: s.draft.due, time: s.draft.time, shop: s.draft.shop, priority: s.draft.priority || '',
-    hand: { when: !!s.hand.when, time: !!s.hand.time, priority: !!s.hand.priority }, wordsOff: !!s.wordsOff
+    hand: { when: !!s.hand.when, time: !!s.hand.time, priority: !!s.hand.priority, shop: !!s.hand.shop }, wordsOff: !!s.wordsOff
   };
   if (how === 'lock') {
     if (s.kept) qaKeptDrop_(s.kept);
@@ -6021,7 +6200,12 @@ function sheetAdd_(s) {
   if (s.list === 'todo') TODO_FOCUS = 'add';
   else GRO_FOCUS = 'add';
   sheetShut_('close');
-  listsAddNew_(s.list, fields, '');
+  if (s.list === 'grocery') { // F4: the Shop row's shop (a hand pick, else the shop on show, else none)
+    var gs = groShopSend_(s.hand.shop ? { hand: true, shop: s.draft.shop } : null, s.here, LISTS, s.draft.text);
+    if (gs) fields.shop = gs;
+    else delete fields.shop;
+  }
+  listsAddNew_(s.list, fields, s.list === 'grocery' ? (s.here || '') : '');
   qaFocusAdd_();
 }
 
@@ -6453,10 +6637,10 @@ function sheetBuild_(s) {
   s.els.text = ta;
   if (s.step) add(p, 'p', 'sheet-step', 'First step: ' + s.step);
   if (s.list === 'todo') sheetTodoFields_(p, s);
-  else if (s.orig) { // A2-T3: a new grocery item has no shop to pick; it is placed by itself
+  else if (s.orig) {
     s.els.shop = add(p, 'div', 'sheet-shop');
     if (typeof sheetShop_ === 'function') sheetShop_(s.els.shop, s); // Task 8
-  }
+  } else sheetGShop_(p, s); // F4: a new grocery item gets the Shop row once it has text
   if (s.orig) {
     var foot = add(p, 'div', 'sheet-foot');
     sheetCtl_(s, btn(foot, 'textbtn sheet-delete', 'Delete', sheetDelete_));
@@ -6568,13 +6752,17 @@ function sheetTodoFields_(p, s) {
     return null;
   };
   var when = sheetScrollRow_(s, sheetRow_(p, 'sheet-when', 'When'));
+  s.whenChip = null; // F4: the day chip tapped last; it stays the pressed one while the day is still its day
   s.chips.forEach(function (c) {
     chip(when, c.label, function () {
       s.draft.due = c.due;
+      s.whenChip = c;
       s.hand.when = true;
       s.dayByTime = false; // fix 2: a day picked by hand never follows a time
       s.pickTap = false;
-    }, function () { return !picking() && firstChip(s.draft.due) === c; });
+    }, function () {
+      return !picking() && (s.whenChip && s.whenChip.due === s.draft.due ? s.whenChip === c : firstChip(s.draft.due) === c);
+    });
   });
   var day;
   chip(when, 'Pick a day', function () {
@@ -7701,6 +7889,7 @@ function groLeave_() {
   GRO_DONE_OPEN = false;
   GRO_FOCUS = '';
   GRO_NOTE = '';
+  groPickReset_(); // F4
   groSetHere_('');
   groTimerStop_();
 }
@@ -7769,7 +7958,9 @@ function groSay_(t) {
 }
 
 // One add, unless that text (without case or accents) is already on the list. No shop given: it is placed by itself.
-function groAdd_(raw) {
+// F4: shop, when given, is what the dock's Shop row decided ('' sends none); left out (Bought recently, staples), the
+// shop on show as before.
+function groAdd_(raw, shop) {
   var text = sheetOneLine_(raw).slice(0, 500).trim();
   if (!text) return false;
   var key = foldKey_(text);
@@ -7782,9 +7973,124 @@ function groAdd_(raw) {
   // A3-T2A m6: in the shop, a new item is for that shop (a hand shop), so it shows right here. M4: the dark toast
   // says where it landed ("Added to Pepito." / "Added under Gran Lucky." / "Added under Any shop."), with Undo.
   var here = groHere_();
-  var fields = here ? { text: text, shop: here.slice(0, 40) } : { text: text };
+  var to = typeof shop === 'string' ? sheetOneLine_(shop).slice(0, 40) : (here ? here.slice(0, 40) : '');
+  var fields = to ? { text: text, shop: to } : { text: text };
   listsAddNew_('grocery', fields, here);
   return true;
+}
+
+// ---- F4: the shop at add time (Kevin overrides spec decision 7) ----------------------------------------------------
+// Once there is text, one sideways row of shop chips: the known shops, Any shop and New shop (a small field). The
+// pressed chip is a hand pick, else the guess: the shop on show ("In the shop"), else the learned shop for the text
+// (shopMap, folded), else Any shop. An add with no hand pick goes as before (in the shop, that shop; elsewhere no
+// shop, so it is placed by itself); a hand pick goes as the item's own shop. Used by the dock and the Add sheet.
+function groShopGuess_(text, lists, here) {
+  if (here) return sheetOneLine_(here).slice(0, 40);
+  return groShopLearned_(text, lists);
+}
+
+// The learned shop for a text (shopMap, folded), or ''. F4 fix 3 (ruling): while there is one, Any shop is not offered
+// at add time (the server has no hand "none", so the item would land in the learned shop anyway), and an Any shop
+// picked earlier does not hold.
+function groShopLearned_(text, lists) {
+  var map = lists && lists.shopMap;
+  var k = foldKey_(text);
+  if (!k || !map || typeof map !== 'object') return '';
+  var v = Object.prototype.hasOwnProperty.call(map, k) ? map[k] : '';
+  return typeof v === 'string' ? sheetOneLine_(v).replace(/\s+/g, ' ').slice(0, 40).trim() : '';
+}
+
+// A hand pick that holds: any shop picked by hand, except Any shop while a shop is learned for the text (fix 3).
+function groShopHand_(pick, text, lists) {
+  return !!(pick && pick.hand && (foldKey_(pick.shop) || !groShopLearned_(text, lists)));
+}
+
+// The shop an add sends: a hand pick in its known spelling (Any shop sends none), else the shop on show, else none.
+function groShopSend_(pick, here, lists, text) {
+  if (groShopHand_(pick, text, lists)) return groShopCanon_(pick.shop, groKnownShops_(lists));
+  return here ? sheetOneLine_(here).slice(0, 40) : '';
+}
+
+// The shop chips: the 12 newest shops of the server list (as the item sheet), then the guess when it is not among them.
+function groShopList_(lists, guess) {
+  var shops = groKnownShops_({ shops: lists && lists.shops }).slice(0, 12);
+  var g = sheetOneLine_(guess).slice(0, 40);
+  if (g && !shops.some(function (n) { return foldKey_(n) === foldKey_(g); })) shops.push(g);
+  return shops;
+}
+
+// Pressed: the chip whose shop folds to the one in force (Any shop: none in force).
+function groShopIsOn_(value, on) {
+  var k = foldKey_(on);
+  return value ? k === foldKey_(value) : !k;
+}
+
+var GRO_PICK = { hand: false, shop: '', open: false, keep: null, on: null }; // the dock's Shop row (memory only)
+
+function groPickReset_() {
+  GRO_PICK = { hand: false, shop: '', open: false, keep: null, on: null };
+  if (GRO && GRO.shopName) GRO.shopName.value = '';
+}
+
+// The dock's Shop row, refilled in place (its box, the chips row and the New shop field are kept, so the sideways
+// scroll and the field's text and keyboard stay). Only while the add field has text. Called on every keystroke and
+// repaint; the dock is then placed again so it stays on the keyboard.
+function groShopPaint_() {
+  if (!GRO || !GRO.shopBox) return;
+  var text = GRO.field.value;
+  var has = !!sheetOneLine_(text);
+  GRO.shopBox.hidden = !has;
+  GRO.shopChips.textContent = '';
+  GRO.shopName.hidden = !(has && GRO_PICK.open);
+  if (has) {
+    var here = groHere_();
+    var guess = groShopGuess_(text, LISTS, here);
+    var on = groShopHand_(GRO_PICK, text, LISTS) ? GRO_PICK.shop : guess;
+    var pressed = null;
+    var chip = function (label, value) {
+      var b = groKey_(btn(GRO.shopChips, 'schip', label, function () {
+        GRO_PICK.hand = true;
+        GRO_PICK.shop = value;
+        GRO_PICK.open = false;
+        GRO.shopName.value = '';
+        GRO_FOCUS = 'field';
+        groShopPaint_();
+        GRO.field.focus({ preventScroll: true }); // straight back to the field: Enter adds
+      }), 'shop:' + (value ? foldKey_(value) : '-'));
+      b.addEventListener('mousedown', function (e) { if (e && typeof e.preventDefault === 'function') e.preventDefault(); }); // keeps the keyboard up
+      var isOn = groShopIsOn_(value, on);
+      b.setAttribute('aria-pressed', isOn ? 'true' : 'false');
+      if (isOn) pressed = b;
+    };
+    groShopList_(LISTS, guess).forEach(function (n) { chip(n, n); });
+    if (!groShopLearned_(text, LISTS)) chip('Any shop', ''); // fix 3: only when nothing is learned
+    var more = groKey_(btn(GRO.shopChips, 'sheet-newshop', 'New shop', function () {
+      if (!GRO_PICK.open) GRO_PICK.keep = { hand: GRO_PICK.hand, shop: GRO_PICK.shop }; // an emptied field gives this back
+      GRO_PICK.open = true;
+      groShopPaint_();
+      GRO.shopName.focus({ preventScroll: true });
+    }), 'shop:new');
+    more.setAttribute('aria-expanded', GRO_PICK.open ? 'true' : 'false');
+    var key = pressed ? pressed.getAttribute('data-focus') : '';
+    if (pressed && key !== GRO_PICK.on && GRO_PICK.on !== null) sheetReveal_(GRO.shopChips, pressed);
+    GRO_PICK.on = key;
+  } else GRO_PICK.on = null;
+  groDockPlace_();
+}
+
+// An add from the dock (Enter in the add field or in the New shop field): the text with the Shop row's shop.
+function groDockAdd_() {
+  var f = GRO && GRO.field;
+  if (!f || !sheetOneLine_(f.value)) return;
+  var v = f.value;
+  var shop = groShopSend_(GRO_PICK, groHere_(), LISTS, v);
+  f.value = '';
+  GRO_DRAFT = '';
+  groPickReset_();
+  GRO_FOCUS = 'field';
+  groAdd_(v, shop);
+  groShopPaint_();
+  f.focus({ preventScroll: true });
 }
 
 // A2-T3: the tick says the shop the item is shown under (hand, learned or guess), so the Done row learns it.
@@ -7861,6 +8167,37 @@ function groAddBox_(root) {
   var box = add(root, 'div', 'gro-dock');
   var toasts = add(box, 'div', 'gro-dock-slot');
   var recent = add(box, 'div', 'gro-dock-slot');
+  // F4: the Shop row, above the field, only while there is text (groShopPaint_).
+  var shopBox = add(box, 'div', 'gro-shop');
+  shopBox.hidden = true;
+  add(shopBox, 'p', 'gro-label', 'Shop').setAttribute('id', 'gro-shop-label');
+  var shopChips = add(shopBox, 'div', 'gro-shop-chips');
+  shopChips.setAttribute('role', 'group');
+  shopChips.setAttribute('aria-labelledby', 'gro-shop-label');
+  var shopName = add(shopBox, 'input', 'gro-shop-input sheet-shop-input');
+  shopName.setAttribute('type', 'text');
+  shopName.setAttribute('aria-label', 'New shop');
+  shopName.setAttribute('placeholder', 'Shop name');
+  shopName.setAttribute('maxlength', '40');
+  shopName.setAttribute('autocomplete', 'off');
+  shopName.setAttribute('enterkeyhint', 'enter');
+  shopName.setAttribute('data-focus', 'shopname');
+  shopName.hidden = true;
+  shopName.addEventListener('input', function () {
+    if (sheetOneLine_(shopName.value)) {
+      GRO_PICK.hand = true;
+      GRO_PICK.shop = shopName.value;
+    } else if (GRO_PICK.keep) { // an emptied field never clears the pick; Any shop does
+      GRO_PICK.hand = GRO_PICK.keep.hand;
+      GRO_PICK.shop = GRO_PICK.keep.shop;
+    }
+    groShopPaint_();
+  });
+  shopName.addEventListener('keydown', function (e) {
+    if (!e || e.key !== 'Enter' || e.isComposing) return;
+    e.preventDefault();
+    groDockAdd_();
+  });
   // A label: a tap anywhere on the pill (the plus too) puts the cursor in the field.
   var w = add(box, 'label', 'gro-add');
   var plus = add(w, 'span', 'gro-add-plus');
@@ -7880,18 +8217,16 @@ function groAddBox_(root) {
   f.addEventListener('input', function () {
     GRO_DRAFT = f.value;
     if (GRO_NOTE) groSay_('');
+    if (!sheetOneLine_(f.value)) groPickReset_(); // F4: an emptied field starts the Shop row again
+    groShopPaint_();
   });
   // Enter adds and keeps the field focused for the next item; lists come in bursts.
   f.addEventListener('keydown', function (e) {
     if (!e || e.key !== 'Enter' || e.isComposing) return;
     e.preventDefault();
-    if (!sheetOneLine_(f.value)) return;
-    var v = f.value;
-    f.value = '';
-    GRO_DRAFT = '';
-    groAdd_(v);
+    groDockAdd_();
   });
-  return { box: box, field: f, note: note, toasts: toasts, recent: recent };
+  return { box: box, field: f, note: note, toasts: toasts, recent: recent, shopBox: shopBox, shopChips: shopChips, shopName: shopName };
 }
 
 // A1-T7: how much of the layout viewport the phone keyboard covers now, from the visual viewport (0: no keyboard).
@@ -7948,6 +8283,9 @@ function renderGroceries_(data) {
       GRO.note = a.note;
       GRO.toasts = a.toasts;
       GRO.recent = a.recent;
+      GRO.shopBox = a.shopBox; // F4
+      GRO.shopChips = a.shopChips;
+      GRO.shopName = a.shopName;
     }
   }
   if (here) { // A2-T3: In the shop: Back to all shops above the shop's name
@@ -7964,6 +8302,7 @@ function renderGroceries_(data) {
   else groMain_(main, lists, GRO.recent);
   add(body, 'div', GRO.box ? 'list-end gro-end' : 'list-end');
   listsDock_(GRO.toasts || GRO.rest);
+  groShopPaint_(); // F4: the Shop row follows the lists (it also places the dock)
   groDockPlace_();
   if (!GRO_FOCUS_EL && GRO_FOCUS === 'add' && ADD_SLOT) GRO_FOCUS_EL = ADD_SLOT; // A1-T5: back to the Add slot
   // The add field is never rebuilt, so it is never focused from here (that would raise the keyboard).
@@ -8190,6 +8529,81 @@ function groRow_(parent, it, done) {
   }), 'open:' + it.id);
   more.setAttribute('aria-label', 'Edit ' + it.text);
   more.appendChild(svgIcon_(DOTS_PATHS));
+}
+
+// F4: the Add sheet's Shop row for a new grocery item, under the text field, with the dock's rules (groShopGuess_):
+// shown once there is text, the guess pressed until a chip is tapped, New shop a small field (Enter there adds).
+// The chips are built once; one extra chip carries a guess the server list does not hold, and hides otherwise.
+function sheetGShop_(p, s) {
+  if (!s.sync) s.sync = [];
+  s.here = VIEW.screen === 'groceries' ? groHere_() : '';
+  s.gNew = false;
+  var has = function () { return SHEET === s && !!sheetOneLine_(s.draft.text); };
+  var guess = function () { return groShopGuess_(s.draft.text, LISTS, s.here); };
+  var on = function () { return groShopHand_({ hand: s.hand.shop, shop: s.draft.shop }, s.draft.text, LISTS) ? s.draft.shop : guess(); };
+  var known = groShopList_(LISTS, '');
+  var isKnown = function (v) { return !foldKey_(v) || known.some(function (n) { return foldKey_(n) === foldKey_(v); }); };
+  var row = add(p, 'div', 'sheet-row sheet-gshop');
+  add(row, 'p', 'sheet-label', 'Shop').setAttribute('id', 'sheet-gshop-label');
+  var g = sheetScrollRow_(s, add(row, 'div', 'sheet-chips sheet-scroll'));
+  g.setAttribute('role', 'group');
+  g.setAttribute('aria-labelledby', 'sheet-gshop-label');
+  var input = null;
+  var chip = function (label, value, shown) {
+    var b = sheetCtl_(s, btn(g, 'schip', label, function () {
+      if (SHEET !== s) return;
+      s.draft.shop = typeof value === 'function' ? value() : value;
+      s.hand.shop = true;
+      s.gNew = false;
+      input.value = '';
+      sheetSync_(s);
+    }), function () { return has() && (!shown || shown()); });
+    s.sync.push(function () {
+      var v = typeof value === 'function' ? value() : value;
+      if (shown) b.hidden = !shown();
+      if (typeof value === 'function' && !b.hidden) b.textContent = v;
+      b.setAttribute('aria-pressed', groShopIsOn_(v, on()) ? 'true' : 'false');
+    });
+  };
+  known.forEach(function (n) { chip(n, n); });
+  chip('', guess, function () { return !isKnown(guess()); }); // a learned shop not on the server list yet
+  chip('Any shop', '', function () { return !groShopLearned_(s.draft.text, LISTS); }); // fix 3: only when nothing is learned
+  var more = sheetCtl_(s, btn(g, 'sheet-newshop', 'New shop', function () {
+    if (SHEET !== s) return;
+    if (!s.gNew) s.gKeep = { hand: s.hand.shop, shop: s.draft.shop };
+    s.gNew = true;
+    sheetSync_(s);
+    input.focus();
+  }), has);
+  input = sheetCtl_(s, add(p, 'input', 'sheet-shop-input sheet-gshop-input'), function () { return has() && s.gNew; });
+  input.setAttribute('type', 'text');
+  input.setAttribute('aria-label', 'New shop');
+  input.setAttribute('placeholder', 'Shop name');
+  input.setAttribute('maxlength', '40');
+  input.setAttribute('autocomplete', 'off');
+  input.setAttribute('enterkeyhint', 'go');
+  input.addEventListener('input', function () {
+    if (SHEET !== s) return;
+    if (sheetOneLine_(input.value)) {
+      s.draft.shop = input.value;
+      s.hand.shop = true;
+    } else if (s.gKeep) { // an emptied field never clears the pick; Any shop does
+      s.draft.shop = s.gKeep.shop;
+      s.hand.shop = s.gKeep.hand;
+    }
+    sheetSync_(s);
+  });
+  input.addEventListener('keydown', function (e) {
+    if (e && e.key === 'Enter' && !e.isComposing && SHEET === s) {
+      e.preventDefault();
+      sheetAdd_(s);
+    }
+  });
+  s.sync.push(function () {
+    row.hidden = !has();
+    more.setAttribute('aria-expanded', s.gNew ? 'true' : 'false');
+    input.hidden = !(has() && s.gNew);
+  });
 }
 
 // The edit sheet's Shop part (called by sheetBuild_, for an item on the list): a chip for each of the 12 newest
