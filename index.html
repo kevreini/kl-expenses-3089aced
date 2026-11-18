@@ -1090,7 +1090,8 @@
     cursor: text;
   }
   .gro-add:focus-within { box-shadow: 0 6px 16px rgba(58, 34, 19, 0.13), 0 0 0 2px var(--action); }
-  .gro-add-plus { flex: none; display: flex; align-items: center; justify-content: center; width: 32px; height: 32px; border-radius: 50%; color: var(--on-action); background: var(--action); }
+  .gro-add-plus { flex: none; display: flex; align-items: center; justify-content: center; width: 44px; height: 44px; padding: 0; border: 0; border-radius: 50%; color: var(--on-action); background: var(--action); cursor: pointer; touch-action: manipulation; }
+  .gro-add-plus:focus-visible { outline: 2px solid var(--action); outline-offset: 2px; }
   .gro-add-plus .icon { width: 18px; height: 18px; color: currentColor; stroke-width: 2.5; }
   .gro-add input {
     display: block;
@@ -8198,12 +8199,24 @@ function groAddBox_(root) {
     e.preventDefault();
     groDockAdd_();
   });
-  // A label: a tap anywhere on the pill (the plus too) puts the cursor in the field.
+  // A label: a tap anywhere on the pill (except the plus) puts the cursor in the field.
   var w = add(box, 'label', 'gro-add');
-  var plus = add(w, 'span', 'gro-add-plus');
-  plus.setAttribute('aria-hidden', 'true');
+  w.setAttribute('for', 'gro-add-field'); // the pill's empty areas focus the field, never the button before it
+  var plus = add(w, 'button', 'gro-add-plus');
+  plus.setAttribute('type', 'button');
+  plus.setAttribute('aria-label', 'Add');
   plus.appendChild(svgIcon_(['M12 6v12', 'M6 12h12']));
+  // The press never takes focus from the field (the keyboard stays up on iPhone); the tap adds, like Enter.
+  function plusHold(e) { if (e && e.preventDefault) e.preventDefault(); }
+  plus.addEventListener('pointerdown', plusHold);
+  plus.addEventListener('mousedown', plusHold);
+  plus.addEventListener('click', function (e) {
+    if (e && e.preventDefault) e.preventDefault(); // inside a label: no second activation of the field
+    if (sheetOneLine_(f.value)) groDockAdd_();
+    else f.focus({ preventScroll: false });
+  });
   var f = add(w, 'input', '');
+  f.setAttribute('id', 'gro-add-field');
   f.setAttribute('type', 'text');
   f.setAttribute('aria-label', 'Add an item');
   f.setAttribute('placeholder', 'Add an item');
