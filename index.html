@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; connect-src https://script.google.com https://script.googleusercontent.com; manifest-src 'self'; img-src 'self' data:; base-uri 'none'; form-action 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; connect-src https://script.google.com https://script.googleusercontent.com; manifest-src 'self'; worker-src 'self'; img-src 'self' data:; base-uri 'none'; form-action 'none'">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="robots" content="noindex,nofollow">
 <meta name="referrer" content="no-referrer">
@@ -679,6 +679,25 @@
   .who-choice .avatar-dot { width: 52px; height: 52px; font-size: 21px; }
   .who-choice[aria-pressed="true"] { box-shadow: inset 0 0 0 2px #dc966a; }
   .who-foot { margin-top: 12px; font: var(--type-caption); color: var(--muted); text-align: center; }
+  /* Papaya push (Task 4): the Notifications row under the who choice. */
+  .push-row { margin-top: 16px; padding-top: 14px; border-top: 1px solid #efe6dc; }
+  .push-title { font-size: 15px; font-weight: 600; }
+  .push-line { margin-top: 4px; font-size: 15px; line-height: 1.4; color: var(--muted); }
+  .push-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 44px;
+    margin-top: 10px;
+    padding: 0 18px;
+    border-radius: 22px;
+    color: var(--on-action);
+    background: var(--action);
+    font-size: 15px;
+    font-weight: 600;
+  }
+  .push-btn.push-quiet { color: var(--action); background: #faf3ec; }
+  .push-btn:disabled { opacity: 0.55; cursor: default; }
 
   /* The empty state: one disc, a title, a line. */
   .empty { display: flex; flex-direction: column; align-items: center; text-align: center; padding: 40px 16px 16px; }
@@ -1966,6 +1985,8 @@ function lockOut() {
   TOKEN = null;
   closeItemSheet_('lock'); // Task 7: an open edit goes into the queue, sent after the unlock (A3-T2A: a new item is not added)
   whoShut_();
+  PUSH_BUSY = false; // Papaya push: a late reply from before the lock-out is ignored (SESSION moved on)
+  PUSH_NOTE = '';
   QA_DRAFT = null; // A1-T5: an unsaved expense goes with the session; a queued one stays for after the PIN
   // A1 final fix 3: so does one kept as 'unsaved' in kl.kept; refused ones stay, as the queue does.
   if (qaKept_().some(function (e) { return e.why === 'unsaved'; })) {
@@ -3968,6 +3989,7 @@ function openSession_() {
   listsFlush_();
   // fix round 1: an expense the server refused earlier still waits in Add (A3-T2A: else a kept to-do or item)
   qaKeptToast_(qaKeptNext_('expense') ? 'expense' : (qaKeptNext_('todo') ? 'todo' : 'grocery'));
+  pushResync_(); // Papaya push: at most once a day per phone
 }
 
 // Writes kl.tab only when it changes, so a Money-only visit stores nothing new.
@@ -4467,6 +4489,12 @@ function listsBody_(op) {
   }
   if (op.op === 'edit' || op.op === 'tick' || op.op === 'delete') b.fp = op.fp;
   if (op.op === 'add' || op.op === 'edit' || op.op === 'pause') b.fields = op.fields || {};
+  // Papaya push: an edit names this phone (Kev or Lili, only when known) beside fields, so a change to Important
+  // tells the other partner. Never inside fields, never null.
+  if (op.op === 'edit') {
+    var me = whoAmI_();
+    if (me === 'Kev' || me === 'Lili') b.from = me;
+  }
   // A2-T3: a grocery tick says the shop the item was shown under, so the Done row learns it (older servers ignore it).
   if (op.op === 'tick' && op.fields && typeof op.fields.shop === 'string' && op.fields.shop) b.fields = { shop: op.fields.shop };
   return b;
@@ -4816,6 +4844,7 @@ function openWhoSheet_() {
     var b = btn(row, 'who-choice', null, function () {
       setWhoAmI_(name);
       closeWhoSheet_();
+      pushResync_(); // Papaya push: a subscribed phone with a new person tells the server
     });
     b.setAttribute('aria-pressed', me === name ? 'true' : 'false');
     add(b, 'span', 'avatar-dot avatar-' + name.toLowerCase(), name.charAt(0)).setAttribute('aria-hidden', 'true');
@@ -4823,9 +4852,14 @@ function openWhoSheet_() {
     WHO_CTLS.push(b);
   });
   add(p, 'p', 'who-foot', 'Change it any time: tap your letter, top right.');
+  PUSH_NOTE = '';
+  PUSH_ROW = add(p, 'div', 'push-row');
+  PUSH_ROW.setAttribute('aria-live', 'polite');
+  pushPaint_();
   root.hidden = false;
   sheetInert_(true);
   p.focus({ preventScroll: true });
+  pushCheck_();
 }
 
 // Closes the sheet with nothing on screen changed but the avatar; focus goes back to it.
@@ -4841,6 +4875,10 @@ function whoShut_() {
   if (!WHO_OPEN) return;
   WHO_OPEN = false;
   WHO_CTLS = [];
+  PUSH_ROW = null;
+  PUSH_BTN = null;
+  PUSH_REFOCUS = false;
+  PUSH_CHECK_N++;
   var root = $('who');
   root.textContent = '';
   root.hidden = true;
@@ -4854,13 +4892,321 @@ function whoKey_(e) {
     closeWhoSheet_();
     return;
   }
-  // Tab stays on the two choices.
-  if (e.key !== 'Tab' || WHO_CTLS.length < 2) return;
+  // Tab stays on the two choices and the Notifications button when it shows.
+  var ctls = WHO_CTLS.concat(PUSH_BTN && !PUSH_BTN.disabled ? [PUSH_BTN] : []);
+  if (e.key !== 'Tab' || ctls.length < 2) return;
   e.preventDefault();
-  var i = WHO_CTLS.indexOf(e.target);
-  // From the panel itself: Tab goes to the first choice, Shift+Tab to the last.
-  if (i < 0) WHO_CTLS[e.shiftKey ? 1 : 0].focus();
-  else WHO_CTLS[i === 0 ? 1 : 0].focus();
+  var n = ctls.length;
+  var i = ctls.indexOf(e.target);
+  // From the panel itself: Tab goes to the first control, Shift+Tab to the last.
+  if (i < 0) ctls[e.shiftKey ? n - 1 : 0].focus();
+  else ctls[(i + (e.shiftKey ? n - 1 : 1)) % n].focus();
+}
+
+// ---- Papaya push (Task 4): the Notifications row in the who sheet ---------------------------------------
+// sw.js, next to the page, shows the pushes. Permission is asked only from the Allow tap (iOS asks only then,
+// and only in the home-screen app). The subscription goes to the dashboard (pushSubscribe) with this phone's
+// person. A granted phone sends it again at start at most once a day; kl.push notes the last one the server took,
+// and "On for this phone" means a subscription the server took.
+var LS_PUSH = 'kl.push'; // {day, person, endpoint}
+var PUSH_SENT;           // memory copy of kl.push: undefined until read, then null or the note
+var PUSH_REG = null;     // the register() promise, made once at start
+var PUSH_ROW = null;     // the row in the open who sheet
+var PUSH_BTN = null;     // its button, for the Tab loop
+var PUSH_ON = null;      // true or false once checked, null before the first check
+var PUSH_BUSY = false;   // 'on' or 'off' while an Allow or a Turn off is on its way
+var PUSH_NOTE = '';      // the line after a failed try
+var PUSH_CHECK_N = 0;    // a newer check (or a closed sheet) makes an older answer moot
+var PUSH_REFOCUS = false; // focus went to the panel while busy; it goes back to the row button when done
+var PUSH_SOON = 'Notifications start in a few minutes. Try again soon.';
+var PUSH_FAIL = 'Could not turn on notifications. Try again.';
+var PUSH_OFF_FAIL = 'Could not turn off notifications. Try again.';
+
+function pushSw_() {
+  var nav = window.navigator;
+  return nav && ('serviceWorker' in nav) && nav.serviceWorker ? nav.serviceWorker : null;
+}
+
+// Once, at start, only when the browser has service workers. No session needed.
+function pushRegister_() {
+  var sw = pushSw_();
+  if (!sw || PUSH_REG || typeof sw.register !== 'function') return;
+  try {
+    PUSH_REG = sw.register('sw.js', { scope: './' });
+    if (PUSH_REG && typeof PUSH_REG.then === 'function') PUSH_REG.then(null, function () {});
+    else PUSH_REG = null;
+  } catch (e) {
+    PUSH_REG = null;
+  }
+}
+
+// The active registration, as a promise; null when there is none to wait for.
+function pushReady_() {
+  var sw = pushSw_();
+  pushRegister_();
+  if (!sw || !PUSH_REG || !sw.ready) return null;
+  return PUSH_REG.then(function () { return sw.ready; });
+}
+
+function pushStandalone_() {
+  var nav = window.navigator;
+  if (nav && nav.standalone === true) return true;
+  try {
+    return !!(window.matchMedia && window.matchMedia('(display-mode: standalone)').matches);
+  } catch (e) {
+    return false;
+  }
+}
+
+// Push works here: a service worker, PushManager and Notification, in the home-screen app.
+function pushSupported_() {
+  return !!(pushSw_() && window.PushManager && window.Notification && pushStandalone_());
+}
+
+function pushPermission_() {
+  try { return String(window.Notification.permission); } catch (e) { return 'default'; }
+}
+
+function pushToday_() {
+  var d = new Date();
+  return d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate());
+}
+
+function pushNote_() {
+  if (PUSH_SENT === undefined) {
+    var n = lsJson_(LS_PUSH);
+    PUSH_SENT = n && typeof n === 'object' && typeof n.endpoint === 'string' ? n : null;
+  }
+  return PUSH_SENT;
+}
+
+function pushNoteSet_(v) {
+  PUSH_SENT = v;
+  if (v) lsSet_(LS_PUSH, JSON.stringify(v));
+  else lsDel_(LS_PUSH);
+}
+
+// The server's public key (base64url of 65 bytes, an uncompressed P-256 point) as bytes; null for anything else.
+function pushKeyBytes_(key) {
+  if (typeof key !== 'string' || !/^[A-Za-z0-9_-]{87}$/.test(key)) return null;
+  var raw;
+  try {
+    raw = atob(key.replace(/-/g, '+').replace(/_/g, '/') + '=');
+  } catch (e) {
+    return null;
+  }
+  if (raw.length !== 65 || raw.charCodeAt(0) !== 4) return null;
+  var out = new Uint8Array(65);
+  for (var i = 0; i < 65; i++) out[i] = raw.charCodeAt(i);
+  return out;
+}
+
+// What the server takes: {endpoint, keys: {p256dh, auth}}; null when the subscription has no such parts.
+function pushSubBody_(sub) {
+  var j = null;
+  try { j = sub && typeof sub.toJSON === 'function' ? sub.toJSON() : null; } catch (e) { j = null; }
+  var keys = j && j.keys;
+  if (!j || typeof j.endpoint !== 'string' || !keys || typeof keys.p256dh !== 'string' || typeof keys.auth !== 'string') return null;
+  return { endpoint: j.endpoint, keys: { p256dh: keys.p256dh, auth: keys.auth } };
+}
+
+function pushIsOn_(sub) {
+  var b = pushSubBody_(sub);
+  var note = pushNote_();
+  return !!(b && note && note.endpoint === b.endpoint);
+}
+
+// The row, from the state: no support, blocked, no person yet, on, or the Allow button.
+function pushPaint_() {
+  var row = PUSH_ROW;
+  if (!row) return;
+  var panel = row.parentNode;
+  var a = document.activeElement;
+  var had = (!!PUSH_BTN && a === PUSH_BTN) || (PUSH_REFOCUS && a === panel);
+  PUSH_REFOCUS = false;
+  row.textContent = '';
+  PUSH_BTN = null;
+  add(row, 'h3', 'push-title', 'Notifications');
+  var me = whoAmI_();
+  if (!pushSupported_()) add(row, 'p', 'push-line', 'Add Papaya to your home screen to get notifications.');
+  else if (pushPermission_() === 'denied') add(row, 'p', 'push-line', 'Notifications are blocked for Papaya in iPhone Settings.');
+  else if (me !== 'Kev' && me !== 'Lili') add(row, 'p', 'push-line', 'Pick who uses this phone first.');
+  else if (PUSH_BUSY === 'off' || (PUSH_ON === true && PUSH_BUSY !== 'on')) {
+    add(row, 'p', 'push-line', 'On for this phone');
+    if (PUSH_NOTE) add(row, 'p', 'push-line', PUSH_NOTE);
+    PUSH_BTN = btn(row, 'push-btn push-quiet', 'Turn off', pushOff_);
+  } else if (PUSH_ON !== null || PUSH_BUSY) {
+    if (PUSH_NOTE) add(row, 'p', 'push-line', PUSH_NOTE);
+    PUSH_BTN = btn(row, 'push-btn', 'Allow notifications', pushAllow_);
+  }
+  if (PUSH_BTN && PUSH_BUSY) {
+    PUSH_BTN.disabled = true;
+    PUSH_BTN.setAttribute('aria-busy', 'true');
+  }
+  // Never a disabled button: while busy the panel holds focus, and the row button gets it back when done.
+  if (had && PUSH_BTN && !PUSH_BUSY) PUSH_BTN.focus({ preventScroll: true });
+  else if (had && panel) {
+    panel.focus({ preventScroll: true });
+    PUSH_REFOCUS = !!PUSH_BUSY;
+  }
+}
+
+// Looks for this phone's subscription, then paints the row.
+function pushCheck_() {
+  var n = ++PUSH_CHECK_N;
+  var ready = pushSupported_() && pushPermission_() === 'granted' ? pushReady_() : null;
+  if (!ready) {
+    PUSH_ON = false;
+    pushPaint_();
+    return;
+  }
+  ready.then(function (reg) { return reg.pushManager.getSubscription(); }).then(function (sub) {
+    if (n !== PUSH_CHECK_N) return;
+    PUSH_ON = pushIsOn_(sub);
+    pushPaint_();
+  }, function () {
+    if (n !== PUSH_CHECK_N) return;
+    PUSH_ON = false;
+    pushPaint_();
+  });
+}
+
+function pushFinish_(note) {
+  PUSH_BUSY = false;
+  PUSH_NOTE = note || '';
+  pushCheck_();
+}
+
+function pushFailed_(err) {
+  if (err && err.code === 'NO_SESSION') {
+    lockOut();
+    return;
+  }
+  pushFinish_(unreached(err) ? REACH_TEXT : PUSH_FAIL);
+}
+
+// The Allow tap. The ask comes first, inside the tap, before anything else waits; then the key, the
+// subscription, and the server.
+function pushAllow_() {
+  var me = whoAmI_();
+  if (PUSH_BUSY || !pushSupported_() || (me !== 'Kev' && me !== 'Lili')) return;
+  var asked = null;
+  try { asked = window.Notification.requestPermission(); } catch (e) { asked = null; }
+  var s = SESSION;
+  PUSH_BUSY = 'on';
+  PUSH_NOTE = '';
+  pushPaint_();
+  if (!asked || typeof asked.then !== 'function') {
+    pushFinish_(PUSH_FAIL);
+    return;
+  }
+  asked.then(function (perm) {
+    if (SESSION !== s) return;
+    if (perm !== 'granted') {
+      pushFinish_(''); // blocked: the Settings line; dismissed: the button again
+      return;
+    }
+    pushAskKey_(s, me);
+  }, function () {
+    if (SESSION === s) pushFinish_(PUSH_FAIL);
+  });
+}
+
+function pushAskKey_(s, me) {
+  listsCall_('pushKey', {}).then(function (r) {
+    if (SESSION !== s) return;
+    var key = r && r.ok ? pushKeyBytes_(r.key) : null;
+    if (!key) {
+      pushFinish_(r && r.ok ? PUSH_SOON : PUSH_FAIL); // the bot makes the key on its first run
+      return;
+    }
+    pushSubscribeWith_(s, me, key);
+  }, function (err) {
+    if (SESSION === s) pushFailed_(err);
+  });
+}
+
+function pushSubscribeWith_(s, me, key) {
+  var ready = pushReady_();
+  if (!ready) {
+    pushFinish_(PUSH_FAIL);
+    return;
+  }
+  ready.then(function (reg) {
+    return reg.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey: key });
+  }).then(function (sub) {
+    if (SESSION !== s) return;
+    var body = pushSubBody_(sub);
+    if (!body) {
+      pushFinish_(PUSH_FAIL);
+      return;
+    }
+    pushSend_(s, me, body, true);
+  }, function () {
+    if (SESSION === s) pushFinish_(PUSH_FAIL);
+  });
+}
+
+// Sends this phone's subscription for me. loud: the Allow tap, and the row says how it went; otherwise the
+// quiet re-sync, whose failures say nothing (the next start tries again).
+function pushSend_(s, me, body, loud) {
+  listsCall_('pushSubscribe', { person: me, subscription: body }).then(function (r) {
+    if (SESSION !== s) return;
+    var ok = !!(r && r.ok);
+    if (ok) pushNoteSet_({ day: pushToday_(), person: me, endpoint: body.endpoint });
+    if (loud) pushFinish_(ok ? '' : PUSH_FAIL);
+    else if (WHO_OPEN && !PUSH_BUSY) pushCheck_();
+  }, function (err) {
+    if (SESSION === s && loud) pushFailed_(err);
+  });
+}
+
+// At start (and after a new person is picked): a granted phone with a subscription sends it again, at most once
+// a day, or at once when the person or the endpoint changed. Never asks.
+function pushResync_() {
+  var me = whoAmI_();
+  if (!TOKEN || PUSH_BUSY || !pushSupported_() || pushPermission_() !== 'granted' || (me !== 'Kev' && me !== 'Lili')) return;
+  var ready = pushReady_();
+  if (!ready) return;
+  var s = SESSION;
+  ready.then(function (reg) { return reg.pushManager.getSubscription(); }).then(function (sub) {
+    var body = pushSubBody_(sub);
+    var note = pushNote_();
+    if (SESSION !== s || !body || PUSH_BUSY) return;
+    if (note && note.day === pushToday_() && note.person === me && note.endpoint === body.endpoint) return;
+    pushSend_(s, me, body, false);
+  }, function () {});
+}
+
+// The Turn off tap: the subscription goes on the phone first, then the server is told.
+function pushOff_() {
+  if (PUSH_BUSY) return;
+  var ready = pushReady_();
+  if (!ready) return;
+  var s = SESSION;
+  PUSH_BUSY = 'off';
+  PUSH_NOTE = '';
+  pushPaint_();
+  ready.then(function (reg) { return reg.pushManager.getSubscription(); }).then(function (sub) {
+    if (!sub) return '';
+    var ep = typeof sub.endpoint === 'string' ? sub.endpoint : '';
+    return sub.unsubscribe().then(function () { return ep; });
+  }).then(function (ep) {
+    pushNoteSet_(null);
+    if (SESSION !== s) return;
+    pushFinish_('');
+    if (ep) pushDrop_(s, ep);
+  }, function () {
+    if (SESSION === s) pushFinish_(PUSH_OFF_FAIL);
+  });
+}
+
+// The phone is off already. If this never lands, the bot drops the endpoint at its next push (gone at the
+// push service).
+function pushDrop_(s, ep) {
+  listsCall_('pushUnsubscribe', { endpoint: ep }).then(function () {}, function (err) {
+    if (SESSION === s && err && err.code === 'NO_SESSION') lockOut();
+  });
 }
 
 // True when there are no lists to show yet; it says why in parent.
@@ -8742,6 +9088,7 @@ window.addEventListener('popstate', sheetPopState_);
 window.addEventListener('pagehide', function () { if (SHEET) closeItemSheet_('hide'); });
 
 listsQueueInit_();
+pushRegister_(); // Papaya push: sw.js, scope ./, only when the browser has service workers
 TOKEN = stored();
 if (TOKEN) openSession_();
 else showCover('gate', '');
